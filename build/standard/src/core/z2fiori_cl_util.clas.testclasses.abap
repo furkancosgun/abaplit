@@ -10,7 +10,8 @@ ENDCLASS.
 
 CLASS ltcl_util IMPLEMENTATION.
   METHOD test_utf8_roundtrip.
-    DATA(lv_xstr) = z2fiori_cl_util=>string_to_xstring_utf8( 'abc' ).
+    DATA lv_xstr TYPE xstring.
+    lv_xstr = z2fiori_cl_util=>string_to_xstring_utf8( 'abc' ).
     cl_abap_unit_assert=>assert_equals( exp = '616263'
                                         act = lv_xstr ).
 
@@ -19,7 +20,8 @@ CLASS ltcl_util IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD test_base64_roundtrip.
-    DATA(lv_b64) = z2fiori_cl_util=>string_to_base64( 'Hello abap2fiori' ).
+    DATA lv_b64 TYPE string.
+    lv_b64 = z2fiori_cl_util=>string_to_base64( 'Hello abap2fiori' ).
     cl_abap_unit_assert=>assert_equals( exp = 'SGVsbG8gYWJhcDJmaW9yaQ=='
                                         act = lv_b64 ).
 
@@ -28,7 +30,8 @@ CLASS ltcl_util IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD test_unicode_base64.
-    DATA(lv_text) = z2fiori_cl_util=>xstring_to_string_utf8( 'C3A4C3B6C3BC' ).
+    DATA lv_text TYPE string.
+    lv_text = z2fiori_cl_util=>xstring_to_string_utf8( 'C3A4C3B6C3BC' ).
 
     cl_abap_unit_assert=>assert_not_initial( lv_text ).
     cl_abap_unit_assert=>assert_equals( exp = lv_text

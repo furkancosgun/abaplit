@@ -21,12 +21,13 @@ CLASS lcl_test_app_1 IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD z2fiori_if_app~main.
-    IF client->check_event( 'INCREMENT' ).
-      ms_state-count += 1.
+    IF client->check_event( 'INCREMENT' ) IS NOT INITIAL.
+      ms_state-count = ms_state-count + 1.
       client->toast_display( |Count: { ms_state-count }| ).
     ENDIF.
 
-    DATA(lo_view) = z2fiori_cl_view_builder=>factory( )->ele( n  = 'View'
+    DATA lo_view TYPE REF TO z2fiori_cl_view_builder.
+    lo_view = z2fiori_cl_view_builder=>factory( )->ele( n  = 'View'
                                                               ns = 'mvc' ).
     lo_view->a( n = 'xmlns'
                 v = 'sap.m'
@@ -69,9 +70,10 @@ CLASS ltcl_client IMPLEMENTATION.
     DATA lv_unbound TYPE string.
     DATA ls_req     TYPE z2fiori_if_types=>ty_s_http_req.
 
-    DATA(lo_app) = NEW lcl_test_app_1( ).
-    DATA(lo_cut) = NEW z2fiori_cl_client( app = lo_app
-                                          req = ls_req ).
+    DATA lo_app TYPE REF TO lcl_test_app_1.
+    CREATE OBJECT lo_app TYPE lcl_test_app_1.
+    DATA lo_cut TYPE REF TO z2fiori_cl_client.
+    CREATE OBJECT lo_cut TYPE z2fiori_cl_client EXPORTING app = lo_app req = ls_req.
 
     cl_abap_unit_assert=>assert_equals( exp = '{/MS_STATE/TEXT_INPUT}'
                                         act = lo_cut->z2fiori_if_client~bind( lo_app->ms_state-text_input ) ).
@@ -92,9 +94,10 @@ CLASS ltcl_client IMPLEMENTATION.
 
     DATA ls_req    TYPE z2fiori_if_types=>ty_s_http_req.
     DATA ls_ret    TYPE ty_s_ret_test.
-    DATA ls_get    TYPE z2fiori_if_types=>ty_s_http_req.
-    DATA lt_args   TYPE string_table.
-    DATA lv_ev_str TYPE string.
+    DATA ls_get      TYPE z2fiori_if_types=>ty_s_http_req.
+    DATA lt_args     TYPE string_table.
+    DATA lt_row_args TYPE string_table.
+    DATA lv_ev_str   TYPE string.
 
     APPEND '[{"name":"mode","value":"EDIT"},{"name":"id","value":"1001"}]' TO lt_args.
     APPEND '{"system":"Desktop","browser":{"name":"Chrome","version":"120"}}' TO lt_args.
@@ -106,8 +109,10 @@ CLASS ltcl_client IMPLEMENTATION.
     ls_req-check_navigated = abap_true.
     ls_req-nav_prev_arg    = '{"id":"101","status":"SAVED"}'.
 
-    DATA(lo_cut) = NEW z2fiori_cl_client( app = NEW lcl_test_app_1( )
-                                          req = ls_req ).
+    DATA lo_cut TYPE REF TO z2fiori_cl_client.
+    DATA temp1 TYPE REF TO lcl_test_app_1.
+    CREATE OBJECT temp1 TYPE lcl_test_app_1.
+    CREATE OBJECT lo_cut TYPE z2fiori_cl_client EXPORTING app = temp1 req = ls_req.
 
     cl_abap_unit_assert=>assert_equals( exp = 'SELECT'
                                         act = lo_cut->z2fiori_if_client~get_event( ) ).
@@ -118,17 +123,20 @@ CLASS ltcl_client IMPLEMENTATION.
     cl_abap_unit_assert=>assert_equals( exp = 'EDIT'
                                         act = lo_cut->z2fiori_if_client~get_query_param( 'MODE' ) ).
 
-    DATA(lt_q) = lo_cut->z2fiori_if_client~get_query( 1 ).
+    DATA lt_q TYPE z2fiori_if_types=>ty_t_query.
+    lt_q = lo_cut->z2fiori_if_client~get_query( 1 ).
     cl_abap_unit_assert=>assert_equals( exp = 2
                                         act = lines( lt_q ) ).
 
-    DATA(ls_dev) = lo_cut->z2fiori_if_client~get_device( 2 ).
+    DATA ls_dev TYPE z2fiori_if_types=>ty_s_device.
+    ls_dev = lo_cut->z2fiori_if_client~get_device( 2 ).
     cl_abap_unit_assert=>assert_equals( exp = 'Desktop'
                                         act = ls_dev-system ).
     cl_abap_unit_assert=>assert_equals( exp = 'Chrome'
                                         act = ls_dev-browser-name ).
 
-    DATA(ls_cfg) = lo_cut->z2fiori_if_client~get_config( 3 ).
+    DATA ls_cfg TYPE z2fiori_if_types=>ty_s_config.
+    ls_cfg = lo_cut->z2fiori_if_client~get_config( 3 ).
     cl_abap_unit_assert=>assert_equals( exp = 'http://localhost:3000'
                                         act = ls_cfg-origin ).
 
@@ -140,8 +148,9 @@ CLASS ltcl_client IMPLEMENTATION.
     cl_abap_unit_assert=>assert_equals( exp = `onEvent('ROW_CLICK')`
                                         act = lv_ev_str ).
 
+    APPEND 'ID_99' TO lt_row_args.
     lv_ev_str = lo_cut->z2fiori_if_client~event( event = 'ROW_CLICK'
-                                                 t_arg = VALUE #( ( `ID_99` ) ) ).
+                                                 t_arg = lt_row_args ).
     cl_abap_unit_assert=>assert_equals( exp = `onEvent('ROW_CLICK', 'ID_99')`
                                         act = lv_ev_str ).
 
@@ -164,19 +173,23 @@ CLASS ltcl_client IMPLEMENTATION.
 
     ls_req-event = 'INCREMENT'.
 
-    DATA(lo_app) = NEW lcl_test_app_1( ).
-    DATA(lo_cut) = NEW z2fiori_cl_client( app = lo_app
-                                          req = ls_req ).
+    DATA lo_app TYPE REF TO lcl_test_app_1.
+    CREATE OBJECT lo_app TYPE lcl_test_app_1.
+    DATA lo_cut TYPE REF TO z2fiori_cl_client.
+    CREATE OBJECT lo_cut TYPE z2fiori_cl_client EXPORTING app = lo_app req = ls_req.
 
     li_app ?= lo_app.
     li_app->main( lo_cut ).
 
-    DATA(lv_view) = lo_cut->z2fiori_if_client~get_view( ).
-    DATA(lt_actions) = lo_cut->z2fiori_if_client~get_actions( ).
+    DATA lv_view TYPE string.
+    lv_view = lo_cut->z2fiori_if_client~get_view( ).
+    DATA lt_actions TYPE z2fiori_if_types=>ty_t_action.
+    lt_actions = lo_cut->z2fiori_if_client~get_actions( ).
     cl_abap_unit_assert=>assert_not_initial( lv_view ).
     cl_abap_unit_assert=>assert_not_initial( lt_actions ).
 
-    READ TABLE lt_actions INTO DATA(ls_action) INDEX 1.
+    DATA ls_action TYPE z2fiori_if_types=>ty_s_action.
+    READ TABLE lt_actions INTO ls_action INDEX 1.
     cl_abap_unit_assert=>assert_subrc( ).
     cl_abap_unit_assert=>assert_equals( exp = 'TOAST'
                                         act = ls_action-type ).
@@ -190,14 +203,17 @@ CLASS ltcl_client IMPLEMENTATION.
     lo_cut->z2fiori_if_client~follow_up_action( event    = 'REFRESH'
                                                 delay_ms = 500 ).
 
-    DATA(lo_app2) = NEW lcl_test_app_2( ).
+    DATA lo_app2 TYPE REF TO lcl_test_app_2.
+    CREATE OBJECT lo_app2 TYPE lcl_test_app_2.
     lo_cut->z2fiori_if_client~nav_call( lo_app2 ).
 
     lo_cut->z2fiori_if_client~nav_leave( '{"id":"101","status":"SAVED"}' ).
 
-    DATA(lv_b64) = z2fiori_cl_util=>string_to_base64( 'Hello ABAP Cloud' ).
+    DATA lv_b64 TYPE string.
+    lv_b64 = z2fiori_cl_util=>string_to_base64( 'Hello ABAP Cloud' ).
     cl_abap_unit_assert=>assert_not_initial( lv_b64 ).
-    DATA(lv_decoded_str) = z2fiori_cl_util=>base64_to_string( lv_b64 ).
+    DATA lv_decoded_str TYPE string.
+    lv_decoded_str = z2fiori_cl_util=>base64_to_string( lv_b64 ).
     cl_abap_unit_assert=>assert_equals( exp = 'Hello ABAP Cloud'
                                         act = lv_decoded_str ).
 
@@ -217,7 +233,8 @@ CLASS ltcl_client IMPLEMENTATION.
                                                  ctrl  = abap_true
                                                  event = 'SAVE' ).
 
-    DATA(lt_final_actions) = lo_cut->z2fiori_if_client~get_actions( ).
+    DATA lt_final_actions TYPE z2fiori_if_types=>ty_t_action.
+    lt_final_actions = lo_cut->z2fiori_if_client~get_actions( ).
     cl_abap_unit_assert=>assert_not_initial( lt_final_actions ).
   ENDMETHOD.
 ENDCLASS.

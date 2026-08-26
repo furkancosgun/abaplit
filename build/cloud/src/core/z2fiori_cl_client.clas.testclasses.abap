@@ -92,9 +92,10 @@ CLASS ltcl_client IMPLEMENTATION.
 
     DATA ls_req    TYPE z2fiori_if_types=>ty_s_http_req.
     DATA ls_ret    TYPE ty_s_ret_test.
-    DATA ls_get    TYPE z2fiori_if_types=>ty_s_http_req.
-    DATA lt_args   TYPE string_table.
-    DATA lv_ev_str TYPE string.
+    DATA ls_get      TYPE z2fiori_if_types=>ty_s_http_req.
+    DATA lt_args     TYPE string_table.
+    DATA lt_row_args TYPE string_table.
+    DATA lv_ev_str   TYPE string.
 
     APPEND '[{"name":"mode","value":"EDIT"},{"name":"id","value":"1001"}]' TO lt_args.
     APPEND '{"system":"Desktop","browser":{"name":"Chrome","version":"120"}}' TO lt_args.
@@ -140,8 +141,9 @@ CLASS ltcl_client IMPLEMENTATION.
     cl_abap_unit_assert=>assert_equals( exp = `onEvent('ROW_CLICK')`
                                         act = lv_ev_str ).
 
+    APPEND 'ID_99' TO lt_row_args.
     lv_ev_str = lo_cut->z2fiori_if_client~event( event = 'ROW_CLICK'
-                                                 t_arg = VALUE #( ( `ID_99` ) ) ).
+                                                 t_arg = lt_row_args ).
     cl_abap_unit_assert=>assert_equals( exp = `onEvent('ROW_CLICK', 'ID_99')`
                                         act = lv_ev_str ).
 

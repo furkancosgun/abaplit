@@ -69,7 +69,8 @@ CLASS z2fiori_cx_error IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD raise.
-    RAISE EXCEPTION NEW z2fiori_cx_error( message  = val
-                                          previous = previous ).
+    DATA temp1_44634bbc93 TYPE REF TO z2fiori_cx_error.
+    CREATE OBJECT temp1_44634bbc93 TYPE z2fiori_cx_error EXPORTING message = val previous = previous.
+    RAISE EXCEPTION temp1_44634bbc93.
   ENDMETHOD.
 ENDCLASS.

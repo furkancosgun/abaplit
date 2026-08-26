@@ -133,8 +133,11 @@ CLASS lcl_action_mgr IMPLEMENTATION.
       ENDIF.
     ENDIF.
 
-    APPEND VALUE #( type    = n
-                    payload = lr_data ) TO mt_actions.
+    DATA temp1 TYPE z2fiori_if_types=>ty_s_action.
+    CLEAR temp1.
+    temp1-type = n.
+    temp1-payload = lr_data.
+    APPEND temp1 TO mt_actions.
   ENDMETHOD.
 
   METHOD get_actions.
@@ -393,7 +396,7 @@ CLASS lcl_binding_resolver IMPLEMENTATION.
 
     GET REFERENCE OF val INTO lr_val.
 
-    ASSIGN mt_nodes[ dref = lr_val ] TO <fs_node>.
+    READ TABLE mt_nodes WITH KEY dref = lr_val ASSIGNING <fs_node>.
     IF sy-subrc <> 0.
       z2fiori_cx_error=>raise( 'Binding error: Variable reference not found in registered app state.' ).
     ENDIF.
@@ -410,19 +413,26 @@ CLASS lcl_binding_resolver IMPLEMENTATION.
 
     IF iv_path IS NOT INITIAL.
       GET REFERENCE OF iv_data INTO lr_data.
-      INSERT VALUE #( path = iv_path
-                      dref = lr_data ) INTO TABLE ct_node.
+      DATA temp2 TYPE lcl_binding_resolver=>ty_s_node.
+      CLEAR temp2.
+      temp2-path = iv_path.
+      temp2-dref = lr_data.
+      INSERT temp2 INTO TABLE ct_node.
     ENDIF.
 
     CASE lo_typedescr->kind.
       WHEN cl_abap_typedescr=>kind_struct.
+        DATA temp3 TYPE undefined.
+        temp3 ?= lo_typedescr.
         resolve_struct( EXPORTING iv_path = iv_path
                                   iv_data = iv_data
-                                  io_desc = CAST #( lo_typedescr )
+                                  io_desc = temp3
                         CHANGING  ct_node = ct_node ).
 
       WHEN cl_abap_typedescr=>kind_ref.
-        lo_refdescr = CAST cl_abap_refdescr( lo_typedescr ).
+        DATA temp4 TYPE REF TO cl_abap_refdescr.
+        temp4 ?= lo_typedescr.
+        lo_refdescr = temp4.
 
         CASE lo_refdescr->type_kind.
           WHEN cl_abap_typedescr=>typekind_dref.
@@ -465,7 +475,9 @@ CLASS lcl_binding_resolver IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    lo_classdescr = CAST cl_abap_classdescr( cl_abap_typedescr=>describe_by_object_ref( io_data ) ).
+    DATA temp5 TYPE REF TO cl_abap_classdescr.
+    temp5 ?= cl_abap_typedescr=>describe_by_object_ref( io_data ).
+    lo_classdescr = temp5.
     lr_object ?= io_data.
     ASSIGN lr_object TO <fs_obj>.
     IF sy-subrc <> 0.
@@ -493,13 +505,19 @@ CLASS lcl_binding_resolver IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD resolve_struct.
+    DATA lv_sub_path TYPE string.
     FIELD-SYMBOLS <fs_comp> TYPE abap_compdescr.
     FIELD-SYMBOLS <fs_any>  TYPE any.
 
     LOOP AT io_desc->components ASSIGNING <fs_comp>.
       ASSIGN COMPONENT <fs_comp>-name OF STRUCTURE iv_data TO <fs_any>.
       IF sy-subrc = 0.
-        resolve( EXPORTING iv_path = COND #( WHEN iv_path IS INITIAL THEN <fs_comp>-name ELSE |{ iv_path }/{ <fs_comp>-name }| )
+        IF iv_path IS INITIAL.
+          lv_sub_path = <fs_comp>-name.
+        ELSE.
+          lv_sub_path = |{ iv_path }/{ <fs_comp>-name }|.
+        ENDIF.
+        resolve( EXPORTING iv_path = lv_sub_path
                            iv_data = <fs_any>
                  CHANGING  ct_node = ct_node ).
       ENDIF.

@@ -6,12 +6,15 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = path.resolve(__dirname, "..");
 
-export function downportDirectory(targetDir) {
-  // Config for downporting via abaplint --fix
+export function downportDirectory(targetDir = path.join(ROOT_DIR, "build", "standard")) {
+  const configPath = path.join(targetDir, "abaplint-downport.json");
   const downportConfig = {
     global: {
-      files: `${targetDir}/**/*.*`,
-      noIssues: ["**/vendor/*", "**/z2fiori_cl_xml_view_builder.clas.abap"]
+      files: "/src/**/*.*",
+      noIssues: [
+        "/src/vendor/*",
+        "z2fiori_cl_xml_view_builder.clas.abap"
+      ]
     },
     dependencies: [
       {
@@ -24,23 +27,14 @@ export function downportDirectory(targetDir) {
       errorNamespace: "^(Z|Y|LCL_|TY_|LIF_)"
     },
     rules: {
-      downport: true,
-      parser_error: false
+      downport: true
     }
   };
 
-  const configPath = path.join(ROOT_DIR, ".temp_downport_config.json");
   fs.writeFileSync(configPath, JSON.stringify(downportConfig, null, 2), "utf-8");
 
   try {
-    // Run downport fix passes
-    for (let i = 0; i < 3; i++) {
-      try {
-        execSync(`npx abaplint --fix ${configPath}`, { cwd: ROOT_DIR, stdio: "pipe" });
-      } catch {
-        // abaplint may exit with code 1 if issues remain after pass
-      }
-    }
+    execSync(`npx abaplint --fix "${configPath}"`, { cwd: targetDir, stdio: "inherit" });
   } finally {
     if (fs.existsSync(configPath)) {
       fs.unlinkSync(configPath);

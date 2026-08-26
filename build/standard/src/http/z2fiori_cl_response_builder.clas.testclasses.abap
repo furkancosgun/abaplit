@@ -16,10 +16,12 @@ CLASS ltcl_response_builder IMPLEMENTATION.
     ls_res-state     = '{"ms_state":{"count":2}}'.
     ls_res-message   = 'ok'.
 
-    DATA(lv_json) = z2fiori_cl_response_builder=>build( ls_res ).
+    DATA lv_json TYPE string.
+    lv_json = z2fiori_cl_response_builder=>build( ls_res ).
 
     TRY.
-        DATA(lo_ajson) = z2fiori_cl_ajson=>parse( lv_json ).
+        DATA lo_ajson TYPE REF TO z2fiori_cl_ajson.
+        lo_ajson = z2fiori_cl_ajson=>parse( lv_json ).
         cl_abap_unit_assert=>assert_true( lo_ajson->get_boolean( '/success' ) ).
         cl_abap_unit_assert=>assert_equals( exp = 'ZCL_MY_APP' act = lo_ajson->get_string( '/app' ) ).
         cl_abap_unit_assert=>assert_equals( exp = '<Button text="Hi" />' act = lo_ajson->get_string( '/view' ) ).
@@ -35,10 +37,12 @@ CLASS ltcl_response_builder IMPLEMENTATION.
     ls_res-success = abap_false.
     ls_res-message = |quotes " and \\ backslash|.
 
-    DATA(lv_json) = z2fiori_cl_response_builder=>build( ls_res ).
+    DATA lv_json TYPE string.
+    lv_json = z2fiori_cl_response_builder=>build( ls_res ).
 
     TRY.
-        DATA(lo_ajson) = z2fiori_cl_ajson=>parse( lv_json ).
+        DATA lo_ajson TYPE REF TO z2fiori_cl_ajson.
+        lo_ajson = z2fiori_cl_ajson=>parse( lv_json ).
         cl_abap_unit_assert=>assert_false( lo_ajson->get_boolean( '/success' ) ).
         cl_abap_unit_assert=>assert_equals( exp = ls_res-message
                                             act = lo_ajson->get_string( '/message' ) ).

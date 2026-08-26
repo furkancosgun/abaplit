@@ -11,7 +11,8 @@ ENDCLASS.
 
 CLASS ltcl_request_parser IMPLEMENTATION.
   METHOD test_parse_valid.
-    DATA(lv_json) = '{' &&
+    DATA lv_json TYPE string.
+    lv_json = '{' &&
       '"app":"ZCL_MY_APP",' &&
       '"event":"SAVE",' &&
       '"event_args":["A","B"],' &&
@@ -19,7 +20,8 @@ CLASS ltcl_request_parser IMPLEMENTATION.
       '"check_navigated":true' &&
       '}'.
 
-    DATA(ls_req) = z2fiori_cl_request_parser=>parse( lv_json ).
+    DATA ls_req TYPE z2fiori_if_types=>ty_s_http_req.
+    ls_req = z2fiori_cl_request_parser=>parse( lv_json ).
 
     cl_abap_unit_assert=>assert_equals( exp = 'ZCL_MY_APP' act = ls_req-app ).
     cl_abap_unit_assert=>assert_equals( exp = 'SAVE'        act = ls_req-event ).

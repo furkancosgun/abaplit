@@ -185,8 +185,8 @@ ENDCLASS.
     <ICF_NAME>Z2FIORI</ICF_NAME>
     <ICFORDER>01</ICFORDER>
     <ICFHANDLER>Z2FIORI_CL_LP_HANDLER</ICFHANDLER>
-   </ICFHANDLER_TABLE>
-  </asx:values>
+   </ICFHANDLER>
+  </ICFHANDLER_TABLE>
  </asx:abap>
 </abapGit>
 `;
@@ -289,8 +289,8 @@ ${pagesXml.join("\n")}
   fs.writeFileSync(path.join(appDir, bspSicfFileName), bspSicfXml, "utf-8");
   fs.writeFileSync(path.join(appDir, ui5SicfFileName), ui5SicfXml, "utf-8");
 
-  // 9. Downport entire standard ABAP package to 7.02
-  downportDirectory(destSrcDir);
+  // 9. Downport entire standard ABAP package to 7.02 via abaplint --fix
+  downportDirectory(ONPREM_BUILD);
 
   console.log(`[abap2fiori] Standard (On-Premise) build created in ${ONPREM_BUILD}`);
 }
@@ -361,8 +361,6 @@ function buildCloud() {
 </abapGit>
 `;
   fs.writeFileSync(path.join(srvDir, "package.devc.xml"), devcSrvXml, "utf-8");
-
-  // Note: No package.devc.xml under app/ for Cloud distribution.
 
   // 5. z2fiori_cl_lp_handler (Cloud)
   const lpHandlerCloudAbap = `CLASS z2fiori_cl_lp_handler DEFINITION

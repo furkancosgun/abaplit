@@ -22,8 +22,8 @@ CLASS z2fiori_cl_client IMPLEMENTATION.
   METHOD constructor.
     mo_app     = app.
     ms_req     = req.
-    mo_actions = NEW #( ).
-    mo_binder  = NEW #( app ).
+    CREATE OBJECT mo_actions.
+    CREATE OBJECT mo_binder EXPORTING IO_APP = app.
   ENDMETHOD.
 
   METHOD z2fiori_if_client~get_view.
@@ -184,23 +184,27 @@ CLASS z2fiori_cl_client IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD z2fiori_if_client~get_query_param.
-    DATA(lt_query) = z2fiori_if_client~get_query( index ).
+    DATA lt_query TYPE z2fiori_if_types=>ty_t_query.
+    lt_query = z2fiori_if_client~get_query( index ).
     result = lcl_request_reader=>find_query_param( it_query = lt_query
                                                    name     = name ).
   ENDMETHOD.
 
   METHOD z2fiori_if_client~get_query.
-    DATA(lv_arg) = z2fiori_if_client~get_event_arg( index ).
+    DATA lv_arg TYPE string.
+    lv_arg = z2fiori_if_client~get_event_arg( index ).
     result = lcl_request_reader=>get_query( lv_arg ).
   ENDMETHOD.
 
   METHOD z2fiori_if_client~get_config.
-    DATA(lv_arg) = z2fiori_if_client~get_event_arg( index ).
+    DATA lv_arg TYPE string.
+    lv_arg = z2fiori_if_client~get_event_arg( index ).
     result = lcl_request_reader=>get_config( lv_arg ).
   ENDMETHOD.
 
   METHOD z2fiori_if_client~get_device.
-    DATA(lv_arg) = z2fiori_if_client~get_event_arg( index ).
+    DATA lv_arg TYPE string.
+    lv_arg = z2fiori_if_client~get_event_arg( index ).
     result = lcl_request_reader=>get_device( lv_arg ).
   ENDMETHOD.
 
@@ -218,9 +222,13 @@ CLASS z2fiori_cl_client IMPLEMENTATION.
 
   METHOD z2fiori_if_client~check_event.
     IF event IS INITIAL.
-      result = xsdbool( ms_req-event IS NOT INITIAL ).
+      DATA temp1 TYPE xsdboolean.
+      temp1 = boolc( ms_req-event IS NOT INITIAL ).
+      result = temp1.
     ELSE.
-      result = xsdbool( ms_req-event = event ).
+      DATA temp2 TYPE xsdboolean.
+      temp2 = boolc( ms_req-event = event ).
+      result = temp2.
     ENDIF.
   ENDMETHOD.
 

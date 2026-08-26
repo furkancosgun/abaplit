@@ -17,7 +17,8 @@ CLASS z2fiori_cl_request_parser IMPLEMENTATION.
 
     TRY.
         z2fiori_cl_ajson=>parse( json )->to_abap( EXPORTING iv_corresponding = abap_true IMPORTING ev_container = result ).
-      CATCH z2fiori_cx_ajson_error INTO DATA(lx_ajson).
+        DATA lx_ajson TYPE REF TO z2fiori_cx_ajson_error.
+      CATCH z2fiori_cx_ajson_error INTO lx_ajson.
         z2fiori_cx_error=>raise( val      = 'Invalid JSON request payload.'
                                  previous = lx_ajson ).
     ENDTRY.

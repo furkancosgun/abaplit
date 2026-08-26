@@ -31,15 +31,18 @@ ENDCLASS.
 
 CLASS z2fiori_cl_http_handler IMPLEMENTATION.
   METHOD factory_onprem.
-    DATA(lo_service) = NEW z2fiori_cl_http_onprem( server = server ).
-    DATA(lo_handler) = NEW z2fiori_cl_http_handler( lo_service ).
+    DATA lo_service TYPE REF TO z2fiori_cl_http_onprem.
+    CREATE OBJECT lo_service TYPE z2fiori_cl_http_onprem EXPORTING server = server.
+    DATA lo_handler TYPE REF TO z2fiori_cl_http_handler.
+    CREATE OBJECT lo_handler TYPE z2fiori_cl_http_handler EXPORTING HTTP = lo_service.
     lo_handler->serve( ).
   ENDMETHOD.
 
   METHOD factory_cloud.
-    DATA(lo_service) = NEW z2fiori_cl_http_cloud( request  = request
-                                                  response = response ).
-    DATA(lo_handler) = NEW z2fiori_cl_http_handler( lo_service ).
+    DATA lo_service TYPE REF TO z2fiori_cl_http_cloud.
+    CREATE OBJECT lo_service TYPE z2fiori_cl_http_cloud EXPORTING request = request response = response.
+    DATA lo_handler TYPE REF TO z2fiori_cl_http_handler.
+    CREATE OBJECT lo_handler TYPE z2fiori_cl_http_handler EXPORTING HTTP = lo_service.
     lo_handler->serve( ).
   ENDMETHOD.
 
@@ -65,9 +68,11 @@ CLASS z2fiori_cl_http_handler IMPLEMENTATION.
     DATA ls_res TYPE z2fiori_if_types=>ty_s_http_res.
 
     TRY.
-        DATA(ls_req) = z2fiori_cl_request_parser=>parse( mo_http->get_text( ) ).
+        DATA ls_req TYPE z2fiori_if_types=>ty_s_http_req.
+        ls_req = z2fiori_cl_request_parser=>parse( mo_http->get_text( ) ).
         ls_res = z2fiori_cl_app_runner=>run( ls_req ).
-      CATCH cx_root INTO DATA(lx_err).
+        DATA lx_err TYPE REF TO cx_root.
+      CATCH cx_root INTO lx_err.
         CLEAR ls_res.
         ls_res-success = abap_false.
         ls_res-message = lx_err->get_text( ).

@@ -85,7 +85,11 @@ CLASS z2fiori_cl_state_codec IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD public_attribute_names.
-    LOOP AT descriptor( app )->attributes ASSIGNING FIELD-SYMBOL(<ls_attr>)
+    DATA lo_desc TYPE REF TO cl_abap_classdescr.
+    FIELD-SYMBOLS <ls_attr> TYPE abap_attrdescr.
+
+    lo_desc = descriptor( app ).
+    LOOP AT lo_desc->attributes ASSIGNING <ls_attr>
          WHERE visibility   = cl_abap_classdescr=>public
                AND is_interface = abap_false
                AND is_class     = abap_false

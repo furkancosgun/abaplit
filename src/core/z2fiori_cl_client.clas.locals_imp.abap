@@ -493,13 +493,19 @@ CLASS lcl_binding_resolver IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD resolve_struct.
+    DATA lv_sub_path TYPE string.
     FIELD-SYMBOLS <fs_comp> TYPE abap_compdescr.
     FIELD-SYMBOLS <fs_any>  TYPE any.
 
     LOOP AT io_desc->components ASSIGNING <fs_comp>.
       ASSIGN COMPONENT <fs_comp>-name OF STRUCTURE iv_data TO <fs_any>.
       IF sy-subrc = 0.
-        resolve( EXPORTING iv_path = COND #( WHEN iv_path IS INITIAL THEN <fs_comp>-name ELSE |{ iv_path }/{ <fs_comp>-name }| )
+        IF iv_path IS INITIAL.
+          lv_sub_path = <fs_comp>-name.
+        ELSE.
+          lv_sub_path = |{ iv_path }/{ <fs_comp>-name }|.
+        ENDIF.
+        resolve( EXPORTING iv_path = lv_sub_path
                            iv_data = <fs_any>
                  CHANGING  ct_node = ct_node ).
       ENDIF.

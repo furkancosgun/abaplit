@@ -5,7 +5,7 @@ CLASS lcl_binding_resolver DEFINITION FINAL.
         path TYPE string,
         dref TYPE REF TO data,
       END OF ty_s_node.
-    TYPES ty_t_nodes TYPE STANDARD TABLE OF ty_s_node WITH EMPTY KEY.
+    TYPES ty_t_nodes TYPE STANDARD TABLE OF ty_s_node WITH DEFAULT KEY.
 
     METHODS constructor
       IMPORTING
