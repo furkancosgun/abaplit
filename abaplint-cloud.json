@@ -1,0 +1,28 @@
+{
+  "global": {
+    "files": "/src/**/*.*",
+    "exclude": [],
+    "noIssues": [
+      "/src/vendor/*",
+      "z2fiori_cl_xml_view_builder.clas.abap"
+    ]
+  },
+  "dependencies": [
+    {
+      "folder": "/deps/open-abap-core",
+      "files": "/src/**/*.*"
+    }
+  ],
+  "syntax": {
+    "version": "Cloud",
+    "errorNamespace": "^(Z|Y|LCL_|TY_|LIF_)"
+  },
+  "rules": {
+    "7bit_ascii": true,
+    "abapdoc": false,
+    "parser_error": true,
+    "unknown_types": true,
+    "cloud_types": true,
+    "obsolete_statement": true
+  }
+}

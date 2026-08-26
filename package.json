@@ -7,21 +7,15 @@
   },
   "scripts": {
     "clean": "node scripts/clean.mjs",
-    "build": "npm run clean && abap_transpile abaplint-transpiler.json && abap_transpile e2e/abaplint-transpiler.json",
-    "start": "node scripts/start.mjs",
-    "dev": "node scripts/start.mjs",
-    "start:backend": "node scripts/server.mjs",
-    "start:fiori": "ui5 serve --config app/ui5.yaml --open \"/index.html\"",
-    "build:fiori": "ui5 build --config app/ui5-local.yaml --clean-dest --dest dist",
+    "build": "npm run clean && abap_transpile abaplint-transpiler.json",
     "build:dist": "node scripts/build_dist.mjs",
     "lint": "abaplint",
     "lint:fix": "abaplint --fix",
-    "lint:e2e": "abaplint e2e/abaplint.json",
+    "lint:cloud": "abaplint abaplint-cloud.json",
+    "lint:downport": "abaplint abaplint-downport.json",
+    "downport": "node -e \"import('./scripts/downport.mjs').then(m => m.downportDirectory('src'))\"",
     "unit": "npm run build && node --expose-gc output/index.mjs",
-    "test": "npm run lint && npm run unit",
-    "test:e2e": "playwright test",
-    "generate:views": "node scripts/generate_views.mjs",
-    "pull:ajson": "node scripts/pull_ajson.mjs",
+    "test": "npm run lint && npm run lint:cloud && npm run unit",
     "deps": "git submodule update --init --recursive"
   },
   "devDependencies": {
@@ -29,10 +23,6 @@
     "@abaplint/database-sqlite": "latest",
     "@abaplint/runtime": "latest",
     "@abaplint/transpiler-cli": "latest",
-    "@playwright/test": "^1.62.1",
-    "@sap/ux-ui5-tooling": "1",
-    "@ui5/cli": "^4.0.33",
-    "abap-kit": "latest",
-    "express": "latest"
+    "abap-kit": "latest"
   }
 }

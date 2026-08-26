@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { downportDirectory } from "./downport.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = path.resolve(__dirname, "..");
@@ -74,7 +75,6 @@ function buildOnprem() {
   <asx:values>
    <DEVC>
     <CTEXT>abap2fiori Standard Root</CTEXT>
-    <PARENTCL></PARENTCL>
    </DEVC>
   </asx:values>
  </asx:abap>
@@ -148,23 +148,21 @@ ENDCLASS.
   const sicfXml = `<?xml version="1.0" encoding="utf-8"?>
 <abapGit version="v1.0.0" serializer="LCL_OBJECT_SICF" serializer_version="v1.0.0">
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
-  <asx:values>
-   <URL>/sap/bc/z2fiori/</URL>
-   <ICFSERVICE>
+  <URL>/sap/bc/z2fiori/</URL>
+  <ICFSERVICE>
+   <ICF_NAME>Z2FIORI</ICF_NAME>
+   <ORIG_NAME>z2fiori</ORIG_NAME>
+  </ICFSERVICE>
+  <ICFDOCU>
+   <ICF_NAME>Z2FIORI</ICF_NAME>
+   <ICF_LANGU>E</ICF_LANGU>
+   <ICF_DOCU>abap2fiori HTTP Service</ICF_DOCU>
+  </ICFDOCU>
+  <ICFHANDLER_TABLE>
+   <ICFHANDLER>
     <ICF_NAME>Z2FIORI</ICF_NAME>
-    <ORIG_NAME>z2fiori</ORIG_NAME>
-   </ICFSERVICE>
-   <ICFDOCU>
-    <ICF_NAME>Z2FIORI</ICF_NAME>
-    <ICF_LANGU>E</ICF_LANGU>
-    <ICF_DOCU>abap2fiori HTTP Service</ICF_DOCU>
-   </ICFDOCU>
-   <ICFHANDLER_TABLE>
-    <ICFHANDLER>
-     <ICF_NAME>Z2FIORI</ICF_NAME>
-     <ICFORDER>01</ICFORDER>
-     <ICFHANDLER>Z2FIORI_CL_LP_HANDLER</ICFHANDLER>
-    </ICFHANDLER>
+    <ICFORDER>01</ICFORDER>
+    <ICFHANDLER>Z2FIORI_CL_LP_HANDLER</ICFHANDLER>
    </ICFHANDLER_TABLE>
   </asx:values>
  </asx:abap>
@@ -273,6 +271,9 @@ ${pagesXml.join("\n")}
   fs.writeFileSync(path.join(appDir, bspSicfFileName), bspSicfXml, "utf-8");
   fs.writeFileSync(path.join(appDir, ui5SicfFileName), ui5SicfXml, "utf-8");
 
+  // Perform downport if needed
+  downportDirectory(ONPREM_BUILD);
+
   console.log(`[abap2fiori] Standard (On-Premise) build created in ${ONPREM_BUILD}`);
 }
 
@@ -307,7 +308,6 @@ function buildCloud() {
   <asx:values>
    <DEVC>
     <CTEXT>abap2fiori Cloud Root</CTEXT>
-    <PARENTCL></PARENTCL>
    </DEVC>
   </asx:values>
  </asx:abap>
@@ -329,19 +329,7 @@ function buildCloud() {
 `;
   fs.writeFileSync(path.join(srvDir, "package.devc.xml"), devcSrvXml, "utf-8");
 
-  // package.devc.xml (app)
-  const devcAppXml = `<?xml version="1.0" encoding="utf-8"?>
-<abapGit version="v1.0.0" serializer="LCL_OBJECT_DEVC" serializer_version="v1.0.0">
- <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
-  <asx:values>
-   <DEVC>
-    <CTEXT>abap2fiori Application</CTEXT>
-   </DEVC>
-  </asx:values>
- </asx:abap>
-</abapGit>
-`;
-  fs.writeFileSync(path.join(appDir, "package.devc.xml"), devcAppXml, "utf-8");
+  // Note: No package.devc.xml under app/ for Cloud distribution as per specification.
 
   // z2fiori_cl_lp_handler (Cloud)
   const lpHandlerCloudAbap = `CLASS z2fiori_cl_lp_handler DEFINITION

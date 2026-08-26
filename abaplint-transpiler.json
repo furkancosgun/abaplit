@@ -15,10 +15,6 @@
     "ignoreSyntaxCheck": false,
     "addFilenames": true,
     "addCommonJS": true,
-    "unknownTypes": "compileError",
-    "setup": {
-      "filename": "../scripts/setup.mjs",
-      "preFunction": "setup"
-    }
+    "unknownTypes": "compileError"
   }
 }
