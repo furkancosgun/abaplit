@@ -5,7 +5,7 @@ sap.ui.define([
 
   let csrfToken = null;
 
-  return {
+  const HttpClient = {
     buildPayload({ event = "", args = [], checkInit = false, state } = {}) {
       const cleanArgs = (Array.isArray(args) ? args : [])
         .filter((a) => a !== undefined && !(a && typeof a.getSource === "function"))
@@ -47,7 +47,7 @@ sap.ui.define([
           headers: { "X-CSRF-Token": "Fetch" }
         });
         const token = res.headers.get("x-csrf-token") || res.headers.get("X-CSRF-Token");
-        if (token) this.setCsrfToken(token);
+        if (token) HttpClient.setCsrfToken(token);
         return token;
       } catch {
         return null;
@@ -68,11 +68,11 @@ sap.ui.define([
       });
 
       const returnedToken = response.headers.get("x-csrf-token") || response.headers.get("X-CSRF-Token");
-      if (returnedToken) this.setCsrfToken(returnedToken);
+      if (returnedToken) HttpClient.setCsrfToken(returnedToken);
 
       if (response.status === 403 && retryOn403) {
-        await this.fetchCsrfToken();
-        return await this.post(payload, false);
+        await HttpClient.fetchCsrfToken();
+        return await HttpClient.post(payload, false);
       }
 
       if (!response.ok) {
@@ -82,4 +82,6 @@ sap.ui.define([
       return await response.json();
     }
   };
+
+  return HttpClient;
 });
