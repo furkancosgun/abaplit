@@ -225,6 +225,52 @@ ${pagesXml.join("\n")}
 </abapGit>
 `;
   fs.writeFileSync(path.join(frontendDir, "z2fiori.wapa.xml"), wapaXml, "utf-8");
+
+  // Frontend BSP SICF nodes (both /sap/bc/bsp/sap/z2fiori/ and /sap/bc/ui5_ui5/sap/z2fiori/)
+  const bspSicfXml = `<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_SICF" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <URL>/sap/bc/bsp/sap/z2fiori/</URL>
+   <ICFSERVICE>
+    <ICF_NAME>Z2FIORI</ICF_NAME>
+    <ORIG_NAME>z2fiori</ORIG_NAME>
+   </ICFSERVICE>
+   <ICFDOCU>
+    <ICF_NAME>Z2FIORI</ICF_NAME>
+    <ICF_LANGU>E</ICF_LANGU>
+    <ICF_DOCU>abap2fiori BSP Application</ICF_DOCU>
+   </ICFDOCU>
+  </asx:values>
+ </asx:abap>
+</abapGit>
+`;
+
+  const ui5SicfXml = `<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_SICF" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <URL>/sap/bc/ui5_ui5/sap/z2fiori/</URL>
+   <ICFSERVICE>
+    <ICF_NAME>Z2FIORI</ICF_NAME>
+    <ORIG_NAME>z2fiori</ORIG_NAME>
+   </ICFSERVICE>
+   <ICFDOCU>
+    <ICF_NAME>Z2FIORI</ICF_NAME>
+    <ICF_LANGU>E</ICF_LANGU>
+    <ICF_DOCU>abap2fiori UI5 Application</ICF_DOCU>
+   </ICFDOCU>
+  </asx:values>
+ </asx:abap>
+</abapGit>
+`;
+
+  const bspSicfFileName = "z2fiori".padEnd(15, " ") + "cc3e0011031e2f3f4be478dc5.sicf.xml";
+  const ui5SicfFileName = "z2fiori".padEnd(15, " ") + "0ec96042f38e7e75ceadd96a5.sicf.xml";
+
+  fs.writeFileSync(path.join(frontendDir, bspSicfFileName), bspSicfXml, "utf-8");
+  fs.writeFileSync(path.join(frontendDir, ui5SicfFileName), ui5SicfXml, "utf-8");
+
   console.log(`[abap2fiori] Standard (On-Premise) build created in ${ONPREM_BUILD}`);
 }
 
