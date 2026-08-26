@@ -156,3 +156,10 @@ run("git push origin cloud --force");
 console.log(`[abap2fiori] Cloud branch deployed (${cldCommit.substring(0, 7)})`);
 
 console.log("\n🎉 All tests passed across all branches! Distribution deployed successfully.");
+
+console.log("\n=== Step 8: Cleaning Up Build Directory ===");
+const buildDir = path.join(ROOT_DIR, "build");
+if (fs.existsSync(buildDir)) {
+  fs.rmSync(buildDir, { recursive: true, force: true });
+  console.log("[abap2fiori] build/ directory removed.");
+}

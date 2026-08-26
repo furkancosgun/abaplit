@@ -30,6 +30,10 @@ ENDCLASS.
 
 CLASS z2fiori_cl_state_codec IMPLEMENTATION.
   METHOD hydrate.
+    DATA lo_ajson TYPE REF TO z2fiori_cl_ajson.
+    DATA lt_names TYPE tt_names.
+    DATA lv_path  TYPE string.
+    DATA lx_err   TYPE REF TO cx_root.
     FIELD-SYMBOLS <ls_attr_val> TYPE any.
 
     IF json_state IS INITIAL OR json_state = '{}'.
@@ -37,11 +41,11 @@ CLASS z2fiori_cl_state_codec IMPLEMENTATION.
     ENDIF.
 
     TRY.
-        DATA(lo_ajson) = z2fiori_cl_ajson=>parse( json_state ).
-        DATA(lt_names) = public_attribute_names( app ).
+        lo_ajson = z2fiori_cl_ajson=>parse( json_state ).
+        lt_names = public_attribute_names( app ).
 
         LOOP AT lt_names ASSIGNING FIELD-SYMBOL(<lv_name>).
-          DATA(lv_path) = |/{ <lv_name> }|.
+          lv_path = |/{ <lv_name> }|.
 
           IF lo_ajson->exists( lv_path ) = abap_true.
             ASSIGN app->(<lv_name>) TO <ls_attr_val>.
@@ -51,18 +55,21 @@ CLASS z2fiori_cl_state_codec IMPLEMENTATION.
             ENDIF.
           ENDIF.
         ENDLOOP.
-      CATCH cx_root INTO DATA(lx_err).
+      CATCH cx_root INTO lx_err.
         z2fiori_cx_error=>raise( val      = |Failed to hydrate application state: { lx_err->get_text( ) }|
                                  previous = lx_err ).
     ENDTRY.
   ENDMETHOD.
 
   METHOD serialize.
+    DATA lo_ajson  TYPE REF TO z2fiori_cl_ajson.
+    DATA lt_names  TYPE tt_names.
+    DATA lx_ajson  TYPE REF TO z2fiori_cx_ajson_error.
     FIELD-SYMBOLS <lv_val> TYPE any.
 
     TRY.
-        DATA(lo_ajson) = z2fiori_cl_ajson=>create_empty( ).
-        DATA(lt_names) = public_attribute_names( app ).
+        lo_ajson = z2fiori_cl_ajson=>create_empty( ).
+        lt_names = public_attribute_names( app ).
 
         LOOP AT lt_names ASSIGNING FIELD-SYMBOL(<lv_name>).
           ASSIGN app->(<lv_name>) TO <lv_val>.
@@ -74,7 +81,7 @@ CLASS z2fiori_cl_state_codec IMPLEMENTATION.
         ENDLOOP.
 
         result = lo_ajson->stringify( ).
-      CATCH z2fiori_cx_ajson_error INTO DATA(lx_ajson).
+      CATCH z2fiori_cx_ajson_error INTO lx_ajson.
         z2fiori_cx_error=>raise( val      = 'Failed to serialize application state to JSON.'
                                  previous = lx_ajson ).
     ENDTRY.
@@ -85,7 +92,8 @@ CLASS z2fiori_cl_state_codec IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD public_attribute_names.
-    DATA(lo_desc) = descriptor( app ).
+    DATA lo_desc TYPE REF TO cl_abap_classdescr.
+    lo_desc = descriptor( app ).
     LOOP AT lo_desc->attributes ASSIGNING FIELD-SYMBOL(<ls_attr>)
          WHERE visibility   = cl_abap_classdescr=>public
                AND is_interface = abap_false
@@ -99,3 +107,4 @@ CLASS z2fiori_cl_state_codec IMPLEMENTATION.
     result = cl_abap_typedescr=>describe_by_object_ref( app )->get_relative_name( ).
   ENDMETHOD.
 ENDCLASS.
+

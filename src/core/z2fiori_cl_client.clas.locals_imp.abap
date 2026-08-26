@@ -97,6 +97,7 @@ CLASS lcl_request_reader IMPLEMENTATION.
 
   METHOD get_nav_prev_arg.
     DATA lo_ajson TYPE REF TO z2fiori_cl_ajson.
+    DATA lx_ajson TYPE REF TO z2fiori_cx_ajson_error.
 
     IF iv_nav_prev_arg IS INITIAL.
       RETURN.
@@ -106,7 +107,7 @@ CLASS lcl_request_reader IMPLEMENTATION.
         lo_ajson = z2fiori_cl_ajson=>parse( iv_nav_prev_arg ).
         lo_ajson->to_abap( EXPORTING iv_corresponding = abap_true
                            IMPORTING ev_container     = result ).
-      CATCH z2fiori_cx_ajson_error INTO DATA(lx_ajson).
+      CATCH z2fiori_cx_ajson_error INTO lx_ajson.
         z2fiori_cx_error=>raise( val      = 'Failed to parse previous app return data.'
                                  previous = lx_ajson ).
     ENDTRY.
@@ -396,6 +397,7 @@ CLASS lcl_binding_resolver IMPLEMENTATION.
     DATA lr_data        TYPE REF TO data.
     DATA lo_typedescr   TYPE REF TO cl_abap_typedescr.
     DATA lo_structdescr TYPE REF TO cl_abap_structdescr.
+    DATA lo_refdescr    TYPE REF TO cl_abap_refdescr.
 
     lo_typedescr = cl_abap_typedescr=>describe_by_data( iv_data ).
 
@@ -414,7 +416,7 @@ CLASS lcl_binding_resolver IMPLEMENTATION.
                         CHANGING  ct_node = ct_node ).
 
       WHEN cl_abap_typedescr=>kind_ref.
-        DATA(lo_refdescr) = CAST cl_abap_refdescr( lo_typedescr ).
+        lo_refdescr ?= lo_typedescr.
 
         CASE lo_refdescr->type_kind.
           WHEN cl_abap_typedescr=>typekind_dref.
@@ -446,8 +448,9 @@ CLASS lcl_binding_resolver IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD resolve_oref.
-    DATA lr_object TYPE REF TO object.
-    DATA lv_path   TYPE string.
+    DATA lr_object    TYPE REF TO object.
+    DATA lv_path      TYPE string.
+    DATA lo_classdescr TYPE REF TO cl_abap_classdescr.
 
     FIELD-SYMBOLS <fs_obj> TYPE REF TO object.
 
@@ -457,7 +460,7 @@ CLASS lcl_binding_resolver IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    DATA(lo_classdescr) = CAST cl_abap_classdescr( cl_abap_typedescr=>describe_by_object_ref( io_data ) ).
+    lo_classdescr = CAST cl_abap_classdescr( cl_abap_typedescr=>describe_by_object_ref( io_data ) ).
     lr_object ?= io_data.
     ASSIGN lr_object TO <fs_obj>.
     IF sy-subrc <> 0.
@@ -485,13 +488,14 @@ CLASS lcl_binding_resolver IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD resolve_struct.
+    DATA lv_sub_path TYPE string.
     FIELD-SYMBOLS <fs_any> TYPE any.
 
     LOOP AT io_desc->components ASSIGNING FIELD-SYMBOL(<fs_comp>).
       ASSIGN COMPONENT <fs_comp>-name OF STRUCTURE iv_data TO <fs_any>.
       IF sy-subrc = 0.
         IF iv_path IS INITIAL.
-          DATA(lv_sub_path) = <fs_comp>-name.
+          lv_sub_path = <fs_comp>-name.
         ELSE.
           lv_sub_path = |{ iv_path }/{ <fs_comp>-name }|.
         ENDIF.

@@ -27,7 +27,10 @@ export function downportDirectory(targetDir = path.join(ROOT_DIR, "build", "stan
       errorNamespace: "^(Z|Y|LCL_|TY_|LIF_)"
     },
     rules: {
-      downport: true
+      downport: true,
+      definitions_top: true,
+      no_inline_in_optional_branches: true,
+      inline_data_old_versions: true
     }
   };
 
