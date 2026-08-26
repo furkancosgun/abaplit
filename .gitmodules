@@ -1,0 +1,6 @@
+[submodule "deps/open-abap-core"]
+	path = deps/open-abap-core
+	url = https://github.com/open-abap/open-abap-core.git
+[submodule "deps/express-icf-shim"]
+	path = deps/express-icf-shim
+	url = https://github.com/open-abap/express-icf-shim.git

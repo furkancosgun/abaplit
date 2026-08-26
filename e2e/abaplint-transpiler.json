@@ -1,0 +1,28 @@
+{
+  "input_folder": "e2e/src/",
+  "output_folder": "output/",
+  "libs": [
+    {
+      "folder": "/src",
+      "files": "/**/*"
+    },
+    {
+      "folder": "/deps/open-abap-core"
+    },
+    {
+      "folder": "/deps/express-icf-shim"
+    }
+  ],
+  "write_unit_tests": true,
+  "write_source_map": true,
+  "options": {
+    "ignoreSyntaxCheck": false,
+    "addFilenames": true,
+    "addCommonJS": true,
+    "unknownTypes": "compileError",
+    "setup": {
+      "filename": "../scripts/setup.mjs",
+      "preFunction": "setup"
+    }
+  }
+}
