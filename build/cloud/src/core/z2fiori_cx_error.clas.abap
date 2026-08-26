@@ -69,7 +69,9 @@ CLASS z2fiori_cx_error IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD raise.
-    RAISE EXCEPTION NEW z2fiori_cx_error( message  = val
-                                          previous = previous ).
+    RAISE EXCEPTION TYPE z2fiori_cx_error
+      EXPORTING
+        message  = val
+        previous = previous.
   ENDMETHOD.
 ENDCLASS.

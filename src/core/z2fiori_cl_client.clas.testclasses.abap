@@ -22,7 +22,7 @@ CLASS lcl_test_app_1 IMPLEMENTATION.
 
   METHOD z2fiori_if_app~main.
     IF client->check_event( 'INCREMENT' ).
-      ms_state-count += 1.
+      ms_state-count = ms_state-count + 1.
       client->toast_display( |Count: { ms_state-count }| ).
     ENDIF.
 
