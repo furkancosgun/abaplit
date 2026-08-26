@@ -1,0 +1,1 @@
+{"input_folder":"build/standard/src/","output_folder":"output_std/","libs":[{"folder":"/deps/open-abap-core"},{"folder":"/deps/express-icf-shim"}],"write_unit_tests":true,"options":{"addFilenames":true,"addCommonJS":true,"unknownTypes":"compileError"}}

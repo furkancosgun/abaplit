@@ -28,8 +28,10 @@ ENDCLASS.
 
 CLASS z2fiori_cl_state_codec IMPLEMENTATION.
   METHOD hydrate.
-    DATA lv_name TYPE string.
-    DATA lv_path TYPE string.
+    DATA lo_ajson TYPE REF TO z2fiori_cl_ajson.
+    DATA lv_name  TYPE string.
+    DATA lv_path  TYPE string.
+    DATA lx_err   TYPE REF TO cx_root.
     FIELD-SYMBOLS <ls_attr_val> TYPE any.
 
     IF json_state IS INITIAL OR json_state = '{}'.
@@ -37,7 +39,7 @@ CLASS z2fiori_cl_state_codec IMPLEMENTATION.
     ENDIF.
 
     TRY.
-        DATA(lo_ajson) = z2fiori_cl_ajson=>parse( json_state ).
+        lo_ajson = z2fiori_cl_ajson=>parse( json_state ).
 
         LOOP AT public_attribute_names( app ) INTO lv_name.
           lv_path = |/{ lv_name }|.
@@ -50,15 +52,16 @@ CLASS z2fiori_cl_state_codec IMPLEMENTATION.
             ENDIF.
           ENDIF.
         ENDLOOP.
-      CATCH cx_root INTO DATA(lx_err).
+      CATCH cx_root INTO lx_err.
         z2fiori_cx_error=>raise( val      = |Failed to hydrate application state: { lx_err->get_text( ) }|
                                  previous = lx_err ).
     ENDTRY.
   ENDMETHOD.
 
   METHOD serialize.
-    DATA lo_ajson TYPE REF TO z2fiori_cl_ajson.
-    DATA lv_name  TYPE string.
+    DATA lo_ajson  TYPE REF TO z2fiori_cl_ajson.
+    DATA lv_name   TYPE string.
+    DATA lx_ajson  TYPE REF TO z2fiori_cx_ajson_error.
     FIELD-SYMBOLS <lv_val> TYPE any.
 
     TRY.
@@ -74,7 +77,7 @@ CLASS z2fiori_cl_state_codec IMPLEMENTATION.
         ENDLOOP.
 
         result = lo_ajson->stringify( ).
-      CATCH z2fiori_cx_ajson_error INTO DATA(lx_ajson).
+      CATCH z2fiori_cx_ajson_error INTO lx_ajson.
         z2fiori_cx_error=>raise( val      = 'Failed to serialize application state to JSON.'
                                  previous = lx_ajson ).
     ENDTRY.

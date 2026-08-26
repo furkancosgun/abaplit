@@ -402,9 +402,10 @@ CLASS lcl_binding_resolver IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD resolve.
-    DATA lo_refdescr  TYPE REF TO cl_abap_refdescr.
-    DATA lr_data      TYPE REF TO data.
-    DATA lo_typedescr TYPE REF TO cl_abap_typedescr.
+    DATA lo_refdescr    TYPE REF TO cl_abap_refdescr.
+    DATA lr_data        TYPE REF TO data.
+    DATA lo_typedescr   TYPE REF TO cl_abap_typedescr.
+    DATA lo_structdescr TYPE REF TO cl_abap_structdescr.
 
     lo_typedescr = cl_abap_typedescr=>describe_by_data( iv_data ).
 
@@ -416,9 +417,10 @@ CLASS lcl_binding_resolver IMPLEMENTATION.
 
     CASE lo_typedescr->kind.
       WHEN cl_abap_typedescr=>kind_struct.
+        lo_structdescr ?= lo_typedescr.
         resolve_struct( EXPORTING iv_path = iv_path
                                   iv_data = iv_data
-                                  io_desc = CAST #( lo_typedescr )
+                                  io_desc = lo_structdescr
                         CHANGING  ct_node = ct_node ).
 
       WHEN cl_abap_typedescr=>kind_ref.

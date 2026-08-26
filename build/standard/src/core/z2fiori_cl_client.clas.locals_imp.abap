@@ -405,9 +405,10 @@ CLASS lcl_binding_resolver IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD resolve.
-    DATA lo_refdescr  TYPE REF TO cl_abap_refdescr.
-    DATA lr_data      TYPE REF TO data.
-    DATA lo_typedescr TYPE REF TO cl_abap_typedescr.
+    DATA lo_refdescr    TYPE REF TO cl_abap_refdescr.
+    DATA lr_data        TYPE REF TO data.
+    DATA lo_typedescr   TYPE REF TO cl_abap_typedescr.
+    DATA lo_structdescr TYPE REF TO cl_abap_structdescr.
 
     lo_typedescr = cl_abap_typedescr=>describe_by_data( iv_data ).
 
@@ -422,17 +423,16 @@ CLASS lcl_binding_resolver IMPLEMENTATION.
 
     CASE lo_typedescr->kind.
       WHEN cl_abap_typedescr=>kind_struct.
-        DATA temp3 TYPE undefined.
-        temp3 ?= lo_typedescr.
+        lo_structdescr ?= lo_typedescr.
         resolve_struct( EXPORTING iv_path = iv_path
                                   iv_data = iv_data
-                                  io_desc = temp3
+                                  io_desc = lo_structdescr
                         CHANGING  ct_node = ct_node ).
 
       WHEN cl_abap_typedescr=>kind_ref.
-        DATA temp4 TYPE REF TO cl_abap_refdescr.
-        temp4 ?= lo_typedescr.
-        lo_refdescr = temp4.
+        DATA temp3 TYPE REF TO cl_abap_refdescr.
+        temp3 ?= lo_typedescr.
+        lo_refdescr = temp3.
 
         CASE lo_refdescr->type_kind.
           WHEN cl_abap_typedescr=>typekind_dref.
@@ -475,9 +475,9 @@ CLASS lcl_binding_resolver IMPLEMENTATION.
       RETURN.
     ENDIF.
 
-    DATA temp5 TYPE REF TO cl_abap_classdescr.
-    temp5 ?= cl_abap_typedescr=>describe_by_object_ref( io_data ).
-    lo_classdescr = temp5.
+    DATA temp4 TYPE REF TO cl_abap_classdescr.
+    temp4 ?= cl_abap_typedescr=>describe_by_object_ref( io_data ).
+    lo_classdescr = temp4.
     lr_object ?= io_data.
     ASSIGN lr_object TO <fs_obj>.
     IF sy-subrc <> 0.

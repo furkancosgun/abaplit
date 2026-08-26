@@ -66,12 +66,12 @@ CLASS z2fiori_cl_http_handler IMPLEMENTATION.
 
   METHOD serve_roundtrip.
     DATA ls_res TYPE z2fiori_if_types=>ty_s_http_res.
+    DATA ls_req TYPE z2fiori_if_types=>ty_s_http_req.
+    DATA lx_err TYPE REF TO cx_root.
 
     TRY.
-        DATA ls_req TYPE z2fiori_if_types=>ty_s_http_req.
         ls_req = z2fiori_cl_request_parser=>parse( mo_http->get_text( ) ).
         ls_res = z2fiori_cl_app_runner=>run( ls_req ).
-        DATA lx_err TYPE REF TO cx_root.
       CATCH cx_root INTO lx_err.
         CLEAR ls_res.
         ls_res-success = abap_false.

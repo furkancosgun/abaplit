@@ -23,7 +23,7 @@ run("npm test");
 console.log("\n=== Step 2: Building Distribution Packages (with Downport) ===");
 run("node scripts/build_dist.mjs");
 
-console.log("\n=== Step 3: Validating Standard (On-Premise 7.02) Build ===");
+console.log("\n=== Step 3: Validating Standard (On-Premise 7.02) Syntax ===");
 const stdConfigPath = path.join(ONPREM_BUILD, "abaplint-check.json");
 fs.writeFileSync(stdConfigPath, JSON.stringify({
   global: {
@@ -50,7 +50,35 @@ try {
   if (fs.existsSync(stdConfigPath)) fs.unlinkSync(stdConfigPath);
 }
 
-console.log("\n=== Step 4: Validating Cloud (ABAP Cloud) Build ===");
+console.log("\n=== Step 4: Running Unit Tests on Standard (7.02 Downported) Build ===");
+const stdTranspilerPath = path.join(ROOT_DIR, ".temp_transpile_std.json");
+const stdOutDir = path.join(ROOT_DIR, "output_std");
+if (fs.existsSync(stdOutDir)) fs.rmSync(stdOutDir, { recursive: true, force: true });
+
+fs.writeFileSync(stdTranspilerPath, JSON.stringify({
+  input_folder: "build/standard/src/",
+  output_folder: "output_std/",
+  libs: [
+    { folder: "/deps/open-abap-core" },
+    { folder: "/deps/express-icf-shim" }
+  ],
+  write_unit_tests: true,
+  options: {
+    addFilenames: true,
+    addCommonJS: true,
+    unknownTypes: "compileError"
+  }
+}, null, 2), "utf-8");
+
+try {
+  run(`npx abap_transpile .temp_transpile_std.json`);
+  run(`node --expose-gc output_std/index.mjs`);
+} finally {
+  if (fs.existsSync(stdTranspilerPath)) fs.unlinkSync(stdTranspilerPath);
+  if (fs.existsSync(stdOutDir)) fs.rmSync(stdOutDir, { recursive: true, force: true });
+}
+
+console.log("\n=== Step 5: Validating Cloud (ABAP Cloud) Syntax ===");
 const cldConfigPath = path.join(CLOUD_BUILD, "abaplint-check.json");
 fs.writeFileSync(cldConfigPath, JSON.stringify({
   global: {
@@ -79,7 +107,36 @@ try {
   if (fs.existsSync(cldConfigPath)) fs.unlinkSync(cldConfigPath);
 }
 
-console.log("\n=== Step 5: Staging and Deploying Branches ===");
+console.log("\n=== Step 6: Running Unit Tests on Cloud Build ===");
+const cldTranspilerPath = path.join(ROOT_DIR, ".temp_transpile_cld.json");
+const cldOutDir = path.join(ROOT_DIR, "output_cld");
+if (fs.existsSync(cldOutDir)) fs.rmSync(cldOutDir, { recursive: true, force: true });
+
+fs.writeFileSync(cldTranspilerPath, JSON.stringify({
+  input_folder: "build/cloud/src/",
+  output_folder: "output_cld/",
+  exclude_filter: ["webapp"],
+  libs: [
+    { folder: "/deps/open-abap-core" },
+    { folder: "/deps/express-icf-shim" }
+  ],
+  write_unit_tests: true,
+  options: {
+    addFilenames: true,
+    addCommonJS: true,
+    unknownTypes: "compileError"
+  }
+}, null, 2), "utf-8");
+
+try {
+  run(`npx abap_transpile .temp_transpile_cld.json`);
+  run(`node --expose-gc output_cld/index.mjs`);
+} finally {
+  if (fs.existsSync(cldTranspilerPath)) fs.unlinkSync(cldTranspilerPath);
+  if (fs.existsSync(cldOutDir)) fs.rmSync(cldOutDir, { recursive: true, force: true });
+}
+
+console.log("\n=== Step 7: Staging and Deploying Branches ===");
 run("git add build/standard build/cloud");
 
 const currentCommit = getOutput("git rev-parse --short HEAD");
@@ -98,4 +155,4 @@ run(`git update-ref refs/heads/cloud ${cldCommit}`);
 run("git push origin cloud --force");
 console.log(`[abap2fiori] Cloud branch deployed (${cldCommit.substring(0, 7)})`);
 
-console.log("\n🎉 All distribution branches successfully validated and deployed!");
+console.log("\n🎉 All tests passed across all branches! Distribution deployed successfully.");
