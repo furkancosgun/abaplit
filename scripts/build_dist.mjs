@@ -171,7 +171,8 @@ ENDCLASS.
 
   fs.writeFileSync(path.join(backendDir, "z2fiori_cl_lp_handler.clas.abap"), lpHandlerAbap, "utf-8");
   fs.writeFileSync(path.join(backendDir, "z2fiori_cl_lp_handler.clas.xml"), lpHandlerXml, "utf-8");
-  fs.writeFileSync(path.join(backendDir, "z2fiori          aba643b150c02b2e28e7a7e17.sicf.xml"), sicfXml, "utf-8");
+  const sicfFileName = "z2fiori".padEnd(15, " ") + "aba643b150c02b2e28e7a7e17.sicf.xml";
+  fs.writeFileSync(path.join(backendDir, sicfFileName), sicfXml, "utf-8");
 
   // WAPA BSP for Frontend
   const files = getAllFiles(WEBAPP_DIR);

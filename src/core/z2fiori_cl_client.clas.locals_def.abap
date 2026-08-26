@@ -15,9 +15,7 @@ CLASS lcl_binding_resolver DEFINITION FINAL.
       IMPORTING
         val           TYPE any
       RETURNING
-        VALUE(result) TYPE string
-      RAISING
-        z2fiori_cx_error.
+        VALUE(result) TYPE string.
 
   PRIVATE SECTION.
     DATA mo_app   TYPE REF TO object.
@@ -230,7 +228,5 @@ CLASS lcl_request_reader DEFINITION FINAL.
       IMPORTING
         iv_nav_prev_arg TYPE string
       EXPORTING
-        result          TYPE any
-      RAISING
-        z2fiori_cx_error.
+        result          TYPE any.
 ENDCLASS.
