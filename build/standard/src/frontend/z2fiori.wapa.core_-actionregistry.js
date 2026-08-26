@@ -54,11 +54,17 @@ sap.ui.define([
     },
 
     MESSAGE_BOX: (p, { dispatch }) => {
+      const type = (p?.LEVEL || p?.TYPE || "information").toLowerCase();
+      const text = p?.TEXT || "";
+      const options = { title: p?.TITLE };
+
       if (!p?.CONFIRM_EVENT && !p?.CANCEL_EVENT) {
-        const levelFn = MessageBox[p?.LEVEL] || MessageBox.information;
-        return levelFn(p?.TEXT || "", { title: p?.TITLE });
+        if (typeof MessageBox[type] === "function") {
+          return MessageBox[type](text, options);
+        }
+        return MessageBox.information(text, options);
       }
-      MessageBox.show(p.TEXT || "", {
+      MessageBox.show(text, {
         title: p.TITLE,
         actions: [MessageBox.Action.OK, MessageBox.Action.CANCEL],
         emphasizedAction: MessageBox.Action.OK,
