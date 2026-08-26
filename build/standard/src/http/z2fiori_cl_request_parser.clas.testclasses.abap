@@ -11,23 +11,24 @@ ENDCLASS.
 
 CLASS ltcl_request_parser IMPLEMENTATION.
   METHOD test_parse_valid.
-    DATA lv_json TYPE string.
-    lv_json = '{' &&
-      '"app":"ZCL_MY_APP",' &&
-      '"event":"SAVE",' &&
-      '"event_args":["A","B"],' &&
-      '"check_init":false,' &&
-      '"check_navigated":true' &&
-      '}'.
+    DATA(lv_json) = |\{| &&
+      |"app":"ZCL_MY_APP",| &&
+      |"event":"SAVE",| &&
+      |"event_args":["A","B"],| &&
+      |"check_init":false,| &&
+      |"check_navigated":true| &&
+      |\}|.
 
-    DATA ls_req TYPE z2fiori_if_types=>ty_s_http_req.
-    ls_req = z2fiori_cl_request_parser=>parse( lv_json ).
+    DATA(ls_req) = z2fiori_cl_request_parser=>parse( lv_json ).
 
-    cl_abap_unit_assert=>assert_equals( exp = 'ZCL_MY_APP' act = ls_req-app ).
-    cl_abap_unit_assert=>assert_equals( exp = 'SAVE'        act = ls_req-event ).
+    cl_abap_unit_assert=>assert_equals( exp = 'ZCL_MY_APP'
+                                        act = ls_req-app ).
+    cl_abap_unit_assert=>assert_equals( exp = 'SAVE'
+                                        act = ls_req-event ).
     cl_abap_unit_assert=>assert_false( ls_req-check_init ).
     cl_abap_unit_assert=>assert_true( ls_req-check_navigated ).
-    cl_abap_unit_assert=>assert_equals( exp = 2 act = lines( ls_req-event_args ) ).
+    cl_abap_unit_assert=>assert_equals( exp = 2
+                                        act = lines( ls_req-event_args ) ).
   ENDMETHOD.
 
   METHOD test_parse_empty.

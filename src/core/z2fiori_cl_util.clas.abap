@@ -32,12 +32,10 @@ ENDCLASS.
 
 CLASS z2fiori_cl_util IMPLEMENTATION.
   METHOD string_to_xstring_utf8.
-    DATA lo_conv     TYPE REF TO object.
-    DATA lv_out_ce   TYPE string.
-    DATA lv_codepage TYPE string.
+    DATA lo_conv TYPE REF TO object.
 
-    lv_out_ce   = 'CL_ABAP_CONV_OUT_CE'.
-    lv_codepage = 'CL_ABAP_CONV_CODEPAGE'.
+    DATA(lv_out_ce)   = 'CL_ABAP_CONV_OUT_CE'.
+    DATA(lv_codepage) = 'CL_ABAP_CONV_CODEPAGE'.
 
     TRY.
         CALL METHOD (lv_codepage)=>('CREATE_OUT')
@@ -71,12 +69,10 @@ CLASS z2fiori_cl_util IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD xstring_to_string_utf8.
-    DATA lo_conv     TYPE REF TO object.
-    DATA lv_in_ce    TYPE string.
-    DATA lv_codepage TYPE string.
+    DATA lo_conv TYPE REF TO object.
 
-    lv_in_ce    = 'CL_ABAP_CONV_IN_CE'.
-    lv_codepage = 'CL_ABAP_CONV_CODEPAGE'.
+    DATA(lv_in_ce)    = 'CL_ABAP_CONV_IN_CE'.
+    DATA(lv_codepage) = 'CL_ABAP_CONV_CODEPAGE'.
 
     TRY.
         CALL METHOD (lv_codepage)=>('CREATE_IN')
@@ -110,11 +106,8 @@ CLASS z2fiori_cl_util IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD xstring_to_base64.
-    DATA lv_web_class     TYPE string.
-    DATA lv_classic_class TYPE string.
-
-    lv_web_class     = 'CL_WEB_HTTP_UTILITY'.
-    lv_classic_class = 'CL_HTTP_UTILITY'.
+    DATA(lv_web_class)     = 'CL_WEB_HTTP_UTILITY'.
+    DATA(lv_classic_class) = 'CL_HTTP_UTILITY'.
 
     TRY.
         CALL METHOD (lv_web_class)=>('ENCODE_X_BASE64')
@@ -135,11 +128,8 @@ CLASS z2fiori_cl_util IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD base64_to_xstring.
-    DATA lv_web_class     TYPE string.
-    DATA lv_classic_class TYPE string.
-
-    lv_web_class     = 'CL_WEB_HTTP_UTILITY'.
-    lv_classic_class = 'CL_HTTP_UTILITY'.
+    DATA(lv_web_class)     = 'CL_WEB_HTTP_UTILITY'.
+    DATA(lv_classic_class) = 'CL_HTTP_UTILITY'.
 
     TRY.
         CALL METHOD (lv_web_class)=>('DECODE_X_BASE64')
@@ -160,16 +150,12 @@ CLASS z2fiori_cl_util IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD string_to_base64.
-    DATA lv_xstr TYPE xstring.
-
-    lv_xstr   = string_to_xstring_utf8( iv_str ).
+    DATA(lv_xstr) = string_to_xstring_utf8( iv_str ).
     rv_base64 = xstring_to_base64( lv_xstr ).
   ENDMETHOD.
 
   METHOD base64_to_string.
-    DATA lv_xstr TYPE xstring.
-
-    lv_xstr = base64_to_xstring( iv_base64 ).
-    rv_str  = xstring_to_string_utf8( lv_xstr ).
+    DATA(lv_xstr) = base64_to_xstring( iv_base64 ).
+    rv_str = xstring_to_string_utf8( lv_xstr ).
   ENDMETHOD.
 ENDCLASS.

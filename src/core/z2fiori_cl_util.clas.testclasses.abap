@@ -31,7 +31,8 @@ CLASS ltcl_util IMPLEMENTATION.
     DATA(lv_text) = z2fiori_cl_util=>xstring_to_string_utf8( 'C3A4C3B6C3BC' ).
 
     cl_abap_unit_assert=>assert_not_initial( lv_text ).
-    cl_abap_unit_assert=>assert_equals( exp = lv_text
-                                        act = z2fiori_cl_util=>base64_to_string( z2fiori_cl_util=>string_to_base64( lv_text ) ) ).
+    cl_abap_unit_assert=>assert_equals(
+        exp = lv_text
+        act = z2fiori_cl_util=>base64_to_string( z2fiori_cl_util=>string_to_base64( lv_text ) ) ).
   ENDMETHOD.
 ENDCLASS.

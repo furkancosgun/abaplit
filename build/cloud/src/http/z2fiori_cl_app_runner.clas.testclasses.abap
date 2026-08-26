@@ -11,6 +11,7 @@ CLASS lcl_test_app DEFINITION FINAL.
     DATA ms_state TYPE ty_s_state.
 ENDCLASS.
 
+
 CLASS lcl_test_app IMPLEMENTATION.
   METHOD z2fiori_if_app~main.
     IF client->get( )-check_init = abap_true.
@@ -40,13 +41,15 @@ ENDCLASS.
 CLASS ltcl_app_runner IMPLEMENTATION.
   METHOD test_init_roundtrip.
     DATA ls_req TYPE z2fiori_if_types=>ty_s_http_req.
+
     ls_req-app        = 'LCL_TEST_APP'.
     ls_req-check_init = abap_true.
 
     DATA(ls_res) = z2fiori_cl_app_runner=>run( ls_req ).
 
     cl_abap_unit_assert=>assert_true( ls_res-success ).
-    cl_abap_unit_assert=>assert_equals( exp = 'LCL_TEST_APP' act = ls_res-app ).
+    cl_abap_unit_assert=>assert_equals( exp = 'LCL_TEST_APP'
+                                        act = ls_res-app ).
     cl_abap_unit_assert=>assert_true( contains( val = ls_res-view
                                                 sub = 'Test App 1' ) ).
     cl_abap_unit_assert=>assert_true( contains( val = ls_res-state
@@ -54,16 +57,14 @@ CLASS ltcl_app_runner IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD test_event_roundtrip.
-    DATA ls_req    TYPE z2fiori_if_types=>ty_s_http_req.
-    DATA ls_action TYPE z2fiori_if_types=>ty_s_action.
-    DATA ls_res    TYPE z2fiori_if_types=>ty_s_http_res.
+    DATA ls_req TYPE z2fiori_if_types=>ty_s_http_req.
 
     ls_req-app        = 'LCL_TEST_APP'.
     ls_req-event      = 'DEMO'.
     ls_req-check_init = abap_false.
     ls_req-state      = '{"MS_STATE":{"COUNT":5,"TEXT_INPUT":"abc"}}'.
 
-    ls_res = z2fiori_cl_app_runner=>run( ls_req ).
+    DATA(ls_res) = z2fiori_cl_app_runner=>run( ls_req ).
 
     cl_abap_unit_assert=>assert_true( ls_res-success ).
     cl_abap_unit_assert=>assert_true( contains( val = ls_res-state
@@ -71,13 +72,15 @@ CLASS ltcl_app_runner IMPLEMENTATION.
     cl_abap_unit_assert=>assert_equals( exp = 1
                                         act = lines( ls_res-t_actions ) ).
 
-    READ TABLE ls_res-t_actions INTO ls_action INDEX 1.
+    READ TABLE ls_res-t_actions INTO DATA(ls_action) INDEX 1.
     cl_abap_unit_assert=>assert_subrc( ).
-    cl_abap_unit_assert=>assert_equals( exp = 'TOAST' act = ls_action-type ).
+    cl_abap_unit_assert=>assert_equals( exp = 'TOAST'
+                                        act = ls_action-type ).
   ENDMETHOD.
 
   METHOD test_unknown_app.
     DATA ls_req TYPE z2fiori_if_types=>ty_s_http_req.
+
     ls_req-app   = 'ZCL_DOES_NOT_EXIST_XY'.
     ls_req-event = ''.
 

@@ -5,7 +5,7 @@ INTERFACE z2fiori_if_types PUBLIC.
       name  TYPE string,
       value TYPE string,
     END OF ty_s_query,
-    ty_t_query TYPE STANDARD TABLE OF ty_s_query WITH DEFAULT KEY.
+    ty_t_query TYPE STANDARD TABLE OF ty_s_query WITH EMPTY KEY.
   TYPES:
     BEGIN OF ty_s_config,
       origin   TYPE string,
@@ -48,7 +48,7 @@ INTERFACE z2fiori_if_types PUBLIC.
       type    TYPE string,
       payload TYPE REF TO data,
     END OF ty_s_action,
-    ty_t_action TYPE STANDARD TABLE OF ty_s_action WITH DEFAULT KEY.
+    ty_t_action TYPE STANDARD TABLE OF ty_s_action WITH EMPTY KEY.
   TYPES:
     BEGIN OF ty_s_http_req,
       app             TYPE string,

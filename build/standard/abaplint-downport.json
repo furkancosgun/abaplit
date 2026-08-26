@@ -1,0 +1,22 @@
+{
+  "global": {
+    "files": "/src/**/*.*",
+    "noIssues": [
+      "/src/vendor/*",
+      "z2fiori_cl_xml_view_builder.clas.abap"
+    ]
+  },
+  "dependencies": [
+    {
+      "folder": "/deps/open-abap-core",
+      "files": "/src/**/*.*"
+    }
+  ],
+  "syntax": {
+    "version": "v702",
+    "errorNamespace": "^(Z|Y|LCL_|TY_|LIF_)"
+  },
+  "rules": {
+    "downport": true
+  }
+}

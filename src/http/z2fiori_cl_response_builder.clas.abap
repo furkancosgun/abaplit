@@ -11,10 +11,8 @@ ENDCLASS.
 
 CLASS z2fiori_cl_response_builder IMPLEMENTATION.
   METHOD build.
-    DATA lo_ajson TYPE REF TO z2fiori_cl_ajson.
-
     TRY.
-        lo_ajson = z2fiori_cl_ajson=>create_empty( ).
+        DATA(lo_ajson) = z2fiori_cl_ajson=>create_empty( ).
         lo_ajson->set_boolean( iv_path = '/success'
                                iv_val  = res-success ).
         lo_ajson->set_string( iv_path = '/app'

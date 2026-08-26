@@ -6,9 +6,9 @@ CLASS z2fiori_cl_http_onprem DEFINITION
     INTERFACES z2fiori_if_http.
 
     METHODS constructor
-      IMPORTING request  TYPE REF TO object OPTIONAL
-                response TYPE REF TO object OPTIONAL
-                server   TYPE REF TO object OPTIONAL.
+      IMPORTING !request  TYPE REF TO object OPTIONAL
+                !response TYPE REF TO object OPTIONAL
+                server    TYPE REF TO object OPTIONAL.
 
   PRIVATE SECTION.
     DATA mo_request  TYPE REF TO object.
@@ -20,13 +20,11 @@ CLASS z2fiori_cl_http_onprem IMPLEMENTATION.
   METHOD constructor.
     IF server IS BOUND.
       TRY.
-          FIELD-SYMBOLS <lo_req> TYPE any.
-          ASSIGN server->('REQUEST') TO <lo_req>.
+          ASSIGN server->('REQUEST') TO FIELD-SYMBOL(<lo_req>).
           IF sy-subrc = 0.
             mo_request = <lo_req>.
           ENDIF.
-          FIELD-SYMBOLS <lo_res> TYPE any.
-          ASSIGN server->('RESPONSE') TO <lo_res>.
+          ASSIGN server->('RESPONSE') TO FIELD-SYMBOL(<lo_res>).
           IF sy-subrc = 0.
             mo_response = <lo_res>.
           ENDIF.
@@ -51,10 +49,8 @@ CLASS z2fiori_cl_http_onprem IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD z2fiori_if_http~get_header.
-    DATA lv_upper TYPE string.
-    lv_upper = to_upper( name ).
-    DATA lv_lower TYPE string.
-    lv_lower = to_lower( name ).
+    DATA(lv_upper) = to_upper( name ).
+    DATA(lv_lower) = to_lower( name ).
 
     TRY.
         CALL METHOD mo_request->('IF_HTTP_REQUEST~GET_HEADER_FIELD')

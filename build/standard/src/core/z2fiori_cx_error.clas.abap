@@ -24,8 +24,8 @@ CLASS z2fiori_cx_error DEFINITION
 
     METHODS constructor
       IMPORTING textid    LIKE if_t100_message=>t100key OPTIONAL
-                previous LIKE previous                 OPTIONAL
-                message  TYPE string                   OPTIONAL
+                !previous LIKE previous                 OPTIONAL
+                !message  TYPE string                   OPTIONAL
                 a1        TYPE symsgv                   OPTIONAL
                 a2        TYPE symsgv                   OPTIONAL
                 a3        TYPE symsgv                   OPTIONAL
@@ -33,7 +33,7 @@ CLASS z2fiori_cx_error DEFINITION
 
     CLASS-METHODS raise
       IMPORTING val       TYPE clike    OPTIONAL
-                previous LIKE previous OPTIONAL
+                !previous LIKE previous OPTIONAL
         PREFERRED PARAMETER val.
 
     METHODS if_message~get_text REDEFINITION.
@@ -69,9 +69,7 @@ CLASS z2fiori_cx_error IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD raise.
-    RAISE EXCEPTION TYPE z2fiori_cx_error
-      EXPORTING
-        message  = val
-        previous = previous.
+    RAISE EXCEPTION NEW z2fiori_cx_error( message  = val
+                                          previous = previous ).
   ENDMETHOD.
 ENDCLASS.

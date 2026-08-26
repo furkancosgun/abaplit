@@ -13,10 +13,9 @@ CLASS lcl_event_helper IMPLEMENTATION.
 
   METHOD event.
     DATA lv_args TYPE string.
-    DATA lv_arg  TYPE string.
 
-    LOOP AT t_arg INTO lv_arg.
-      lv_args = |{ lv_args }, { js_quote( lv_arg ) }|.
+    LOOP AT t_arg ASSIGNING FIELD-SYMBOL(<lv_arg>).
+      lv_args = |{ lv_args }, { js_quote( <lv_arg> ) }|.
     ENDLOOP.
 
     result = |onEvent({ js_quote( event ) }{ lv_args })|.
@@ -26,12 +25,11 @@ ENDCLASS.
 
 CLASS lcl_request_reader IMPLEMENTATION.
   METHOD find_query_param.
-    DATA ls_query TYPE z2fiori_if_types=>ty_s_query.
-    DATA lv_name  TYPE string.
+    DATA lv_name TYPE string.
 
     lv_name = name.
 
-    READ TABLE it_query INTO ls_query WITH KEY name = lv_name.
+    READ TABLE it_query INTO DATA(ls_query) WITH KEY name = lv_name.
     IF sy-subrc = 0.
       result = ls_query-value.
       RETURN.
@@ -50,8 +48,7 @@ CLASS lcl_request_reader IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD get_query.
-    DATA lo_ajson TYPE REF TO z2fiori_cl_ajson.
-    DATA lv_json  TYPE string.
+    DATA lv_json TYPE string.
 
     lv_json = iv_json.
     IF lv_json IS INITIAL.
@@ -59,7 +56,7 @@ CLASS lcl_request_reader IMPLEMENTATION.
     ENDIF.
 
     TRY.
-        lo_ajson = z2fiori_cl_ajson=>parse( lv_json ).
+        DATA(lo_ajson) = z2fiori_cl_ajson=>parse( lv_json ).
         lo_ajson->to_abap( EXPORTING iv_corresponding = abap_true
                            IMPORTING ev_container     = result ).
       CATCH z2fiori_cx_ajson_error.
@@ -67,8 +64,7 @@ CLASS lcl_request_reader IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD get_config.
-    DATA lo_ajson TYPE REF TO z2fiori_cl_ajson.
-    DATA lv_json  TYPE string.
+    DATA lv_json TYPE string.
 
     lv_json = iv_json.
     IF lv_json IS INITIAL.
@@ -76,7 +72,7 @@ CLASS lcl_request_reader IMPLEMENTATION.
     ENDIF.
 
     TRY.
-        lo_ajson = z2fiori_cl_ajson=>parse( lv_json ).
+        DATA(lo_ajson) = z2fiori_cl_ajson=>parse( lv_json ).
         lo_ajson->to_abap( EXPORTING iv_corresponding = abap_true
                            IMPORTING ev_container     = result ).
       CATCH z2fiori_cx_ajson_error.
@@ -84,8 +80,7 @@ CLASS lcl_request_reader IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD get_device.
-    DATA lo_ajson TYPE REF TO z2fiori_cl_ajson.
-    DATA lv_json  TYPE string.
+    DATA lv_json TYPE string.
 
     lv_json = iv_json.
     IF lv_json IS INITIAL.
@@ -93,7 +88,7 @@ CLASS lcl_request_reader IMPLEMENTATION.
     ENDIF.
 
     TRY.
-        lo_ajson = z2fiori_cl_ajson=>parse( lv_json ).
+        DATA(lo_ajson) = z2fiori_cl_ajson=>parse( lv_json ).
         lo_ajson->to_abap( EXPORTING iv_corresponding = abap_true
                            IMPORTING ev_container     = result ).
       CATCH z2fiori_cx_ajson_error.
@@ -102,7 +97,6 @@ CLASS lcl_request_reader IMPLEMENTATION.
 
   METHOD get_nav_prev_arg.
     DATA lo_ajson TYPE REF TO z2fiori_cl_ajson.
-    DATA lx_ajson TYPE REF TO z2fiori_cx_ajson_error.
 
     IF iv_nav_prev_arg IS INITIAL.
       RETURN.
@@ -112,7 +106,7 @@ CLASS lcl_request_reader IMPLEMENTATION.
         lo_ajson = z2fiori_cl_ajson=>parse( iv_nav_prev_arg ).
         lo_ajson->to_abap( EXPORTING iv_corresponding = abap_true
                            IMPORTING ev_container     = result ).
-      CATCH z2fiori_cx_ajson_error INTO lx_ajson.
+      CATCH z2fiori_cx_ajson_error INTO DATA(lx_ajson).
         z2fiori_cx_error=>raise( val      = 'Failed to parse previous app return data.'
                                  previous = lx_ajson ).
     ENDTRY.
@@ -357,15 +351,12 @@ CLASS lcl_action_mgr IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD nav_leave.
-    DATA lv_result TYPE string.
-    DATA lo_ajson  TYPE REF TO z2fiori_cl_ajson.
-
     IF result IS SUPPLIED.
       TRY.
-          lo_ajson = z2fiori_cl_ajson=>create_empty( ).
+          DATA(lo_ajson) = z2fiori_cl_ajson=>create_empty( ).
           lo_ajson->set( iv_path = '/'
                          iv_val  = result ).
-          lv_result = lo_ajson->stringify( ).
+          DATA(lv_result) = lo_ajson->stringify( ).
         CATCH z2fiori_cx_ajson_error.
           lv_result = |{ result }|.
       ENDTRY.
@@ -402,7 +393,6 @@ CLASS lcl_binding_resolver IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD resolve.
-    DATA lo_refdescr    TYPE REF TO cl_abap_refdescr.
     DATA lr_data        TYPE REF TO data.
     DATA lo_typedescr   TYPE REF TO cl_abap_typedescr.
     DATA lo_structdescr TYPE REF TO cl_abap_structdescr.
@@ -424,7 +414,7 @@ CLASS lcl_binding_resolver IMPLEMENTATION.
                         CHANGING  ct_node = ct_node ).
 
       WHEN cl_abap_typedescr=>kind_ref.
-        lo_refdescr = CAST cl_abap_refdescr( lo_typedescr ).
+        DATA(lo_refdescr) = CAST cl_abap_refdescr( lo_typedescr ).
 
         CASE lo_refdescr->type_kind.
           WHEN cl_abap_typedescr=>typekind_dref.
@@ -456,29 +446,29 @@ CLASS lcl_binding_resolver IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD resolve_oref.
-    DATA lr_object     TYPE REF TO object.
-    DATA lv_path       TYPE string.
-    DATA lo_classdescr TYPE REF TO cl_abap_classdescr.
-    FIELD-SYMBOLS <fs_obj>  TYPE REF TO object.
-    FIELD-SYMBOLS <fs_attr> TYPE abap_attrdescr.
-    FIELD-SYMBOLS <fs_any>  TYPE any.
+    DATA lr_object TYPE REF TO object.
+    DATA lv_path   TYPE string.
+
+    FIELD-SYMBOLS <fs_obj> TYPE REF TO object.
+
+    FIELD-SYMBOLS <fs_any> TYPE any.
 
     IF io_data IS NOT BOUND.
       RETURN.
     ENDIF.
 
-    lo_classdescr = CAST cl_abap_classdescr( cl_abap_typedescr=>describe_by_object_ref( io_data ) ).
+    DATA(lo_classdescr) = CAST cl_abap_classdescr( cl_abap_typedescr=>describe_by_object_ref( io_data ) ).
     lr_object ?= io_data.
     ASSIGN lr_object TO <fs_obj>.
     IF sy-subrc <> 0.
       RETURN.
     ENDIF.
 
-    LOOP AT lo_classdescr->attributes ASSIGNING <fs_attr>
+    LOOP AT lo_classdescr->attributes ASSIGNING FIELD-SYMBOL(<fs_attr>)
          WHERE visibility   = cl_abap_classdescr=>public
-           AND is_interface = abap_false
-           AND is_class     = abap_false
-           AND is_constant  = abap_false.
+               AND is_interface = abap_false
+               AND is_class     = abap_false
+               AND is_constant  = abap_false.
 
       ASSIGN <fs_obj>->(<fs_attr>-name) TO <fs_any>.
       IF sy-subrc = 0.
@@ -495,15 +485,13 @@ CLASS lcl_binding_resolver IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD resolve_struct.
-    DATA lv_sub_path TYPE string.
-    FIELD-SYMBOLS <fs_comp> TYPE abap_compdescr.
-    FIELD-SYMBOLS <fs_any>  TYPE any.
+    FIELD-SYMBOLS <fs_any> TYPE any.
 
-    LOOP AT io_desc->components ASSIGNING <fs_comp>.
+    LOOP AT io_desc->components ASSIGNING FIELD-SYMBOL(<fs_comp>).
       ASSIGN COMPONENT <fs_comp>-name OF STRUCTURE iv_data TO <fs_any>.
       IF sy-subrc = 0.
         IF iv_path IS INITIAL.
-          lv_sub_path = <fs_comp>-name.
+          DATA(lv_sub_path) = <fs_comp>-name.
         ELSE.
           lv_sub_path = |{ iv_path }/{ <fs_comp>-name }|.
         ENDIF.

@@ -18,6 +18,7 @@
     "downport": "node -e \"import('./scripts/downport.mjs').then(m => m.downportDirectory('src'))\"",
     "unit": "npm run build && node --expose-gc output/index.mjs",
     "test": "npm run lint && npm run lint:cloud && npm run unit",
+    "pull:ajson": "node scripts/pull_ajson.mjs",
     "deps": "git submodule update --init --recursive"
   },
   "devDependencies": {

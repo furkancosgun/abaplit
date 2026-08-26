@@ -14,7 +14,10 @@
     }
   ],
   "syntax": {
-    "version": "v750",
+    "version": {
+      "release": "v769",
+      "language": "Normal"
+    },
     "errorNamespace": "^(Z|Y|LCL_|TY_|LIF_)"
   },
   "rules": {
@@ -33,7 +36,8 @@
       "testSeams": true,
       "describeLines": true,
       "exportToMemory": true,
-      "exportToDatabase": true
+      "exportToDatabase": true,
+      "defaultKey": true
     },
     "begin_end_names": true,
     "begin_single_include": true,
@@ -76,7 +80,9 @@
       "select": true,
       "do": true,
       "at": true,
-      "try": true
+      "try": true,
+      "loopAllowIfSubrc": false,
+      "when": true
     },
     "exit_or_check": true,
     "exporting": true,
@@ -102,7 +108,13 @@
     "intf_referencing_clas": false,
     "keep_single_parameter_on_one_line": false,
     "keyword_case": {
-      "style": "upper"
+      "style": "upper",
+      "ignoreExceptions": true,
+      "ignoreLowerClassImplmentationStatement": true,
+      "ignoreGlobalClassDefinition": true,
+      "ignoreGlobalInterface": true,
+      "ignoreFunctionModuleName": true,
+      "ignoreGlobalClassBoundaries": true
     },
     "line_break_multiple_parameters": false,
     "line_break_style": false,
@@ -140,9 +152,7 @@
     "object_naming": false,
     "obsolete_statement": true,
     "omit_parameter_name": true,
-    "omit_preceeding_zeros": true,
     "omit_receiving": true,
-    "parser_702_chains": true,
     "parser_bad_exceptions": true,
     "parser_error": true,
     "parser_missing_space": true,
@@ -175,7 +185,6 @@
     "start_at_tab": false,
     "static_call_via_instance": true,
     "strict_sql": true,
-    "structure_elements_name": false,
     "superclass_final": true,
     "superfluous_value": true,
     "sy_modification": true,
@@ -191,19 +200,17 @@
     "unnecessary_return": true,
     "unreachable_code": true,
     "unsecure_fae": true,
-    "unused_DDIC": true,
     "unused_methods": true,
     "unused_types": true,
     "unused_variables": {
       "severity": "Error",
-      "skipNames": []
+      "skipNames": [],
+      "skipAbstract": false
     },
     "use_bool_expression": true,
     "use_class_based_exceptions": true,
     "use_line_exists": true,
     "use_new": true,
-    "void_types": false,
-    "when_others_part": false,
     "whitespace_end": true,
     "xml_bom": true,
     "xml_consistency": true

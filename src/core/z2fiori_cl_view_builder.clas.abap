@@ -1,22 +1,21 @@
 CLASS z2fiori_cl_view_builder DEFINITION PUBLIC CREATE PRIVATE.
 
   PUBLIC SECTION.
-
     CLASS-METHODS factory
       RETURNING VALUE(result) TYPE REF TO z2fiori_cl_view_builder.
 
     METHODS ele
-      IMPORTING n             TYPE string
-                ns            TYPE string OPTIONAL
+      IMPORTING !n            TYPE string
+                !ns           TYPE string OPTIONAL
       RETURNING VALUE(result) TYPE REF TO z2fiori_cl_view_builder.
 
     METHODS tag
-      IMPORTING n             TYPE string
-                ns            TYPE string OPTIONAL
+      IMPORTING !n            TYPE string
+                !ns           TYPE string OPTIONAL
       RETURNING VALUE(result) TYPE REF TO z2fiori_cl_view_builder.
 
     METHODS a
-      IMPORTING n             TYPE string
+      IMPORTING !n            TYPE string
                 v             TYPE string    OPTIONAL
                 b             TYPE abap_bool OPTIONAL
       RETURNING VALUE(result) TYPE REF TO z2fiori_cl_view_builder.
@@ -63,10 +62,10 @@ CLASS z2fiori_cl_view_builder IMPLEMENTATION.
 
   METHOD ele.
     result = NEW #( ).
-    result->mo_root = mo_root.
+    result->mo_root   = mo_root.
     result->mo_parent = me.
-    result->mv_name = n.
-    result->mv_ns = ns.
+    result->mv_name   = n.
+    result->mv_ns     = ns.
     APPEND result TO mt_child.
   ENDMETHOD.
 
@@ -77,12 +76,9 @@ CLASS z2fiori_cl_view_builder IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD a.
-    DATA lv_val    TYPE string.
-    DATA lo_target TYPE REF TO z2fiori_cl_view_builder.
-
     ASSERT mv_name IS NOT INITIAL OR mt_child IS NOT INITIAL.
 
-    lv_val = v.
+    DATA(lv_val) = v.
     IF b IS SUPPLIED.
       ASSERT v IS INITIAL.
       lv_val = COND #( WHEN b = abap_true THEN 'true' ELSE 'false' ).
@@ -93,7 +89,7 @@ CLASS z2fiori_cl_view_builder IMPLEMENTATION.
       APPEND VALUE #( n = n
                       v = lv_val ) TO mt_pair.
     ELSE.
-      lo_target = mt_child[ lines( mt_child ) ].
+      DATA(lo_target) = mt_child[ lines( mt_child ) ].
       ASSERT NOT line_exists( lo_target->mt_pair[ n = n ] ).
       APPEND VALUE #( n = n
                       v = lv_val ) TO lo_target->mt_pair.
@@ -112,26 +108,21 @@ CLASS z2fiori_cl_view_builder IMPLEMENTATION.
 
   METHOD render.
     DATA lt_inner TYPE string_table.
-    DATA lv_inner TYPE string.
-    DATA lv_qname TYPE string.
-    DATA lv_attrs TYPE string.
-    DATA lo_child LIKE LINE OF mt_child.
-    DATA ls_pair  LIKE LINE OF mt_pair.
 
-    LOOP AT mt_child INTO lo_child.
-      APPEND lo_child->render( ) TO lt_inner.
+    LOOP AT mt_child ASSIGNING FIELD-SYMBOL(<lo_child>).
+      APPEND <lo_child>->render( ) TO lt_inner.
     ENDLOOP.
-    lv_inner = concat_lines_of( lt_inner ).
+    DATA(lv_inner) = concat_lines_of( lt_inner ).
 
     IF mv_name IS INITIAL.
       result = lv_inner.
       RETURN.
     ENDIF.
 
-    lv_qname = COND string( WHEN mv_ns IS INITIAL THEN mv_name ELSE |{ mv_ns }:{ mv_name }| ).
-    lv_attrs = ``.
-    LOOP AT mt_pair INTO ls_pair.
-      lv_attrs = |{ lv_attrs } { ls_pair-n }="{ xml_escape( ls_pair-v ) }"|.
+    DATA(lv_qname) = COND string( WHEN mv_ns IS INITIAL THEN mv_name ELSE |{ mv_ns }:{ mv_name }| ).
+    DATA(lv_attrs) = ``.
+    LOOP AT mt_pair ASSIGNING FIELD-SYMBOL(<ls_pair>).
+      lv_attrs = |{ lv_attrs } { <ls_pair>-n }="{ xml_escape( <ls_pair>-v ) }"|.
     ENDLOOP.
 
     IF mt_child IS INITIAL.

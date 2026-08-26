@@ -7,11 +7,11 @@ CLASS z2fiori_cl_http_handler DEFINITION
       IMPORTING server TYPE REF TO object.
 
     CLASS-METHODS factory_cloud
-      IMPORTING request  TYPE REF TO object
-                response TYPE REF TO object.
+      IMPORTING !request  TYPE REF TO object
+                !response TYPE REF TO object.
 
     METHODS constructor
-      IMPORTING http TYPE REF TO z2fiori_if_http.
+      IMPORTING !http TYPE REF TO z2fiori_if_http.
 
   PRIVATE SECTION.
     CONSTANTS gc_content_json TYPE string VALUE 'application/json; charset=utf-8'.
@@ -31,18 +31,15 @@ ENDCLASS.
 
 CLASS z2fiori_cl_http_handler IMPLEMENTATION.
   METHOD factory_onprem.
-    DATA lo_service TYPE REF TO z2fiori_cl_http_onprem.
-    CREATE OBJECT lo_service TYPE z2fiori_cl_http_onprem EXPORTING server = server.
-    DATA lo_handler TYPE REF TO z2fiori_cl_http_handler.
-    CREATE OBJECT lo_handler TYPE z2fiori_cl_http_handler EXPORTING HTTP = lo_service.
+    DATA(lo_service) = NEW z2fiori_cl_http_onprem( server = server ).
+    DATA(lo_handler) = NEW z2fiori_cl_http_handler( lo_service ).
     lo_handler->serve( ).
   ENDMETHOD.
 
   METHOD factory_cloud.
-    DATA lo_service TYPE REF TO z2fiori_cl_http_cloud.
-    CREATE OBJECT lo_service TYPE z2fiori_cl_http_cloud EXPORTING request = request response = response.
-    DATA lo_handler TYPE REF TO z2fiori_cl_http_handler.
-    CREATE OBJECT lo_handler TYPE z2fiori_cl_http_handler EXPORTING HTTP = lo_service.
+    DATA(lo_service) = NEW z2fiori_cl_http_cloud( request  = request
+                                                  response = response ).
+    DATA(lo_handler) = NEW z2fiori_cl_http_handler( lo_service ).
     lo_handler->serve( ).
   ENDMETHOD.
 
@@ -65,14 +62,10 @@ CLASS z2fiori_cl_http_handler IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD serve_roundtrip.
-    DATA ls_res TYPE z2fiori_if_types=>ty_s_http_res.
-    DATA ls_req TYPE z2fiori_if_types=>ty_s_http_req.
-    DATA lx_err TYPE REF TO cx_root.
-
     TRY.
-        ls_req = z2fiori_cl_request_parser=>parse( mo_http->get_text( ) ).
-        ls_res = z2fiori_cl_app_runner=>run( ls_req ).
-      CATCH cx_root INTO lx_err.
+        DATA(ls_req) = z2fiori_cl_request_parser=>parse( mo_http->get_text( ) ).
+        DATA(ls_res) = z2fiori_cl_app_runner=>run( ls_req ).
+      CATCH cx_root INTO DATA(lx_err).
         CLEAR ls_res.
         ls_res-success = abap_false.
         ls_res-message = lx_err->get_text( ).
@@ -89,10 +82,8 @@ CLASS z2fiori_cl_http_handler IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD respond_info.
-    DATA lo_ajson TYPE REF TO z2fiori_cl_ajson.
-
     TRY.
-        lo_ajson = z2fiori_cl_ajson=>create_empty( ).
+        DATA(lo_ajson) = z2fiori_cl_ajson=>create_empty( ).
         lo_ajson->set_string( iv_path = '/service'
                               iv_val  = 'abap2fiori' ).
         lo_ajson->set_string( iv_path = '/method'

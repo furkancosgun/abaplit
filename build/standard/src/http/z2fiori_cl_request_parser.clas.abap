@@ -4,22 +4,21 @@ CLASS z2fiori_cl_request_parser DEFINITION
 
   PUBLIC SECTION.
     CLASS-METHODS parse
-      IMPORTING json          TYPE string
+      IMPORTING !json         TYPE string
       RETURNING VALUE(result) TYPE z2fiori_if_types=>ty_s_http_req.
 ENDCLASS.
 
 
 CLASS z2fiori_cl_request_parser IMPLEMENTATION.
   METHOD parse.
-    DATA lx_ajson TYPE REF TO z2fiori_cx_ajson_error.
-
     IF json IS INITIAL.
       z2fiori_cx_error=>raise( 'Request payload is empty.' ).
     ENDIF.
 
     TRY.
-        z2fiori_cl_ajson=>parse( json )->to_abap( EXPORTING iv_corresponding = abap_true IMPORTING ev_container = result ).
-      CATCH z2fiori_cx_ajson_error INTO lx_ajson.
+        z2fiori_cl_ajson=>parse( json )->to_abap( EXPORTING iv_corresponding = abap_true
+                                                  IMPORTING ev_container     = result ).
+      CATCH z2fiori_cx_ajson_error INTO DATA(lx_ajson).
         z2fiori_cx_error=>raise( val      = 'Invalid JSON request payload.'
                                  previous = lx_ajson ).
     ENDTRY.

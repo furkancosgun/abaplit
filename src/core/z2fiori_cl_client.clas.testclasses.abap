@@ -33,7 +33,8 @@ CLASS lcl_test_app_1 IMPLEMENTATION.
       )->a( n = 'xmlns:mvc'
             v = 'sap.ui.core.mvc'
       )->ele( 'Button'
-      )->a( n = 'text' v = 'Test App 1'
+      )->a( n = 'text'
+            v = 'Test App 1'
       )->a( n = 'press'
             v = client->event( 'INCREMENT' ) ).
     client->view_display( lo_view->stringify( ) ).
@@ -90,12 +91,11 @@ CLASS ltcl_client IMPLEMENTATION.
         status TYPE string,
       END OF ty_s_ret_test.
 
-    DATA ls_req    TYPE z2fiori_if_types=>ty_s_http_req.
-    DATA ls_ret    TYPE ty_s_ret_test.
-    DATA ls_get      TYPE z2fiori_if_types=>ty_s_http_req.
+    DATA ls_req      TYPE z2fiori_if_types=>ty_s_http_req.
+    DATA ls_ret      TYPE ty_s_ret_test.
+
     DATA lt_args     TYPE string_table.
     DATA lt_row_args TYPE string_table.
-    DATA lv_ev_str   TYPE string.
 
     APPEND '[{"name":"mode","value":"EDIT"},{"name":"id","value":"1001"}]' TO lt_args.
     APPEND '{"system":"Desktop","browser":{"name":"Chrome","version":"120"}}' TO lt_args.
@@ -137,7 +137,7 @@ CLASS ltcl_client IMPLEMENTATION.
     cl_abap_unit_assert=>assert_false( lo_cut->z2fiori_if_client~check_event( 'OTHER' ) ).
     cl_abap_unit_assert=>assert_true( lo_cut->z2fiori_if_client~check_event( 'SELECT' ) ).
 
-    lv_ev_str = lo_cut->z2fiori_if_client~event( 'ROW_CLICK' ).
+    DATA(lv_ev_str) = lo_cut->z2fiori_if_client~event( 'ROW_CLICK' ).
     cl_abap_unit_assert=>assert_equals( exp = `onEvent('ROW_CLICK')`
                                         act = lv_ev_str ).
 
@@ -153,7 +153,7 @@ CLASS ltcl_client IMPLEMENTATION.
     cl_abap_unit_assert=>assert_equals( exp = 'SAVED'
                                         act = ls_ret-status ).
 
-    ls_get = lo_cut->z2fiori_if_client~get( ).
+    DATA(ls_get) = lo_cut->z2fiori_if_client~get( ).
     cl_abap_unit_assert=>assert_equals( exp = 'SELECT'
                                         act = ls_get-event ).
     cl_abap_unit_assert=>assert_equals( exp = 3
