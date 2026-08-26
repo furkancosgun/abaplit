@@ -1,3 +1,32 @@
+CLASS lcl_test_app DEFINITION FINAL.
+  PUBLIC SECTION.
+    INTERFACES z2fiori_if_app.
+
+    TYPES:
+      BEGIN OF ty_s_state,
+        count      TYPE i,
+        text_input TYPE string,
+      END OF ty_s_state.
+
+    DATA ms_state TYPE ty_s_state.
+ENDCLASS.
+
+CLASS lcl_test_app IMPLEMENTATION.
+  METHOD z2fiori_if_app~main.
+    IF client->get( )-check_init = abap_true.
+      ms_state-count = 1.
+      client->view_display( '<mvc:View><Text text="Test App 1"/></mvc:View>' ).
+      RETURN.
+    ENDIF.
+
+    IF client->get( )-event = 'DEMO'.
+      ms_state-count = ms_state-count + 1.
+      client->toast_display( 'Demo event called' ).
+    ENDIF.
+  ENDMETHOD.
+ENDCLASS.
+
+
 CLASS ltcl_app_runner DEFINITION FINAL
   FOR TESTING RISK LEVEL HARMLESS DURATION SHORT.
 
@@ -11,13 +40,13 @@ ENDCLASS.
 CLASS ltcl_app_runner IMPLEMENTATION.
   METHOD test_init_roundtrip.
     DATA ls_req TYPE z2fiori_if_types=>ty_s_http_req.
-    ls_req-app        = 'ZCL_DEFAULT_APP'.
+    ls_req-app        = 'LCL_TEST_APP'.
     ls_req-check_init = abap_true.
 
     DATA(ls_res) = z2fiori_cl_app_runner=>run( ls_req ).
 
     cl_abap_unit_assert=>assert_true( ls_res-success ).
-    cl_abap_unit_assert=>assert_equals( exp = 'ZCL_DEFAULT_APP' act = ls_res-app ).
+    cl_abap_unit_assert=>assert_equals( exp = 'LCL_TEST_APP' act = ls_res-app ).
     cl_abap_unit_assert=>assert_true( contains( val = ls_res-view
                                                 sub = 'Test App 1' ) ).
     cl_abap_unit_assert=>assert_true( contains( val = ls_res-state
@@ -26,7 +55,7 @@ CLASS ltcl_app_runner IMPLEMENTATION.
 
   METHOD test_event_roundtrip.
     DATA ls_req TYPE z2fiori_if_types=>ty_s_http_req.
-    ls_req-app        = 'ZCL_DEFAULT_APP'.
+    ls_req-app        = 'LCL_TEST_APP'.
     ls_req-event      = 'DEMO'.
     ls_req-check_init = abap_false.
     ls_req-state      = '{"MS_STATE":{"COUNT":5,"TEXT_INPUT":"abc"}}'.

@@ -60,7 +60,7 @@ CLASS ltcl_view_builder IMPLEMENTATION.
     lo_cut->a( n = 'press' v = `.onEvent('A&B<C>"D')` ).
 
     cl_abap_unit_assert=>assert_equals(
-      exp = |<Button press=".onEvent('A&amp;B&lt;C&gt;&quot;D')"/>|
+      exp = '<Button press=".onEvent(&apos;A&amp;B&lt;C>&quot;D&apos;)"/>'
       act = lo_cut->stringify( ) ).
   ENDMETHOD.
 
