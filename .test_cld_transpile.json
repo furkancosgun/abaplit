@@ -1,1 +1,0 @@
-{"input_folder":"build/cloud/src/","output_folder":"output_cld/","exclude_filter":["webapp"],"libs":[{"folder":"/deps/open-abap-core"},{"folder":"/deps/express-icf-shim"}],"write_unit_tests":true,"options":{"addFilenames":true,"addCommonJS":true,"unknownTypes":"compileError"}}
