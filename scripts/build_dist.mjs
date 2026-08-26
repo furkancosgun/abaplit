@@ -45,12 +45,12 @@ function copyDirRecursive(src, dest, transformFile = null) {
 
 function buildOnprem() {
   const srcDir = path.join(ONPREM_BUILD, "src");
-  const backendDir = path.join(srcDir, "backend");
-  const frontendDir = path.join(srcDir, "frontend");
+  const srvDir = path.join(srcDir, "srv");
+  const appDir = path.join(srcDir, "app");
 
   fs.rmSync(ONPREM_BUILD, { recursive: true, force: true });
-  fs.mkdirSync(backendDir, { recursive: true });
-  fs.mkdirSync(frontendDir, { recursive: true });
+  fs.mkdirSync(srvDir, { recursive: true });
+  fs.mkdirSync(appDir, { recursive: true });
 
   // .abapgit.xml
   const abapgitXml = `<?xml version="1.0" encoding="utf-8"?>
@@ -67,7 +67,7 @@ function buildOnprem() {
 `;
   fs.writeFileSync(path.join(ONPREM_BUILD, ".abapgit.xml"), abapgitXml, "utf-8");
 
-  // package.devc.xml
+  // package.devc.xml (root)
   const devcRootXml = `<?xml version="1.0" encoding="utf-8"?>
 <abapGit version="v1.0.0" serializer="LCL_OBJECT_DEVC" serializer_version="v1.0.0">
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
@@ -82,33 +82,35 @@ function buildOnprem() {
 `;
   fs.writeFileSync(path.join(srcDir, "package.devc.xml"), devcRootXml, "utf-8");
 
-  const devcBackendXml = `<?xml version="1.0" encoding="utf-8"?>
+  // package.devc.xml (srv)
+  const devcSrvXml = `<?xml version="1.0" encoding="utf-8"?>
 <abapGit version="v1.0.0" serializer="LCL_OBJECT_DEVC" serializer_version="v1.0.0">
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <DEVC>
-    <CTEXT>abap2fiori Backend</CTEXT>
+    <CTEXT>abap2fiori Service</CTEXT>
    </DEVC>
   </asx:values>
  </asx:abap>
 </abapGit>
 `;
-  fs.writeFileSync(path.join(backendDir, "package.devc.xml"), devcBackendXml, "utf-8");
+  fs.writeFileSync(path.join(srvDir, "package.devc.xml"), devcSrvXml, "utf-8");
 
-  const devcFrontendXml = `<?xml version="1.0" encoding="utf-8"?>
+  // package.devc.xml (app)
+  const devcAppXml = `<?xml version="1.0" encoding="utf-8"?>
 <abapGit version="v1.0.0" serializer="LCL_OBJECT_DEVC" serializer_version="v1.0.0">
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <DEVC>
-    <CTEXT>abap2fiori Frontend</CTEXT>
+    <CTEXT>abap2fiori Application</CTEXT>
    </DEVC>
   </asx:values>
  </asx:abap>
 </abapGit>
 `;
-  fs.writeFileSync(path.join(frontendDir, "package.devc.xml"), devcFrontendXml, "utf-8");
+  fs.writeFileSync(path.join(appDir, "package.devc.xml"), devcAppXml, "utf-8");
 
-  // z2fiori_cl_lp_handler
+  // z2fiori_cl_lp_handler (On-Premise)
   const lpHandlerAbap = `CLASS z2fiori_cl_lp_handler DEFINITION
   PUBLIC FINAL
   CREATE PUBLIC.
@@ -169,12 +171,12 @@ ENDCLASS.
 </abapGit>
 `;
 
-  fs.writeFileSync(path.join(backendDir, "z2fiori_cl_lp_handler.clas.abap"), lpHandlerAbap, "utf-8");
-  fs.writeFileSync(path.join(backendDir, "z2fiori_cl_lp_handler.clas.xml"), lpHandlerXml, "utf-8");
+  fs.writeFileSync(path.join(srvDir, "z2fiori_cl_lp_handler.clas.abap"), lpHandlerAbap, "utf-8");
+  fs.writeFileSync(path.join(srvDir, "z2fiori_cl_lp_handler.clas.xml"), lpHandlerXml, "utf-8");
   const sicfFileName = "z2fiori".padEnd(15, " ") + "aba643b150c02b2e28e7a7e17.sicf.xml";
-  fs.writeFileSync(path.join(backendDir, sicfFileName), sicfXml, "utf-8");
+  fs.writeFileSync(path.join(srvDir, sicfFileName), sicfXml, "utf-8");
 
-  // WAPA BSP for Frontend
+  // WAPA BSP for Frontend Application
   const files = getAllFiles(WEBAPP_DIR);
   const pagesXml = [];
 
@@ -182,7 +184,7 @@ ENDCLASS.
     const pageKey = relPath.toUpperCase();
     const pageName = relPath;
     const wapaFileName = `z2fiori.wapa.${relPath.replace(/\//g, "_-").toLowerCase()}`;
-    const outPath = path.join(frontendDir, wapaFileName);
+    const outPath = path.join(appDir, wapaFileName);
 
     let content = fs.readFileSync(fullPath, "utf-8");
     if (relPath === "manifest.json") {
@@ -224,9 +226,9 @@ ${pagesXml.join("\n")}
  </asx:abap>
 </abapGit>
 `;
-  fs.writeFileSync(path.join(frontendDir, "z2fiori.wapa.xml"), wapaXml, "utf-8");
+  fs.writeFileSync(path.join(appDir, "z2fiori.wapa.xml"), wapaXml, "utf-8");
 
-  // Frontend BSP SICF nodes (both /sap/bc/bsp/sap/z2fiori/ and /sap/bc/ui5_ui5/sap/z2fiori/)
+  // Frontend BSP SICF nodes
   const bspSicfXml = `<?xml version="1.0" encoding="utf-8"?>
 <abapGit version="v1.0.0" serializer="LCL_OBJECT_SICF" serializer_version="v1.0.0">
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
@@ -268,20 +270,20 @@ ${pagesXml.join("\n")}
   const bspSicfFileName = "z2fiori".padEnd(15, " ") + "cc3e0011031e2f3f4be478dc5.sicf.xml";
   const ui5SicfFileName = "z2fiori".padEnd(15, " ") + "0ec96042f38e7e75ceadd96a5.sicf.xml";
 
-  fs.writeFileSync(path.join(frontendDir, bspSicfFileName), bspSicfXml, "utf-8");
-  fs.writeFileSync(path.join(frontendDir, ui5SicfFileName), ui5SicfXml, "utf-8");
+  fs.writeFileSync(path.join(appDir, bspSicfFileName), bspSicfXml, "utf-8");
+  fs.writeFileSync(path.join(appDir, ui5SicfFileName), ui5SicfXml, "utf-8");
 
   console.log(`[abap2fiori] Standard (On-Premise) build created in ${ONPREM_BUILD}`);
 }
 
 function buildCloud() {
   const srcDir = path.join(CLOUD_BUILD, "src");
-  const backendDir = path.join(srcDir, "backend");
-  const frontendDir = path.join(srcDir, "frontend");
+  const srvDir = path.join(srcDir, "srv");
+  const appDir = path.join(srcDir, "app");
 
   fs.rmSync(CLOUD_BUILD, { recursive: true, force: true });
-  fs.mkdirSync(backendDir, { recursive: true });
-  fs.mkdirSync(frontendDir, { recursive: true });
+  fs.mkdirSync(srvDir, { recursive: true });
+  fs.mkdirSync(appDir, { recursive: true });
 
   // .abapgit.xml
   const abapgitXml = `<?xml version="1.0" encoding="utf-8"?>
@@ -298,7 +300,7 @@ function buildCloud() {
 `;
   fs.writeFileSync(path.join(CLOUD_BUILD, ".abapgit.xml"), abapgitXml, "utf-8");
 
-  // package.devc.xml
+  // package.devc.xml (root)
   const devcRootXml = `<?xml version="1.0" encoding="utf-8"?>
 <abapGit version="v1.0.0" serializer="LCL_OBJECT_DEVC" serializer_version="v1.0.0">
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
@@ -313,31 +315,33 @@ function buildCloud() {
 `;
   fs.writeFileSync(path.join(srcDir, "package.devc.xml"), devcRootXml, "utf-8");
 
-  const devcBackendXml = `<?xml version="1.0" encoding="utf-8"?>
+  // package.devc.xml (srv)
+  const devcSrvXml = `<?xml version="1.0" encoding="utf-8"?>
 <abapGit version="v1.0.0" serializer="LCL_OBJECT_DEVC" serializer_version="v1.0.0">
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <DEVC>
-    <CTEXT>abap2fiori Backend</CTEXT>
+    <CTEXT>abap2fiori Service</CTEXT>
    </DEVC>
   </asx:values>
  </asx:abap>
 </abapGit>
 `;
-  fs.writeFileSync(path.join(backendDir, "package.devc.xml"), devcBackendXml, "utf-8");
+  fs.writeFileSync(path.join(srvDir, "package.devc.xml"), devcSrvXml, "utf-8");
 
-  const devcFrontendXml = `<?xml version="1.0" encoding="utf-8"?>
+  // package.devc.xml (app)
+  const devcAppXml = `<?xml version="1.0" encoding="utf-8"?>
 <abapGit version="v1.0.0" serializer="LCL_OBJECT_DEVC" serializer_version="v1.0.0">
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <DEVC>
-    <CTEXT>abap2fiori Frontend</CTEXT>
+    <CTEXT>abap2fiori Application</CTEXT>
    </DEVC>
   </asx:values>
  </asx:abap>
 </abapGit>
 `;
-  fs.writeFileSync(path.join(frontendDir, "package.devc.xml"), devcFrontendXml, "utf-8");
+  fs.writeFileSync(path.join(appDir, "package.devc.xml"), devcAppXml, "utf-8");
 
   // z2fiori_cl_lp_handler (Cloud)
   const lpHandlerCloudAbap = `CLASS z2fiori_cl_lp_handler DEFINITION
@@ -377,11 +381,11 @@ ENDCLASS.
 </abapGit>
 `;
 
-  fs.writeFileSync(path.join(backendDir, "z2fiori_cl_lp_handler.clas.abap"), lpHandlerCloudAbap, "utf-8");
-  fs.writeFileSync(path.join(backendDir, "z2fiori_cl_lp_handler.clas.xml"), lpHandlerCloudXml, "utf-8");
+  fs.writeFileSync(path.join(srvDir, "z2fiori_cl_lp_handler.clas.abap"), lpHandlerCloudAbap, "utf-8");
+  fs.writeFileSync(path.join(srvDir, "z2fiori_cl_lp_handler.clas.xml"), lpHandlerCloudXml, "utf-8");
 
   // Copy frontend webapp to cloud with URL rewrite in manifest.json
-  const cloudWebappDest = path.join(frontendDir, "webapp");
+  const cloudWebappDest = path.join(appDir, "webapp");
   copyDirRecursive(WEBAPP_DIR, cloudWebappDest, (src, dest) => {
     let content = fs.readFileSync(src, "utf-8");
     if (src.endsWith("manifest.json")) {

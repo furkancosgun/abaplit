@@ -10,5 +10,3 @@ dist/
 .temp_ajson_clone/
 test-results/
 playwright-report/
-*.zip
-
