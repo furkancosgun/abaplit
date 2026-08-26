@@ -23,14 +23,14 @@ CLASS lcl_binding_resolver DEFINITION FINAL.
 
     METHODS resolve
       IMPORTING
-        iv_path TYPE string
+        iv_path TYPE clike
         iv_data TYPE data
       CHANGING
         ct_node TYPE ty_t_nodes.
 
     METHODS resolve_struct
       IMPORTING
-        iv_path TYPE string
+        iv_path TYPE clike
         iv_data TYPE any
         io_desc TYPE REF TO cl_abap_structdescr
       CHANGING
@@ -38,14 +38,14 @@ CLASS lcl_binding_resolver DEFINITION FINAL.
 
     METHODS resolve_dref
       IMPORTING
-        iv_path TYPE string
+        iv_path TYPE clike
         ir_data TYPE REF TO data
       CHANGING
         ct_node TYPE ty_t_nodes.
 
     METHODS resolve_oref
       IMPORTING
-        iv_path TYPE string
+        iv_path TYPE clike
         io_data TYPE REF TO object
       CHANGING
         ct_node TYPE ty_t_nodes.
@@ -64,7 +64,7 @@ CLASS lcl_action_mgr DEFINITION FINAL.
 
     METHODS popup_show
       IMPORTING
-        xml TYPE string.
+        xml TYPE clike.
 
     METHODS popup_close.
 
@@ -72,67 +72,67 @@ CLASS lcl_action_mgr DEFINITION FINAL.
 
     METHODS nest_view_display
       IMPORTING
-        id            TYPE string
-        xml           TYPE string
-        method_insert TYPE string.
+        id            TYPE clike
+        xml           TYPE clike
+        method_insert TYPE clike.
 
     METHODS nest_view_destroy
       IMPORTING
-        id             TYPE string
-        method_destroy TYPE string.
+        id             TYPE clike
+        method_destroy TYPE clike.
 
     METHODS toast_display
       IMPORTING
-        text     TYPE string
-        duration TYPE string.
+        text     TYPE clike
+        duration TYPE clike OPTIONAL.
 
     METHODS message_box_display
       IMPORTING
         text          TYPE clike
-        title         TYPE string
-        type          TYPE string
-        confirm_event TYPE string
-        cancel_event  TYPE string.
+        title         TYPE clike OPTIONAL
+        type          TYPE clike OPTIONAL
+        confirm_event TYPE clike OPTIONAL
+        cancel_event  TYPE clike OPTIONAL.
 
     METHODS set_title
       IMPORTING
-        title TYPE string.
+        title TYPE clike.
 
     METHODS set_favicon
       IMPORTING
-        url TYPE string.
+        url TYPE clike.
 
     METHODS set_focus
       IMPORTING
-        id TYPE string.
+        id TYPE clike.
 
     METHODS scroll_into_view
       IMPORTING
-        id TYPE string.
+        id TYPE clike.
 
     METHODS clipboard_write
       IMPORTING
-        text TYPE string.
+        text TYPE clike.
 
     METHODS clipboard_read
       IMPORTING
-        event TYPE string.
+        event TYPE clike.
 
     METHODS device_read
       IMPORTING
-        event TYPE string.
+        event TYPE clike.
 
     METHODS location_read
       IMPORTING
-        event TYPE string.
+        event TYPE clike.
 
     METHODS query_read
       IMPORTING
-        event TYPE string.
+        event TYPE clike.
 
     METHODS open_new_tab
       IMPORTING
-        url TYPE string.
+        url TYPE clike.
 
     METHODS location_reload.
 
@@ -142,32 +142,32 @@ CLASS lcl_action_mgr DEFINITION FINAL.
 
     METHODS keyboard_shortcut
       IMPORTING
-        key        TYPE string
-        ctrl       TYPE abap_bool
-        alt        TYPE abap_bool
-        shift      TYPE abap_bool
-        event      TYPE string
-        event_args TYPE string_table.
+        key        TYPE clike
+        ctrl       TYPE abap_bool OPTIONAL
+        alt        TYPE abap_bool OPTIONAL
+        shift      TYPE abap_bool OPTIONAL
+        event      TYPE clike
+        event_args TYPE string_table OPTIONAL.
 
     METHODS add_script
       IMPORTING
-        url TYPE string.
+        url TYPE clike.
 
     METHODS add_style
       IMPORTING
-        url TYPE string.
+        url TYPE clike.
 
     METHODS file_download
       IMPORTING
-        filename TYPE string
-        base64   TYPE string
-        type     TYPE string.
+        filename TYPE clike
+        base64   TYPE clike
+        type     TYPE clike OPTIONAL.
 
     METHODS follow_up_action
       IMPORTING
-        event      TYPE string
-        event_args TYPE string_table
-        delay_ms   TYPE i.
+        event      TYPE clike
+        event_args TYPE string_table OPTIONAL
+        delay_ms   TYPE i OPTIONAL.
 
     METHODS nav_call
       IMPORTING
@@ -191,7 +191,7 @@ CLASS lcl_event_helper DEFINITION FINAL.
 
     CLASS-METHODS event
       IMPORTING
-        event         TYPE string
+        event         TYPE clike
         t_arg         TYPE string_table OPTIONAL
       RETURNING
         VALUE(result) TYPE string.
@@ -208,25 +208,25 @@ CLASS lcl_request_reader DEFINITION FINAL.
 
     CLASS-METHODS get_query
       IMPORTING
-        iv_json       TYPE string
+        iv_json       TYPE clike
       RETURNING
         VALUE(result) TYPE z2fiori_if_types=>ty_t_query.
 
     CLASS-METHODS get_config
       IMPORTING
-        iv_json       TYPE string
+        iv_json       TYPE clike
       RETURNING
         VALUE(result) TYPE z2fiori_if_types=>ty_s_config.
 
     CLASS-METHODS get_device
       IMPORTING
-        iv_json       TYPE string
+        iv_json       TYPE clike
       RETURNING
         VALUE(result) TYPE z2fiori_if_types=>ty_s_device.
 
     CLASS-METHODS get_nav_prev_arg
       IMPORTING
-        iv_nav_prev_arg TYPE string
+        iv_nav_prev_arg TYPE clike
       EXPORTING
         result          TYPE any.
 ENDCLASS.
