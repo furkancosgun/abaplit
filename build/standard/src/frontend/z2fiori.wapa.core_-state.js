@@ -30,16 +30,28 @@ sap.ui.define([
         state.model = new JSONModel({});
         state.model.setSizeLimit(10000);
 
-        const manifestUri = controller.getOwnerComponent?.()?.getManifestEntry?.("/sap/app/dataSources/http/uri");
+        const comp = controller.getOwnerComponent?.();
+        const manifest = comp?.getManifest?.() || comp?.getMetadata?.()?.getManifest?.();
+        const manifestUri = manifest?.["sap.app"]?.dataSources?.http?.uri
+          || comp?.getManifestEntry?.("/sap.app/dataSources/http/uri")
+          || comp?.getManifestEntry?.("sap.app")?.dataSources?.http?.uri;
+
         if (!manifestUri) {
-          throw new Error("HTTP dataSource URI is missing in manifest.json (/sap/app/dataSources/http/uri).");
+          throw new Error("HTTP dataSource URI is missing in manifest.json (/sap.app/dataSources/http/uri).");
         }
         state.endpoint = manifestUri;
 
+        const compData = comp?.getComponentData?.();
+        const startupApp = compData?.startupParameters?.app?.[0]
+          || compData?.startupParameters?.["sap-startup-params"]?.[0];
+        const hashSearch = new URLSearchParams(location.hash.includes("?") ? location.hash.split("?")[1] : "");
+        const appFromHash = hashSearch.get("app");
         const search = new URLSearchParams(location.search);
-        state.app = (search.get("app") || "").trim().toUpperCase();
+        const appFromSearch = search.get("app");
+
+        state.app = (startupApp || appFromHash || appFromSearch || "").trim().toUpperCase();
         if (!state.app) {
-          throw new Error("Application name is missing. Add '?app=YOUR_APP_CLASS' to the URL.");
+          throw new Error("Application name is missing. Add '?app=YOUR_APP_CLASS' or configure Launchpad Tile parameter.");
         }
       }
 
