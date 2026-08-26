@@ -5,6 +5,7 @@ import { downportDirectory } from "./downport.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = path.resolve(__dirname, "..");
+const SRC_DIR = path.join(ROOT_DIR, "src");
 const WEBAPP_DIR = path.join(ROOT_DIR, "app", "webapp");
 const BUILD_DIR = path.join(ROOT_DIR, "build");
 const ONPREM_BUILD = path.join(BUILD_DIR, "standard");
@@ -12,6 +13,7 @@ const CLOUD_BUILD = path.join(BUILD_DIR, "cloud");
 
 function getAllFiles(dir, base = "") {
   let results = [];
+  if (!fs.existsSync(dir)) return results;
   const list = fs.readdirSync(dir);
   for (const file of list) {
     const filePath = path.join(dir, file);
@@ -27,6 +29,7 @@ function getAllFiles(dir, base = "") {
 }
 
 function copyDirRecursive(src, dest, transformFile = null) {
+  if (!fs.existsSync(src)) return;
   fs.mkdirSync(dest, { recursive: true });
   const entries = fs.readdirSync(src, { withFileTypes: true });
   for (const entry of entries) {
@@ -44,16 +47,35 @@ function copyDirRecursive(src, dest, transformFile = null) {
   }
 }
 
+function ensureCloudLanguageVersion(xmlContent) {
+  if (xmlContent.includes("<ABAP_LANGU_VERSION>")) {
+    return xmlContent;
+  }
+  return xmlContent.replace(
+    "</UNICODE>",
+    `</UNICODE>\n    <ABAP_LANGU_VERSION>5</ABAP_LANGU_VERSION>`
+  );
+}
+
 function buildOnprem() {
-  const srcDir = path.join(ONPREM_BUILD, "src");
-  const srvDir = path.join(srcDir, "srv");
-  const appDir = path.join(srcDir, "app");
+  const destSrcDir = path.join(ONPREM_BUILD, "src");
+  const srvDir = path.join(destSrcDir, "srv");
+  const appDir = path.join(destSrcDir, "app");
 
   fs.rmSync(ONPREM_BUILD, { recursive: true, force: true });
   fs.mkdirSync(srvDir, { recursive: true });
   fs.mkdirSync(appDir, { recursive: true });
 
-  // .abapgit.xml
+  // 1. Copy Core ABAP packages (core, http, vendor)
+  for (const folder of ["core", "http", "vendor"]) {
+    const sourceFolder = path.join(SRC_DIR, folder);
+    const destFolder = path.join(destSrcDir, folder);
+    if (fs.existsSync(sourceFolder)) {
+      copyDirRecursive(sourceFolder, destFolder);
+    }
+  }
+
+  // 2. Root .abapgit.xml
   const abapgitXml = `<?xml version="1.0" encoding="utf-8"?>
 <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
  <asx:values>
@@ -68,7 +90,7 @@ function buildOnprem() {
 `;
   fs.writeFileSync(path.join(ONPREM_BUILD, ".abapgit.xml"), abapgitXml, "utf-8");
 
-  // package.devc.xml (root)
+  // 3. package.devc.xml (root)
   const devcRootXml = `<?xml version="1.0" encoding="utf-8"?>
 <abapGit version="v1.0.0" serializer="LCL_OBJECT_DEVC" serializer_version="v1.0.0">
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
@@ -80,9 +102,9 @@ function buildOnprem() {
  </asx:abap>
 </abapGit>
 `;
-  fs.writeFileSync(path.join(srcDir, "package.devc.xml"), devcRootXml, "utf-8");
+  fs.writeFileSync(path.join(destSrcDir, "package.devc.xml"), devcRootXml, "utf-8");
 
-  // package.devc.xml (srv)
+  // 4. package.devc.xml (srv)
   const devcSrvXml = `<?xml version="1.0" encoding="utf-8"?>
 <abapGit version="v1.0.0" serializer="LCL_OBJECT_DEVC" serializer_version="v1.0.0">
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
@@ -96,7 +118,7 @@ function buildOnprem() {
 `;
   fs.writeFileSync(path.join(srvDir, "package.devc.xml"), devcSrvXml, "utf-8");
 
-  // package.devc.xml (app)
+  // 5. package.devc.xml (app)
   const devcAppXml = `<?xml version="1.0" encoding="utf-8"?>
 <abapGit version="v1.0.0" serializer="LCL_OBJECT_DEVC" serializer_version="v1.0.0">
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
@@ -110,7 +132,7 @@ function buildOnprem() {
 `;
   fs.writeFileSync(path.join(appDir, "package.devc.xml"), devcAppXml, "utf-8");
 
-  // z2fiori_cl_lp_handler (On-Premise)
+  // 6. z2fiori_cl_lp_handler (On-Premise)
   const lpHandlerAbap = `CLASS z2fiori_cl_lp_handler DEFINITION
   PUBLIC FINAL
   CREATE PUBLIC.
@@ -174,7 +196,7 @@ ENDCLASS.
   const sicfFileName = "z2fiori".padEnd(15, " ") + "aba643b150c02b2e28e7a7e17.sicf.xml";
   fs.writeFileSync(path.join(srvDir, sicfFileName), sicfXml, "utf-8");
 
-  // WAPA BSP for Frontend Application
+  // 7. WAPA BSP for Frontend Application
   const files = getAllFiles(WEBAPP_DIR);
   const pagesXml = [];
 
@@ -226,22 +248,20 @@ ${pagesXml.join("\n")}
 `;
   fs.writeFileSync(path.join(appDir, "z2fiori.wapa.xml"), wapaXml, "utf-8");
 
-  // Frontend BSP SICF nodes
+  // 8. Frontend BSP & UI5 SICF nodes
   const bspSicfXml = `<?xml version="1.0" encoding="utf-8"?>
 <abapGit version="v1.0.0" serializer="LCL_OBJECT_SICF" serializer_version="v1.0.0">
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
-  <asx:values>
-   <URL>/sap/bc/bsp/sap/z2fiori/</URL>
-   <ICFSERVICE>
-    <ICF_NAME>Z2FIORI</ICF_NAME>
-    <ORIG_NAME>z2fiori</ORIG_NAME>
-   </ICFSERVICE>
-   <ICFDOCU>
-    <ICF_NAME>Z2FIORI</ICF_NAME>
-    <ICF_LANGU>E</ICF_LANGU>
-    <ICF_DOCU>abap2fiori BSP Application</ICF_DOCU>
-   </ICFDOCU>
-  </asx:values>
+  <URL>/sap/bc/bsp/sap/z2fiori/</URL>
+  <ICFSERVICE>
+   <ICF_NAME>Z2FIORI</ICF_NAME>
+   <ORIG_NAME>z2fiori</ORIG_NAME>
+  </ICFSERVICE>
+  <ICFDOCU>
+   <ICF_NAME>Z2FIORI</ICF_NAME>
+   <ICF_LANGU>E</ICF_LANGU>
+   <ICF_DOCU>abap2fiori BSP Application</ICF_DOCU>
+  </ICFDOCU>
  </asx:abap>
 </abapGit>
 `;
@@ -249,18 +269,16 @@ ${pagesXml.join("\n")}
   const ui5SicfXml = `<?xml version="1.0" encoding="utf-8"?>
 <abapGit version="v1.0.0" serializer="LCL_OBJECT_SICF" serializer_version="v1.0.0">
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
-  <asx:values>
-   <URL>/sap/bc/ui5_ui5/sap/z2fiori/</URL>
-   <ICFSERVICE>
-    <ICF_NAME>Z2FIORI</ICF_NAME>
-    <ORIG_NAME>z2fiori</ORIG_NAME>
-   </ICFSERVICE>
-   <ICFDOCU>
-    <ICF_NAME>Z2FIORI</ICF_NAME>
-    <ICF_LANGU>E</ICF_LANGU>
-    <ICF_DOCU>abap2fiori UI5 Application</ICF_DOCU>
-   </ICFDOCU>
-  </asx:values>
+  <URL>/sap/bc/ui5_ui5/sap/z2fiori/</URL>
+  <ICFSERVICE>
+   <ICF_NAME>Z2FIORI</ICF_NAME>
+   <ORIG_NAME>z2fiori</ORIG_NAME>
+  </ICFSERVICE>
+  <ICFDOCU>
+   <ICF_NAME>Z2FIORI</ICF_NAME>
+   <ICF_LANGU>E</ICF_LANGU>
+   <ICF_DOCU>abap2fiori UI5 Application</ICF_DOCU>
+  </ICFDOCU>
  </asx:abap>
 </abapGit>
 `;
@@ -271,22 +289,37 @@ ${pagesXml.join("\n")}
   fs.writeFileSync(path.join(appDir, bspSicfFileName), bspSicfXml, "utf-8");
   fs.writeFileSync(path.join(appDir, ui5SicfFileName), ui5SicfXml, "utf-8");
 
-  // Perform downport if needed
-  downportDirectory(ONPREM_BUILD);
+  // 9. Downport entire standard ABAP package to 7.02
+  downportDirectory(destSrcDir);
 
   console.log(`[abap2fiori] Standard (On-Premise) build created in ${ONPREM_BUILD}`);
 }
 
 function buildCloud() {
-  const srcDir = path.join(CLOUD_BUILD, "src");
-  const srvDir = path.join(srcDir, "srv");
-  const appDir = path.join(srcDir, "app");
+  const destSrcDir = path.join(CLOUD_BUILD, "src");
+  const srvDir = path.join(destSrcDir, "srv");
+  const appDir = path.join(destSrcDir, "app");
 
   fs.rmSync(CLOUD_BUILD, { recursive: true, force: true });
   fs.mkdirSync(srvDir, { recursive: true });
   fs.mkdirSync(appDir, { recursive: true });
 
-  // .abapgit.xml
+  // 1. Copy Core ABAP packages (core, http, vendor) with Cloud language version
+  for (const folder of ["core", "http", "vendor"]) {
+    const sourceFolder = path.join(SRC_DIR, folder);
+    const destFolder = path.join(destSrcDir, folder);
+    if (fs.existsSync(sourceFolder)) {
+      copyDirRecursive(sourceFolder, destFolder, (srcFile, destFile) => {
+        let content = fs.readFileSync(srcFile, "utf-8");
+        if (srcFile.endsWith(".clas.xml")) {
+          content = ensureCloudLanguageVersion(content);
+        }
+        fs.writeFileSync(destFile, content, "utf-8");
+      });
+    }
+  }
+
+  // 2. Root .abapgit.xml
   const abapgitXml = `<?xml version="1.0" encoding="utf-8"?>
 <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
  <asx:values>
@@ -301,7 +334,7 @@ function buildCloud() {
 `;
   fs.writeFileSync(path.join(CLOUD_BUILD, ".abapgit.xml"), abapgitXml, "utf-8");
 
-  // package.devc.xml (root)
+  // 3. package.devc.xml (root)
   const devcRootXml = `<?xml version="1.0" encoding="utf-8"?>
 <abapGit version="v1.0.0" serializer="LCL_OBJECT_DEVC" serializer_version="v1.0.0">
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
@@ -313,9 +346,9 @@ function buildCloud() {
  </asx:abap>
 </abapGit>
 `;
-  fs.writeFileSync(path.join(srcDir, "package.devc.xml"), devcRootXml, "utf-8");
+  fs.writeFileSync(path.join(destSrcDir, "package.devc.xml"), devcRootXml, "utf-8");
 
-  // package.devc.xml (srv)
+  // 4. package.devc.xml (srv)
   const devcSrvXml = `<?xml version="1.0" encoding="utf-8"?>
 <abapGit version="v1.0.0" serializer="LCL_OBJECT_DEVC" serializer_version="v1.0.0">
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
@@ -329,9 +362,9 @@ function buildCloud() {
 `;
   fs.writeFileSync(path.join(srvDir, "package.devc.xml"), devcSrvXml, "utf-8");
 
-  // Note: No package.devc.xml under app/ for Cloud distribution as per specification.
+  // Note: No package.devc.xml under app/ for Cloud distribution.
 
-  // z2fiori_cl_lp_handler (Cloud)
+  // 5. z2fiori_cl_lp_handler (Cloud)
   const lpHandlerCloudAbap = `CLASS z2fiori_cl_lp_handler DEFINITION
   PUBLIC FINAL
   CREATE PUBLIC.
@@ -372,7 +405,7 @@ ENDCLASS.
   fs.writeFileSync(path.join(srvDir, "z2fiori_cl_lp_handler.clas.abap"), lpHandlerCloudAbap, "utf-8");
   fs.writeFileSync(path.join(srvDir, "z2fiori_cl_lp_handler.clas.xml"), lpHandlerCloudXml, "utf-8");
 
-  // Copy frontend webapp to cloud with URL rewrite in manifest.json
+  // 6. Copy frontend webapp to cloud with URL rewrite in manifest.json
   const cloudWebappDest = path.join(appDir, "webapp");
   copyDirRecursive(WEBAPP_DIR, cloudWebappDest, (src, dest) => {
     let content = fs.readFileSync(src, "utf-8");

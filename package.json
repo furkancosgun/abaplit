@@ -9,6 +9,8 @@
     "clean": "node scripts/clean.mjs",
     "build": "npm run clean && abap_transpile abaplint-transpiler.json",
     "build:dist": "node scripts/build_dist.mjs",
+    "deploy": "node scripts/deploy_branches.mjs",
+    "release": "node scripts/deploy_branches.mjs",
     "lint": "abaplint",
     "lint:fix": "abaplint --fix",
     "lint:cloud": "abaplint abaplint-cloud.json",
