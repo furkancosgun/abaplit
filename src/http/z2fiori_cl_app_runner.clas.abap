@@ -60,7 +60,7 @@ CLASS z2fiori_cl_app_runner IMPLEMENTATION.
     DATA(lv_class) = to_upper( app_name ).
     TRY.
         CREATE OBJECT result TYPE (lv_class).
-      CATCH cx_sy_create_object_error INTO DATA(lx_create).
+      CATCH cx_root INTO DATA(lx_create).
         z2fiori_cx_error=>raise( val      = |Application class '{ app_name }' not found.|
                                  previous = lx_create ).
     ENDTRY.
