@@ -93,9 +93,12 @@ CLASS z2fiori_cl_pop_input IMPLEMENTATION.
           )->label( client->bind( mv_label )
           )->input( value = client->bind( mv_value ) placeholder = client->bind( mv_placeholder ) type = mv_type submit = client->event( 'OK' )
         )->end(
-      )->buttons(
-        )->button( text = 'OK' press = client->event( 'OK' ) type = 'Emphasized'
-        )->button( text = 'Cancel' press = client->event( 'CANCEL' ) ).
+        )->begin_button(
+          )->button( text = 'OK' press = client->event( 'OK' ) type = 'Emphasized'
+        )->end(
+        )->end_button(
+          )->button( text = 'Cancel' press = client->event( 'CANCEL' )
+        )->end( ).
 
       client->popup_show( view->stringify( ) ).
     ENDIF.

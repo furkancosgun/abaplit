@@ -85,9 +85,12 @@ CLASS z2fiori_cl_pop_confirm IMPLEMENTATION.
         )->vbox( class = 'sapUiMediumMargin'
           )->text( client->bind( mv_text )
         )->end(
-      )->buttons(
-        )->button( text = client->bind( mv_button_text_ok ) press = client->event( 'OK' ) type = 'Emphasized'
-        )->button( text = client->bind( mv_button_text_cancel ) press = client->event( 'CANCEL' ) ).
+        )->begin_button(
+          )->button( text = client->bind( mv_button_text_ok ) press = client->event( 'OK' ) type = 'Emphasized'
+        )->end(
+        )->end_button(
+          )->button( text = client->bind( mv_button_text_cancel ) press = client->event( 'CANCEL' )
+        )->end( ).
 
       client->popup_show( view->stringify( ) ).
     ENDIF.

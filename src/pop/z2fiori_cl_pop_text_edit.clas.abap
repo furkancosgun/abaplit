@@ -94,9 +94,12 @@ CLASS z2fiori_cl_pop_text_edit IMPLEMENTATION.
             editable    = |{ mv_editable }|
             growing     = 'true'
         )->end(
-      )->buttons(
-        )->button( text = 'OK' press = client->event( 'OK' ) type = 'Emphasized'
-        )->button( text = 'Cancel' press = client->event( 'CANCEL' ) ).
+        )->begin_button(
+          )->button( text = 'OK' press = client->event( 'OK' ) type = 'Emphasized'
+        )->end(
+        )->end_button(
+          )->button( text = 'Cancel' press = client->event( 'CANCEL' )
+        )->end( ).
 
       client->popup_show( view->stringify( ) ).
     ENDIF.

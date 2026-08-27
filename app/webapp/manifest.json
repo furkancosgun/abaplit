@@ -60,7 +60,11 @@
       }
     },
     "resources": {
-      "css": []
+      "css": [
+        {
+          "uri": "css/style.css"
+        }
+      ]
     },
     "rootView": {
       "viewName": "z2fiori.view.App",

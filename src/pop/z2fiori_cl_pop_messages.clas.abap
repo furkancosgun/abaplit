@@ -106,9 +106,9 @@ CLASS z2fiori_cl_pop_messages IMPLEMENTATION.
                 )->text( '{ID} {NUMBER}'
               )->end(
             )->end(
-        )->buttons(
+        )->begin_button(
           )->button( text = 'Close' press = client->event( 'CLOSE' ) type = 'Emphasized'
-        ).
+        )->end( ).
 
       client->popup_show( view->stringify( ) ).
     ENDIF.

@@ -57,9 +57,12 @@ CLASS z2fiori_cl_pop_pdf IMPLEMENTATION.
         )->vbox( class = 'sapUiMediumMargin'
           )->text( |File: { mv_filename } (Ready to download)|
         )->end(
-      )->buttons(
-        )->button( text = 'Download PDF' press = client->event( 'DOWNLOAD' ) type = 'Emphasized' icon = 'sap-icon://download'
-        )->button( text = 'Close' press = client->event( 'CLOSE' ) ).
+      )->begin_button(
+          )->button( text = 'Download PDF' press = client->event( 'DOWNLOAD' ) type = 'Emphasized' icon = 'sap-icon://download'
+        )->end(
+        )->end_button(
+          )->button( text = 'Close' press = client->event( 'CLOSE' )
+        )->end( ).
 
       client->popup_show( view->stringify( ) ).
     ENDIF.

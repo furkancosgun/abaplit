@@ -141,8 +141,9 @@ CLASS z2fiori_cl_pop_table IMPLEMENTATION.
             press       = client->event( event = 'SELECT' t_arg = VALUE #( ( `{KEY}` ) ) )
             type        = 'Active'
         )->end(
-      )->buttons(
-        )->button( text = 'Cancel' press = client->event( 'CANCEL' ) ).
+        )->begin_button(
+          )->button( text = 'Cancel' press = client->event( 'CANCEL' )
+        )->end( ).
 
       client->popup_show( view->stringify( ) ).
     ENDIF.
