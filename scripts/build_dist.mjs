@@ -73,8 +73,8 @@ function buildOnprem() {
   fs.mkdirSync(srvDir, { recursive: true });
   fs.mkdirSync(appDir, { recursive: true });
 
-  // 1. Copy Core ABAP packages (core, http, vendor)
-  for (const folder of ["core", "http", "vendor"]) {
+  // 1. Copy Core ABAP packages (core, http, vendor, demo)
+  for (const folder of ["core", "http", "vendor", "demo"]) {
     const sourceFolder = path.join(SRC_DIR, folder);
     const destFolder = path.join(destSrcDir, folder);
     if (fs.existsSync(sourceFolder)) {
@@ -312,8 +312,8 @@ function buildCloud() {
   fs.mkdirSync(srvDir, { recursive: true });
   fs.mkdirSync(appDir, { recursive: true });
 
-  // 1. Copy Core ABAP packages (core, http, vendor) with Cloud language version
-  for (const folder of ["core", "http", "vendor"]) {
+  // 1. Copy Core ABAP packages (core, http, vendor, demo) with Cloud language version
+  for (const folder of ["core", "http", "vendor", "demo"]) {
     const sourceFolder = path.join(SRC_DIR, folder);
     const destFolder = path.join(destSrcDir, folder);
     if (fs.existsSync(sourceFolder)) {
