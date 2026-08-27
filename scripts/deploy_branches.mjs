@@ -47,6 +47,7 @@ const stdTranspileConfig = {
   ...baseConfigStd,
   input_folder: "build/standard/src/",
   output_folder: "output_std/",
+  exclude_filter: ["/src/app/"],
   write_unit_tests: true,
   options: {
     ...(baseConfigStd.options || {}),
@@ -79,6 +80,7 @@ const cldTranspileConfig = {
   ...baseConfigCld,
   input_folder: "build/cloud/src/",
   output_folder: "output_cld/",
+  exclude_filter: ["/src/app/"],
   write_unit_tests: true,
   options: {
     ...(baseConfigCld.options || {}),
