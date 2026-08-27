@@ -101,6 +101,8 @@ abap2fiori/
 │   │   ├── z2fiori_cl_request_parser.clas.abap   # JSON -> ty_s_http_req
 │   │   ├── z2fiori_cl_response_builder.clas.abap # ty_s_http_res -> JSON
 │   │   └── z2fiori_cl_state_codec.clas.abap
+│   ├── pop/                      # Ready-to-use Popups (Confirm, Input, TextEdit, Table, Messages, PDF)
+│   ├── demo/                     # Sample applications (z2fiori_cl_demo_001, ...)
 │   └── vendor/z2fiori_cl_ajson*  # JSON (ajson)
 ├── scripts/
 │   ├── server.mjs                # Local dev server (UI5 + ABAP ICF)

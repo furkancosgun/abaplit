@@ -52,13 +52,21 @@ const app = express();
 app.disable("x-powered-by");
 app.set("etag", false);
 
-// 1. Static UI5 Frontend
+// 1. Root redirect if app query is missing
+app.get("/", (req, res, next) => {
+  if (!req.query.app && !req.query["app"]) {
+    return res.redirect("/?app=z2fiori_cl_demo_002");
+  }
+  next();
+});
+
+// 2. Static UI5 Frontend
 app.use(express.static(distPath));
 
-// 2. Raw body parsing for ABAP ICF requests
+// 3. Raw body parsing for ABAP ICF requests
 app.use(express.raw({ type: "*/*", limit: "10mb" }));
 
-// 3. ICF handler route
+// 4. ICF handler route
 app.all(/^\/sap\/bc\/(http\/sap\/)?z2fiori/, async (req, res) => {
   if (!req.body) {
     req.body = Buffer.alloc(0);
@@ -79,9 +87,14 @@ app.all(/^\/sap\/bc\/(http\/sap\/)?z2fiori/, async (req, res) => {
 });
 
 export const server = app.listen(PORT, () => {
-  console.log(`\n🚀 abap2fiori Dev Server running on http://localhost:${PORT}`);
-  console.log(`📡 ICF Handler: ${HANDLER_CLASS.toUpperCase()} -> /sap/bc/z2fiori`);
-  console.log(`🌐 Open http://localhost:${PORT}/?app=<YOUR_APP_CLASS> in browser\n`);
+  console.log(`\n=============================================================`);
+  console.log(`🚀 abap2fiori Dev Server is RUNNING at http://localhost:${PORT}`);
+  console.log(`📡 ICF Backend Handler: ${HANDLER_CLASS.toUpperCase()} -> /sap/bc/z2fiori`);
+  console.log(`=============================================================`);
+  console.log(`\nReady-to-use Demos:`);
+  console.log(`  🔹 Demo 001 (Basic Form & Counter):  http://localhost:${PORT}/?app=z2fiori_cl_demo_001`);
+  console.log(`  🔹 Demo 002 (All 6 Popups Showcase): http://localhost:${PORT}/?app=z2fiori_cl_demo_002`);
+  console.log(`\n=============================================================\n`);
 });
 
 server.on("error", (err) => {

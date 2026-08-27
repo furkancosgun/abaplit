@@ -23,19 +23,19 @@ CLASS z2fiori_cl_demo_001 IMPLEMENTATION.
         client->toast_display( 'Counter reset' ).
 
       WHEN 'SAY_HELLO'.
-        client->message_box_display( text = |Hello, { mv_user_name }! Welcome to abap2fiori.| ).
+        client->message_box_display( |Hello, { mv_user_name }! Welcome to abap2fiori.| ).
     ENDCASE.
 
     IF client->check_init( ) = abap_true.
       DATA(view) = z2fiori_cl_xml_view_builder=>factory( ).
 
-      view->page( title = 'abap2fiori - Demo 001' )->content(
-        )->simple_form( title = 'Interactive Demo' )->content(
-          )->label( text = 'Your Name'
-          )->input( value = client->bind( mv_user_name )
+      view->page( 'abap2fiori - Demo 001'
+        )->simple_form( 'Interactive Demo'
+          )->label( 'Your Name'
+          )->input( client->bind( mv_user_name )
           )->button( text = 'Say Hello' press = client->event( 'SAY_HELLO' ) type = 'Emphasized'
-          )->label( text = 'Counter'
-          )->text( text = client->bind( mv_counter )
+          )->label( 'Counter'
+          )->text( client->bind( mv_counter )
           )->button( text = '+1 Increment' press = client->event( 'INCREMENT' )
           )->button( text = 'Reset' press = client->event( 'RESET' ) type = 'Reject'
       ).

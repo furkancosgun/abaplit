@@ -102,7 +102,7 @@
     "identical_form_names": true,
     "if_in_if": false,
     "implement_methods": true,
-    "in_statement_indentation": true,
+    "in_statement_indentation": false,
     "indentation": true,
     "inline_data_old_versions": true,
     "intf_referencing_clas": false,
