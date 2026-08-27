@@ -7,25 +7,29 @@
   },
   "scripts": {
     "clean": "node scripts/clean.mjs",
+    "typecheck": "tsc --noEmit --project app/tsconfig.json",
     "build": "npm run clean && abap_transpile abaplint-transpiler.json",
+    "build:ui5": "cd app && npx ui5 build --clean-dest --dest dist",
+    "build:all": "npm run build && npm run build:ui5 && node scripts/build_dist.mjs",
     "build:dist": "node scripts/build_dist.mjs",
-    "deploy": "node scripts/deploy_branches.mjs",
-    "release": "node scripts/deploy_branches.mjs",
     "lint": "abaplint",
     "lint:fix": "abaplint --fix",
-    "lint:cloud": "abaplint abaplint-cloud.json",
-    "lint:downport": "abaplint abaplint-downport.json",
+    "lint:cloud": "abaplint --config abaplint-cloud.json",
     "downport": "node -e \"import('./scripts/downport.mjs').then(m => m.downportDirectory('src'))\"",
-    "unit": "npm run build && node --expose-gc output/index.mjs",
+    "unit": "node --expose-gc output/index.mjs",
     "test": "npm run lint && npm run lint:cloud && npm run unit",
+    "test:ui5": "npm run typecheck && npm run build:ui5",
+    "check": "npm run typecheck && npm run lint",
+    "deploy": "node scripts/deploy_branches.mjs",
     "pull:ajson": "node scripts/pull_ajson.mjs",
     "deps": "git submodule update --init --recursive"
   },
   "devDependencies": {
     "@abaplint/cli": "latest",
-    "@abaplint/database-sqlite": "latest",
-    "@abaplint/runtime": "latest",
-    "@abaplint/transpiler-cli": "latest",
-    "abap-kit": "latest"
+    "@openui5/ts-types": "~1.151.0",
+    "@sapui5/types": "~1.151.0",
+    "@ui5/cli": "^4.0.33",
+    "typescript": "^5.9.3",
+    "ui5-tooling-transpile": "^3.10.0"
   }
 }

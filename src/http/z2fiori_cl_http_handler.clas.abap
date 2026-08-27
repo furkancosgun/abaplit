@@ -58,7 +58,6 @@ CLASS z2fiori_cl_http_handler IMPLEMENTATION.
       WHEN OTHERS.
         mo_http->set_status( 405 ).
     ENDCASE.
-    mo_http->set_compression( ).
   ENDMETHOD.
 
   METHOD serve_roundtrip.
@@ -75,10 +74,14 @@ CLASS z2fiori_cl_http_handler IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD respond_json.
+    DATA(lv_json) = z2fiori_cl_response_builder=>build( res ).
     mo_http->set_header( name  = 'content-type'
                          value = gc_content_json ).
-    mo_http->set_text( z2fiori_cl_response_builder=>build( res ) ).
+    mo_http->set_text( lv_json ).
     mo_http->set_status( 200 ).
+    IF strlen( lv_json ) > 1024.
+      mo_http->set_compression( ).
+    ENDIF.
   ENDMETHOD.
 
   METHOD respond_info.
@@ -88,11 +91,17 @@ CLASS z2fiori_cl_http_handler IMPLEMENTATION.
                               iv_val  = 'abap2fiori' ).
         lo_ajson->set_string( iv_path = '/method'
                               iv_val  = 'POST' ).
+        lo_ajson->set_string( iv_path = '/version'
+                              iv_val  = '2.0' ).
 
+        DATA(lv_json) = lo_ajson->stringify( ).
         mo_http->set_header( name  = 'content-type'
                              value = gc_content_json ).
-        mo_http->set_text( lo_ajson->stringify( ) ).
+        mo_http->set_text( lv_json ).
         mo_http->set_status( 200 ).
+        IF strlen( lv_json ) > 1024.
+          mo_http->set_compression( ).
+        ENDIF.
       CATCH z2fiori_cx_ajson_error.
         mo_http->set_status( 500 ).
     ENDTRY.

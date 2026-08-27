@@ -1,30 +1,23 @@
 # yaml-language-server: $schema=https://sap.github.io/ui5-tooling/schema/ui5.yaml.json
-
 specVersion: "4.0"
 metadata:
   name: z2fiori
 type: application
-resources:
-  configuration:
-    paths:
-      webapp: app/webapp
 server:
   customMiddleware:
-    - name: fiori-tools-proxy
+    - name: ui5-tooling-transpile-middleware
       afterMiddleware: compression
       configuration:
-        ignoreCertErrors: false # If set to true, certificate errors will be ignored. E.g. self-signed certificates will be accepted
-        backend:
-          - path: /sap
-            url: http://localhost:3000 # abap2fiori backend (npm run start in repo root)
-        ui5:
-          path:
-            - /resources
-            - /test-resources
-          url: https://ui5.sap.com
-    - name: fiori-tools-appreload
-      afterMiddleware: compression
+        debug: true
+        transformModulesToUI5:
+          overridesToOverride: true
+        excludePatterns:
+          - /Component-preload.js
+builder:
+  customTasks:
+    - name: ui5-tooling-transpile-task
+      afterTask: replaceVersion
       configuration:
-        port: 35729
-        path: app/webapp
-        delay: 300
+        debug: true
+        transformModulesToUI5:
+          overridesToOverride: true

@@ -1,4 +1,6 @@
 INTERFACE z2fiori_if_client PUBLIC.
+  "! SRP split available: z2fiori_if_view, z2fiori_if_popup, z2fiori_if_navigation, z2fiori_if_system
+  "! This interface is kept as composite facade for backward compatibility.
 
   CONSTANTS:
     BEGIN OF cs_msg_box_type,
