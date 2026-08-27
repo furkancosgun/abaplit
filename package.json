@@ -18,6 +18,7 @@
     "build": "npm run clean && abap_transpile abaplint-transpiler.json",
     "build:dist": "node scripts/build_dist.mjs",
     "build:ui5": "npx ui5 build --clean-dest --dest dist --config app/ui5.yaml",
+    "generate:views": "node scripts/generate_views.mjs",
     "test": "npm run lint && npm run lint:cloud && npm run test:unit",
     "test:unit": "npm run build && node --expose-gc output/index.mjs",
     "unit": "npm run test:unit",
