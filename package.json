@@ -5,7 +5,9 @@
   "engines": {
     "node": ">=20.0.0"
   },
-"scripts": {
+  "scripts": {
+    "start": "node scripts/server.mjs",
+    "dev": "node scripts/server.mjs",
     "clean": "node scripts/clean.mjs",
     "deps": "git submodule update --init --recursive",
     "pull": "node scripts/pull_ajson.mjs",

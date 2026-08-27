@@ -103,6 +103,7 @@ abap2fiori/
 │   │   └── z2fiori_cl_state_codec.clas.abap
 │   └── vendor/z2fiori_cl_ajson*  # JSON (ajson)
 ├── scripts/
+│   ├── server.mjs                # Local dev server (UI5 + ABAP ICF)
 │   ├── generate_views.mjs        # Generates z2fiori_cl_xml_view_builder from api.json
 │   ├── pull_ajson.mjs            # Syncs & vendors ajson library
 │   ├── build_dist.mjs            # standard + cloud distribution builds
@@ -455,6 +456,7 @@ To expose a new ABAP action, add it to `lcl_action_mgr` in `z2fiori_cl_client` l
 | `lint` | `abaplint` | ABAP lint (Normal) |
 | Command | Action | Description |
 |---|---|---|
+| `start` / `dev` | `node scripts/server.mjs` | Run local dev server (UI5 frontend + ABAP ICF handler) |
 | `build` | `npm run build:ui && npm run build:abap && npm run lint:all` | Full project build and verification |
 | `build:ui` | `tsc && ui5 build` | Build UI5 webapp to `dist/` |
 | `build:abap` | `node scripts/build_dist.mjs` | Transpile & create onprem/cloud packages in `build/` |
