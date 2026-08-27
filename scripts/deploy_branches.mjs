@@ -79,7 +79,6 @@ const cldTranspileConfig = {
   ...baseConfigCld,
   input_folder: "build/cloud/src/",
   output_folder: "output_cld/",
-  exclude_filter: ["app"],
   write_unit_tests: true,
   options: {
     ...(baseConfigCld.options || {}),
