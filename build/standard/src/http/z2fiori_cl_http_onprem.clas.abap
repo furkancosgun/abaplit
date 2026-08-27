@@ -6,9 +6,9 @@ CLASS z2fiori_cl_http_onprem DEFINITION
     INTERFACES z2fiori_if_http.
 
     METHODS constructor
-      IMPORTING !request  TYPE REF TO object OPTIONAL
-                !response TYPE REF TO object OPTIONAL
-                server    TYPE REF TO object OPTIONAL.
+      IMPORTING request  TYPE REF TO object OPTIONAL
+                response TYPE REF TO object OPTIONAL
+                server   TYPE REF TO object OPTIONAL.
 
   PRIVATE SECTION.
     DATA mo_request  TYPE REF TO object.

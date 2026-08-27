@@ -24,31 +24,7 @@ console.log("\n=== Step 2: Building Distribution Packages (with Downport) ===");
 run("node scripts/build_dist.mjs");
 
 console.log("\n=== Step 3: Validating Standard (On-Premise 7.02) Syntax ===");
-const stdConfigPath = path.join(ONPREM_BUILD, "abaplint-check.json");
-fs.writeFileSync(stdConfigPath, JSON.stringify({
-  global: {
-    files: "/src/**/*.*",
-    noIssues: ["/src/vendor/*", "z2fiori_cl_xml_view_builder.clas.abap"]
-  },
-  dependencies: [
-    { folder: "/deps/open-abap-core", files: "/src/**/*.*" }
-  ],
-  syntax: {
-    version: "v702",
-    errorNamespace: "^(Z|Y|LCL_|TY_|LIF_)"
-  },
-  rules: {
-    parser_error: true,
-    unknown_types: true,
-    obsolete_statement: true
-  }
-}, null, 2), "utf-8");
-
-try {
-  run(`npx abaplint "${stdConfigPath}"`, ONPREM_BUILD);
-} finally {
-  if (fs.existsSync(stdConfigPath)) fs.unlinkSync(stdConfigPath);
-}
+run(`npx abaplint --config "${path.join(ROOT_DIR, "abaplint-downport.json")}"`, ONPREM_BUILD);
 
 console.log("\n=== Step 4: Running Unit Tests on Standard (7.02 Downported) Build ===");
 const stdTranspilerPath = path.join(ROOT_DIR, ".temp_transpile_std.json");
@@ -79,33 +55,7 @@ try {
 }
 
 console.log("\n=== Step 5: Validating Cloud (ABAP Cloud) Syntax ===");
-const cldConfigPath = path.join(CLOUD_BUILD, "abaplint-check.json");
-fs.writeFileSync(cldConfigPath, JSON.stringify({
-  global: {
-    files: "/src/**/*.*",
-    exclude: ["webapp"],
-    noIssues: ["/src/vendor/*", "z2fiori_cl_xml_view_builder.clas.abap"]
-  },
-  dependencies: [
-    { folder: "/deps/open-abap-core", files: "/src/**/*.*" }
-  ],
-  syntax: {
-    version: "Cloud",
-    errorNamespace: "^(Z|Y|LCL_|TY_|LIF_)"
-  },
-  rules: {
-    parser_error: true,
-    unknown_types: true,
-    cloud_types: true,
-    obsolete_statement: true
-  }
-}, null, 2), "utf-8");
-
-try {
-  run(`npx abaplint "${cldConfigPath}"`, CLOUD_BUILD);
-} finally {
-  if (fs.existsSync(cldConfigPath)) fs.unlinkSync(cldConfigPath);
-}
+run(`npx abaplint --config "${path.join(ROOT_DIR, "abaplint-cloud.json")}"`, CLOUD_BUILD);
 
 console.log("\n=== Step 6: Running Unit Tests on Cloud Build ===");
 const cldTranspilerPath = path.join(ROOT_DIR, ".temp_transpile_cld.json");

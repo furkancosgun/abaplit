@@ -23,9 +23,9 @@
   "rules": {
     "7bit_ascii": true,
     "abapdoc": false,
-    "align_parameters": false,
-    "align_pseudo_comments": false,
-    "align_type_expressions": false,
+    "align_parameters": true,
+    "align_pseudo_comments": true,
+    "align_type_expressions": true,
     "allowed_object_naming": true,
     "ambiguous_statement": true,
     "avoid_use": {
@@ -44,7 +44,7 @@
     "call_transaction_authority_check": true,
     "catch_and_raise": true,
     "chain_mainly_declarations": true,
-    "change_if_to_case": false,
+    "change_if_to_case": true,
     "check_abstract": true,
     "check_comments": true,
     "check_include": true,
@@ -57,7 +57,7 @@
     "clear_exporting_parameters": true,
     "cloud_types": false,
     "colon_missing_space": true,
-    "commented_code": false,
+    "commented_code": true,
     "constant_classes": true,
     "contains_tab": true,
     "cyclic_oo": false,
@@ -70,7 +70,7 @@
     "description_empty": true,
     "double_space": true,
     "downport": false,
-    "empty_line_in_statement": false,
+    "empty_line_in_statement": true,
     "empty_statement": true,
     "empty_structure": {
       "loop": true,
@@ -102,8 +102,8 @@
     "identical_form_names": true,
     "if_in_if": false,
     "implement_methods": true,
-    "in_statement_indentation": false,
-    "indentation": false,
+    "in_statement_indentation": true,
+    "indentation": true,
     "inline_data_old_versions": true,
     "intf_referencing_clas": false,
     "keep_single_parameter_on_one_line": false,
@@ -118,7 +118,9 @@
     },
     "line_break_multiple_parameters": false,
     "line_break_style": false,
-    "line_length": false,
+    "line_length": {
+      "max": 120
+    },
     "line_only_punc": false,
     "local_class_naming": true,
     "local_testclass_consistency": true,
@@ -161,7 +163,7 @@
     "prefer_is_not": true,
     "prefer_raise_exception_new": true,
     "prefer_returning_to_exporting": true,
-    "prefer_xsdbool": false,
+    "prefer_xsdbool": true,
     "preferred_compare_operator": true,
     "prefix_is_current_class": true,
     "reduce_string_templates": true,
@@ -182,7 +184,7 @@
       "ignoreExceptions": true
     },
     "sql_escape_host_variables": true,
-    "start_at_tab": false,
+    "start_at_tab": true,
     "static_call_via_instance": true,
     "strict_sql": true,
     "superclass_final": true,
@@ -213,6 +215,7 @@
     "use_new": true,
     "whitespace_end": true,
     "xml_bom": true,
-    "xml_consistency": true
+    "xml_consistency": true,
+    "no_exclamation_escape": true
   }
 }

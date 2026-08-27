@@ -5,17 +5,17 @@ CLASS z2fiori_cl_view_builder DEFINITION PUBLIC CREATE PRIVATE.
       RETURNING VALUE(result) TYPE REF TO z2fiori_cl_view_builder.
 
     METHODS ele
-      IMPORTING !n            TYPE string
-                !ns           TYPE string OPTIONAL
+      IMPORTING n             TYPE string
+                ns            TYPE string OPTIONAL
       RETURNING VALUE(result) TYPE REF TO z2fiori_cl_view_builder.
 
     METHODS tag
-      IMPORTING !n            TYPE string
-                !ns           TYPE string OPTIONAL
+      IMPORTING n             TYPE string
+                ns            TYPE string OPTIONAL
       RETURNING VALUE(result) TYPE REF TO z2fiori_cl_view_builder.
 
     METHODS a
-      IMPORTING !n            TYPE string
+      IMPORTING n             TYPE string
                 v             TYPE string    OPTIONAL
                 b             TYPE abap_bool OPTIONAL
       RETURNING VALUE(result) TYPE REF TO z2fiori_cl_view_builder.
@@ -85,12 +85,16 @@ CLASS z2fiori_cl_view_builder IMPLEMENTATION.
       DATA temp7 LIKE sy-tabix.
       DATA temp4 LIKE sy-subrc.
       DATA temp5 TYPE z2fiori_cl_view_builder=>ty_s_name_value.
-    ASSERT mv_name IS NOT INITIAL OR mt_child IS NOT INITIAL.
+    IF mv_name IS INITIAL AND mt_child IS INITIAL.
+      z2fiori_cx_error=>raise( 'View builder: attribute requires active element.' ).
+    ENDIF.
 
     
     lv_val = v.
     IF b IS SUPPLIED.
-      ASSERT v IS INITIAL.
+      IF v IS NOT INITIAL.
+        z2fiori_cx_error=>raise( 'View builder: boolean param b requires v initial.' ).
+      ENDIF.
       
       IF b = abap_true.
         temp1 = 'true'.
@@ -104,7 +108,9 @@ CLASS z2fiori_cl_view_builder IMPLEMENTATION.
       
       READ TABLE mt_pair WITH KEY n = n TRANSPORTING NO FIELDS.
       temp2 = sy-subrc.
-      ASSERT NOT temp2 = 0.
+      IF temp2 = 0.
+        z2fiori_cx_error=>raise( |Attribute '{ n }' already exists.| ).
+      ENDIF.
       
       CLEAR temp3.
       temp3-n = n.
@@ -124,7 +130,9 @@ CLASS z2fiori_cl_view_builder IMPLEMENTATION.
       
       READ TABLE lo_target->mt_pair WITH KEY n = n TRANSPORTING NO FIELDS.
       temp4 = sy-subrc.
-      ASSERT NOT temp4 = 0.
+      IF temp4 = 0.
+        z2fiori_cx_error=>raise( |Attribute '{ n }' already exists on target.| ).
+      ENDIF.
       
       CLEAR temp5.
       temp5-n = n.
@@ -135,7 +143,9 @@ CLASS z2fiori_cl_view_builder IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD end.
-    ASSERT mo_parent IS BOUND.
+    IF mo_parent IS NOT BOUND.
+      z2fiori_cx_error=>raise( 'View builder: end() called without parent.' ).
+    ENDIF.
     result = mo_parent.
   ENDMETHOD.
 

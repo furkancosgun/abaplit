@@ -7,11 +7,11 @@ CLASS z2fiori_cl_http_handler DEFINITION
       IMPORTING server TYPE REF TO object.
 
     CLASS-METHODS factory_cloud
-      IMPORTING !request  TYPE REF TO object
-                !response TYPE REF TO object.
+      IMPORTING request  TYPE REF TO object
+                response TYPE REF TO object.
 
     METHODS constructor
-      IMPORTING !http TYPE REF TO z2fiori_if_http.
+      IMPORTING http TYPE REF TO z2fiori_if_http.
 
   PRIVATE SECTION.
     CONSTANTS gc_content_json TYPE string VALUE 'application/json; charset=utf-8'.
@@ -79,9 +79,7 @@ CLASS z2fiori_cl_http_handler IMPLEMENTATION.
                          value = gc_content_json ).
     mo_http->set_text( lv_json ).
     mo_http->set_status( 200 ).
-    IF strlen( lv_json ) > 1024.
-      mo_http->set_compression( ).
-    ENDIF.
+    mo_http->set_compression( ).
   ENDMETHOD.
 
   METHOD respond_info.

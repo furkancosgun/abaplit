@@ -384,7 +384,7 @@ CLASS lcl_binding_resolver IMPLEMENTATION.
 
     GET REFERENCE OF val INTO lr_val.
 
-    ASSIGN mt_nodes[ dref = lr_val ] TO <fs_node>.
+    READ TABLE mt_nodes WITH KEY dref = lr_val ASSIGNING <fs_node>.
     IF sy-subrc <> 0.
       z2fiori_cx_error=>raise( 'Binding error: Variable reference not found in registered app state.' ).
     ENDIF.

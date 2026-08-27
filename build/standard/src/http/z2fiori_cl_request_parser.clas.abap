@@ -4,7 +4,7 @@ CLASS z2fiori_cl_request_parser DEFINITION
 
   PUBLIC SECTION.
     CLASS-METHODS parse
-      IMPORTING !json         TYPE string
+      IMPORTING json          TYPE string
       RETURNING VALUE(result) TYPE z2fiori_if_types=>ty_s_http_req.
 ENDCLASS.
 

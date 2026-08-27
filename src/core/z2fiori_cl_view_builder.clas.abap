@@ -5,17 +5,17 @@ CLASS z2fiori_cl_view_builder DEFINITION PUBLIC CREATE PRIVATE.
       RETURNING VALUE(result) TYPE REF TO z2fiori_cl_view_builder.
 
     METHODS ele
-      IMPORTING !n            TYPE string
-                !ns           TYPE string OPTIONAL
+      IMPORTING n             TYPE string
+                ns            TYPE string OPTIONAL
       RETURNING VALUE(result) TYPE REF TO z2fiori_cl_view_builder.
 
     METHODS tag
-      IMPORTING !n            TYPE string
-                !ns           TYPE string OPTIONAL
+      IMPORTING n             TYPE string
+                ns            TYPE string OPTIONAL
       RETURNING VALUE(result) TYPE REF TO z2fiori_cl_view_builder.
 
     METHODS a
-      IMPORTING !n            TYPE string
+      IMPORTING n             TYPE string
                 v             TYPE string    OPTIONAL
                 b             TYPE abap_bool OPTIONAL
       RETURNING VALUE(result) TYPE REF TO z2fiori_cl_view_builder.

@@ -6,8 +6,8 @@ CLASS z2fiori_cl_http_cloud DEFINITION
     INTERFACES z2fiori_if_http.
 
     METHODS constructor
-      IMPORTING !request  TYPE REF TO object
-                !response TYPE REF TO object.
+      IMPORTING request  TYPE REF TO object
+                response TYPE REF TO object.
 
   PRIVATE SECTION.
     DATA mo_request  TYPE REF TO object.

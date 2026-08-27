@@ -5,17 +5,17 @@ CLASS z2fiori_cl_view_builder DEFINITION PUBLIC CREATE PRIVATE.
       RETURNING VALUE(result) TYPE REF TO z2fiori_cl_view_builder.
 
     METHODS ele
-      IMPORTING !n            TYPE string
-                !ns           TYPE string OPTIONAL
+      IMPORTING n             TYPE string
+                ns            TYPE string OPTIONAL
       RETURNING VALUE(result) TYPE REF TO z2fiori_cl_view_builder.
 
     METHODS tag
-      IMPORTING !n            TYPE string
-                !ns           TYPE string OPTIONAL
+      IMPORTING n             TYPE string
+                ns            TYPE string OPTIONAL
       RETURNING VALUE(result) TYPE REF TO z2fiori_cl_view_builder.
 
     METHODS a
-      IMPORTING !n            TYPE string
+      IMPORTING n             TYPE string
                 v             TYPE string    OPTIONAL
                 b             TYPE abap_bool OPTIONAL
       RETURNING VALUE(result) TYPE REF TO z2fiori_cl_view_builder.
@@ -76,21 +76,29 @@ CLASS z2fiori_cl_view_builder IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD a.
-    ASSERT mv_name IS NOT INITIAL OR mt_child IS NOT INITIAL.
+    IF mv_name IS INITIAL AND mt_child IS INITIAL.
+      z2fiori_cx_error=>raise( 'View builder: attribute requires active element.' ).
+    ENDIF.
 
     DATA(lv_val) = v.
     IF b IS SUPPLIED.
-      ASSERT v IS INITIAL.
+      IF v IS NOT INITIAL.
+        z2fiori_cx_error=>raise( 'View builder: boolean param b requires v initial.' ).
+      ENDIF.
       lv_val = COND #( WHEN b = abap_true THEN 'true' ELSE 'false' ).
     ENDIF.
 
     IF mt_child IS INITIAL.
-      ASSERT NOT line_exists( mt_pair[ n = n ] ).
+      IF line_exists( mt_pair[ n = n ] ).
+        z2fiori_cx_error=>raise( |Attribute '{ n }' already exists.| ).
+      ENDIF.
       APPEND VALUE #( n = n
                       v = lv_val ) TO mt_pair.
     ELSE.
       DATA(lo_target) = mt_child[ lines( mt_child ) ].
-      ASSERT NOT line_exists( lo_target->mt_pair[ n = n ] ).
+      IF line_exists( lo_target->mt_pair[ n = n ] ).
+        z2fiori_cx_error=>raise( |Attribute '{ n }' already exists on target.| ).
+      ENDIF.
       APPEND VALUE #( n = n
                       v = lv_val ) TO lo_target->mt_pair.
     ENDIF.
@@ -98,7 +106,9 @@ CLASS z2fiori_cl_view_builder IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD end.
-    ASSERT mo_parent IS BOUND.
+    IF mo_parent IS NOT BOUND.
+      z2fiori_cx_error=>raise( 'View builder: end() called without parent.' ).
+    ENDIF.
     result = mo_parent.
   ENDMETHOD.
 
