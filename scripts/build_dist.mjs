@@ -6,10 +6,17 @@ import { fileURLToPath } from "node:url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = path.resolve(__dirname, "..");
 const SRC_DIR = path.join(ROOT_DIR, "src");
-const WEBAPP_DIR = path.join(ROOT_DIR, "app", "webapp");
+const DIST_DIR = path.join(ROOT_DIR, "dist");
 const BUILD_DIR = path.join(ROOT_DIR, "build");
 const ONPREM_BUILD = path.join(BUILD_DIR, "standard");
 const CLOUD_BUILD = path.join(BUILD_DIR, "cloud");
+
+function ensureUiBuild() {
+  if (!fs.existsSync(DIST_DIR) || !fs.existsSync(path.join(DIST_DIR, "Component.js"))) {
+    console.log("[build_dist] Compiling UI5 frontend into dist/...");
+    execSync("npm run build:ui", { cwd: ROOT_DIR, stdio: "inherit" });
+  }
+}
 
 function getAllFiles(dir, base = "") {
   let results = [];
@@ -197,7 +204,8 @@ ENDCLASS.
   fs.writeFileSync(path.join(srvDir, sicfFileName), sicfXml, "utf-8");
 
   // 7. WAPA BSP for Frontend Application
-  const files = getAllFiles(WEBAPP_DIR);
+  ensureUiBuild();
+  const files = getAllFiles(DIST_DIR);
   const pagesXml = [];
 
   for (const { relPath, fullPath } of files) {
@@ -403,9 +411,9 @@ ENDCLASS.
   fs.writeFileSync(path.join(srvDir, "z2fiori_cl_lp_handler.clas.abap"), lpHandlerCloudAbap, "utf-8");
   fs.writeFileSync(path.join(srvDir, "z2fiori_cl_lp_handler.clas.xml"), lpHandlerCloudXml, "utf-8");
 
-  // 6. Copy frontend webapp to cloud with URL rewrite in manifest.json
-  const cloudWebappDest = path.join(appDir, "webapp");
-  copyDirRecursive(WEBAPP_DIR, cloudWebappDest, (src, dest) => {
+  // 6. Copy frontend directly to src/app with URL rewrite in manifest.json
+  ensureUiBuild();
+  copyDirRecursive(DIST_DIR, appDir, (src, dest) => {
     let content = fs.readFileSync(src, "utf-8");
     if (src.endsWith("manifest.json")) {
       // Rewrite endpoint to Cloud HTTP Service path
@@ -417,12 +425,9 @@ ENDCLASS.
   console.log(`[abap2fiori] Cloud build created in ${CLOUD_BUILD}`);
 }
 
-// Clean previous result/dist directories
+// Clean previous result directory
 if (fs.existsSync(path.join(ROOT_DIR, "result"))) {
   fs.rmSync(path.join(ROOT_DIR, "result"), { recursive: true, force: true });
-}
-if (fs.existsSync(path.join(ROOT_DIR, "dist"))) {
-  fs.rmSync(path.join(ROOT_DIR, "dist"), { recursive: true, force: true });
 }
 
 buildOnprem();

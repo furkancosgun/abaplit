@@ -2,7 +2,7 @@
   "global": {
     "files": "/build/standard/src/**/*.*",
     "exclude": [
-      "/build/standard/src/app/*"
+      "/build/standard/src/app/"
     ],
     "noIssues": [
       "/build/standard/src/vendor/*",

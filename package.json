@@ -5,35 +5,29 @@
   "engines": {
     "node": ">=20.0.0"
   },
-  "scripts": {
+"scripts": {
     "clean": "node scripts/clean.mjs",
     "deps": "git submodule update --init --recursive",
-    "pull:ajson": "node scripts/pull_ajson.mjs",
-    "typecheck": "tsc --noEmit --project app/tsconfig.json",
+    "pull": "node scripts/pull_ajson.mjs",
+    "views": "node scripts/generate_views.mjs",
     "lint": "abaplint",
     "lint:fix": "abaplint --fix",
-    "lint:ui": "npm run typecheck",
-    "lint:cloud": "abaplint abaplint-cloud.json",
-    "lint:downport": "abaplint abaplint-downport.json",
-    "build": "npm run clean && abap_transpile abaplint-transpiler.json",
-    "build:dist": "node scripts/build_dist.mjs",
-    "build:ui5": "npx ui5 build --clean-dest --dest dist --config app/ui5.yaml",
-    "generate:views": "node scripts/generate_views.mjs",
-    "test": "npm run lint && npm run lint:cloud && npm run test:unit",
-    "test:unit": "npm run build && node --expose-gc output/index.mjs",
-    "unit": "npm run test:unit",
-    "check": "node scripts/check.mjs",
-    "ci": "npm run lint:ui && npm run lint && npm run lint:cloud && npm run lint:downport",
+    "lint:all": "tsc --noEmit --project app/tsconfig.json && npm run lint && abaplint abaplint-cloud.json && abaplint abaplint-downport.json",
+    "build:ui": "tsc --noEmit --project app/tsconfig.json && npx ui5 build --clean-dest --dest dist --config app/ui5.yaml",
+    "build:abap": "abap_transpile abaplint-transpiler.json && node scripts/build_dist.mjs",
+    "build": "npm run clean && npm run build:ui && npm run build:abap && npm run lint:all",
+    "test": "npm run clean && abap_transpile abaplint-transpiler.json && node --expose-gc output/index.mjs",
+    "test:all": "npm run lint:all && npm run test",
     "deploy": "node scripts/deploy_branches.mjs"
   },
   "devDependencies": {
     "@abaplint/cli": "latest",
     "@abaplint/runtime": "latest",
     "@abaplint/transpiler-cli": "latest",
-    "abap-kit": "latest",
     "@openui5/ts-types": "~1.151.0",
     "@sapui5/types": "~1.151.0",
     "@ui5/cli": "^4.0.33",
+    "abap-kit": "latest",
     "typescript": "^5.9.3",
     "ui5-tooling-transpile": "^3.10.0"
   }

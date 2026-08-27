@@ -104,9 +104,10 @@ abap2fiori/
 │   └── vendor/z2fiori_cl_ajson*  # JSON (ajson)
 ├── scripts/
 │   ├── generate_views.mjs        # Generates z2fiori_cl_xml_view_builder from api.json
-│   ├── pull_ajson.mjs
+│   ├── pull_ajson.mjs            # Syncs & vendors ajson library
 │   ├── build_dist.mjs            # standard + cloud distribution builds
-│   ├── check.mjs / clean.mjs / deploy_branches.mjs
+│   ├── clean.mjs                 # Cleans build/transpiled artifacts
+│   └── deploy_branches.mjs       # Deploys standard and cloud branches
 ├── abaplint.json / abaplint-cloud.json / abaplint-downport.json / abaplint-transpiler.json
 └── package.json
 ```
@@ -452,20 +453,20 @@ To expose a new ABAP action, add it to `lcl_action_mgr` in `z2fiori_cl_client` l
 | `pull:ajson` | `node scripts/pull_ajson.mjs` | Vendor `ajson` |
 | `typecheck` | `tsc --noEmit --project app/tsconfig.json` | TS strict check |
 | `lint` | `abaplint` | ABAP lint (Normal) |
-| `lint:fix` | `abaplint --fix` | Auto-fix |
-| `lint:ui` | `npm run typecheck` | Alias |
-| `lint:cloud` | `abaplint abaplint-cloud.json` | Cloud rules |
-| `lint:downport` | `abaplint abaplint-downport.json` | 7.02 compat |
-| `build` | `npm run clean && abap_transpile abaplint-transpiler.json` | Transpile to `output/` |
-| `build:dist` | `node scripts/build_dist.mjs` | Standard + cloud distributions |
-| `build:ui5` | `npx ui5 build --clean-dest --dest dist --config app/ui5.yaml` | UI5 bundle |
-| `generate:views` | `node scripts/generate_views.mjs` | Regenerate view builder |
-| `test` | `npm run lint && npm run lint:cloud && npm run test:unit` | All lints + unit |
-| `test:unit` | `npm run build && node --expose-gc output/index.mjs` | Transpiled unit |
-| `unit` | `npm run test:unit` | Alias |
-| `check` | `node scripts/check.mjs` | Project checks |
-| `ci` | `npm run lint:ui && npm run lint && npm run lint:cloud && npm run lint:downport` | CI gate |
-| `deploy` | `node scripts/deploy_branches.mjs` | Deploy `build/` branches |
+| Command | Action | Description |
+|---|---|---|
+| `build` | `npm run build:ui && npm run build:abap && npm run lint:all` | Full project build and verification |
+| `build:ui` | `tsc && ui5 build` | Build UI5 webapp to `dist/` |
+| `build:abap` | `node scripts/build_dist.mjs` | Transpile & create onprem/cloud packages in `build/` |
+| `clean` | `node scripts/clean.mjs` | Clean temporary and output directories |
+| `views` | `node scripts/generate_views.mjs` | Regenerate ABAP XML view builder from UI5 metadata |
+| `pull` | `node scripts/pull_ajson.mjs` | Pull latest ajson library into vendor folder |
+| `lint` | `abaplint` | Lint ABAP code |
+| `lint:fix` | `abaplint --fix` | Auto-fix ABAP issues |
+| `lint:all` | `tsc && abaplint (all targets)` | Full linting (TS, standard, cloud, downport) |
+| `test` | `abap_transpile && node index.mjs` | Run ABAP unit tests |
+| `test:all` | `npm run lint:all && npm run test` | Full linting and unit testing |
+| `deploy` | `node scripts/deploy_branches.mjs` | Deploy to `standard` and `cloud` branches |
 
 ---
 
