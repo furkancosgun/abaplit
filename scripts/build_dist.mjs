@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
+import { execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { downportDirectory } from "./downport.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT_DIR = path.resolve(__dirname, "..");
@@ -289,8 +289,8 @@ ${pagesXml.join("\n")}
   fs.writeFileSync(path.join(appDir, bspSicfFileName), bspSicfXml, "utf-8");
   fs.writeFileSync(path.join(appDir, ui5SicfFileName), ui5SicfXml, "utf-8");
 
-  // 9. Downport entire standard ABAP package to 7.02 via abaplint --fix
-  downportDirectory(ONPREM_BUILD);
+  // 9. Downport entire standard ABAP package to 7.02 via abaplint --fix (ana config: abaplint-downport.json)
+  execSync(`npx abaplint abaplint-downport.json --fix`, { cwd: ROOT_DIR, stdio: "inherit" });
 
   console.log(`[abap2fiori] Standard (On-Premise) build created in ${ONPREM_BUILD}`);
 }

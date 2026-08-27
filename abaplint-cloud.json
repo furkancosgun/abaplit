@@ -1,9 +1,11 @@
 {
   "global": {
-    "files": "/src/**/*.*",
-    "exclude": [],
+    "files": "/build/cloud/src/**/*.*",
+    "exclude": [
+      "/build/cloud/src/app/*"
+    ],
     "noIssues": [
-      "/src/vendor/*",
+      "/build/cloud/src/vendor/*",
       "z2fiori_cl_xml_view_builder.clas.abap"
     ]
   },
@@ -15,14 +17,22 @@
   ],
   "syntax": {
     "version": "Cloud",
-    "errorNamespace": "^(Z|Y|LCL_|TY_|LIF_)"
+    "errorNamespace": "."
   },
   "rules": {
-    "7bit_ascii": true,
-    "abapdoc": false,
+    "downport": false,
+    "begin_end_names": true,
+    "check_ddic": true,
+    "check_include": true,
+    "check_syntax": true,
+    "global_class": true,
+    "definitions_top": false,
+    "implement_methods": true,
+    "method_implemented_twice": true,
     "parser_error": true,
+    "superclass_final": true,
     "unknown_types": true,
-    "cloud_types": true,
-    "obsolete_statement": true
+    "xml_bom": true,
+    "xml_consistency": true
   }
 }

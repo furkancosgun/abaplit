@@ -8,6 +8,10 @@ const ROOT_DIR = path.resolve(__dirname, "..");
 const ONPREM_BUILD = path.join(ROOT_DIR, "build", "standard");
 const CLOUD_BUILD = path.join(ROOT_DIR, "build", "cloud");
 
+const DOWNPORT_CONFIG = path.join(ROOT_DIR, "abaplint-downport.json");
+const CLOUD_CONFIG = path.join(ROOT_DIR, "abaplint-cloud.json");
+const TRANSPILER_CONFIG = path.join(ROOT_DIR, "abaplint-transpiler.json");
+
 function run(cmd, cwd = ROOT_DIR) {
   console.log(`> ${cmd}`);
   return execSync(cmd, { cwd, stdio: "inherit" });
@@ -17,6 +21,13 @@ function getOutput(cmd, cwd = ROOT_DIR) {
   return execSync(cmd, { cwd, encoding: "utf-8" }).trim();
 }
 
+function getTranspileBaseConfig() {
+  if (fs.existsSync(TRANSPILER_CONFIG)) {
+    return JSON.parse(fs.readFileSync(TRANSPILER_CONFIG, "utf-8"));
+  }
+  return {};
+}
+
 console.log("=== Step 1: Running Master Tests & Lint ===");
 run("npm test");
 
@@ -24,27 +35,28 @@ console.log("\n=== Step 2: Building Distribution Packages (with Downport) ===");
 run("node scripts/build_dist.mjs");
 
 console.log("\n=== Step 3: Validating Standard (On-Premise 7.02) Syntax ===");
-run(`npx abaplint --config "${path.join(ROOT_DIR, "abaplint-downport.json")}"`, ONPREM_BUILD);
+run(`npx abaplint "${DOWNPORT_CONFIG}"`);
 
 console.log("\n=== Step 4: Running Unit Tests on Standard (7.02 Downported) Build ===");
 const stdTranspilerPath = path.join(ROOT_DIR, ".temp_transpile_std.json");
 const stdOutDir = path.join(ROOT_DIR, "output_std");
 if (fs.existsSync(stdOutDir)) fs.rmSync(stdOutDir, { recursive: true, force: true });
 
-fs.writeFileSync(stdTranspilerPath, JSON.stringify({
+const baseConfigStd = getTranspileBaseConfig();
+const stdTranspileConfig = {
+  ...baseConfigStd,
   input_folder: "build/standard/src/",
   output_folder: "output_std/",
-  libs: [
-    { folder: "/deps/open-abap-core" },
-    { folder: "/deps/express-icf-shim" }
-  ],
   write_unit_tests: true,
   options: {
+    ...(baseConfigStd.options || {}),
     addFilenames: true,
     addCommonJS: true,
     unknownTypes: "compileError"
   }
-}, null, 2), "utf-8");
+};
+
+fs.writeFileSync(stdTranspilerPath, JSON.stringify(stdTranspileConfig, null, 2), "utf-8");
 
 try {
   run(`npx abap_transpile .temp_transpile_std.json`);
@@ -55,28 +67,29 @@ try {
 }
 
 console.log("\n=== Step 5: Validating Cloud (ABAP Cloud) Syntax ===");
-run(`npx abaplint --config "${path.join(ROOT_DIR, "abaplint-cloud.json")}"`, CLOUD_BUILD);
+run(`npx abaplint "${CLOUD_CONFIG}"`);
 
 console.log("\n=== Step 6: Running Unit Tests on Cloud Build ===");
 const cldTranspilerPath = path.join(ROOT_DIR, ".temp_transpile_cld.json");
 const cldOutDir = path.join(ROOT_DIR, "output_cld");
 if (fs.existsSync(cldOutDir)) fs.rmSync(cldOutDir, { recursive: true, force: true });
 
-fs.writeFileSync(cldTranspilerPath, JSON.stringify({
+const baseConfigCld = getTranspileBaseConfig();
+const cldTranspileConfig = {
+  ...baseConfigCld,
   input_folder: "build/cloud/src/",
   output_folder: "output_cld/",
   exclude_filter: ["webapp"],
-  libs: [
-    { folder: "/deps/open-abap-core" },
-    { folder: "/deps/express-icf-shim" }
-  ],
   write_unit_tests: true,
   options: {
+    ...(baseConfigCld.options || {}),
     addFilenames: true,
     addCommonJS: true,
     unknownTypes: "compileError"
   }
-}, null, 2), "utf-8");
+};
+
+fs.writeFileSync(cldTranspilerPath, JSON.stringify(cldTranspileConfig, null, 2), "utf-8");
 
 try {
   run(`npx abap_transpile .temp_transpile_cld.json`);
@@ -87,7 +100,7 @@ try {
 }
 
 console.log("\n=== Step 7: Staging and Deploying Branches ===");
-run("git add build/standard build/cloud");
+run("git add -f build/standard build/cloud");
 
 const currentCommit = getOutput("git rev-parse --short HEAD");
 

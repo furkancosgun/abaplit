@@ -1,6 +1,9 @@
 output/
+output_std/
+output_cld/
 node_modules/
 dist/
+app/dist/
 *.log
 .DS_Store
 *.swp
@@ -8,5 +11,7 @@ dist/
 *~
 .vscode/
 .temp_ajson_clone/
+.temp_transpile_*.json
 test-results/
 playwright-report/
+build/

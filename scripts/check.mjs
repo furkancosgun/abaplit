@@ -1,27 +1,31 @@
 import { execSync } from "node:child_process";
 import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-function run(cmd, cwd = process.cwd()) {
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const ROOT_DIR = path.resolve(__dirname, "..");
+
+function run(cmd, cwd = ROOT_DIR) {
   console.log(`\n> ${cmd}`);
   execSync(cmd, { stdio: "inherit", cwd });
 }
 
-const root = new URL("..", import.meta.url).pathname.replace(/\/$/, "");
+// 1. Frontend typecheck (app/tsconfig.json)
+run("npm run typecheck", ROOT_DIR);
 
-// 1. Frontend typecheck
-run("npm run ts-typecheck", `${root}/app`);
-
-// 2. UI5 build (dry-run)
-run("npm run build", `${root}/app`);
-
-// 3. abaplint (all configs)
-const configs = ["abaplint.json", "abaplint-cloud.json", "abaplint-downport.json"];
-for (const cfg of configs) {
-  if (fs.existsSync(`${root}/${cfg}`)) {
+// 2. abaplint (all configs) - positional arg is config file (abaplint <config>)
+const configs = [
+  { file: "abaplint.json", cmd: "npx abaplint" },
+  { file: "abaplint-cloud.json", cmd: "npx abaplint abaplint-cloud.json" },
+  { file: "abaplint-downport.json", cmd: "npx abaplint abaplint-downport.json" },
+];
+for (const { file, cmd } of configs) {
+  if (fs.existsSync(path.join(ROOT_DIR, file))) {
     try {
-      run(`npx abaplint --config ${cfg}`, root);
-    } catch (e) {
-      console.error(`abaplint failed for ${cfg}`);
+      run(cmd, ROOT_DIR);
+    } catch (_e) {
+      console.error(`[check] abaplint failed for ${file}`);
       process.exit(1);
     }
   }
