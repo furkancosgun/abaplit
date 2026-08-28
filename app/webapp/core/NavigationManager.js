@@ -9,6 +9,7 @@ sap.ui.define(["z2fiori/core/State", "z2fiori/core/PopupManager"], (State, Popup
       State.pushSnapshot();
       history.pushState({ z2fioriNav: true }, "");
       State.createNext({ app: APP, state: STATE });
+      State.setNavigated(true);
       sap.ui.require(["z2fiori/core/Dispatcher"], (D) => D.send({ checkInit: true, state: STATE }));
     },
 
