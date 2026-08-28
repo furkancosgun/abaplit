@@ -299,6 +299,12 @@ async function generate() {
       .filter((p) => !p.visibility || p.visibility === 'public')
       .forEach((p) => paramMap.set(p.name, { ...p, type: p.type || 'string' }));
 
+    aggregations
+      .filter((a) => a?.name && (!a.visibility || a.visibility === 'public') && !a.name.startsWith('_'))
+      .forEach((a) => {
+        if (!paramMap.has(a.name)) paramMap.set(a.name, { ...a, type: 'aggregation' });
+      });
+
     events
       .filter((e) => !e.visibility || e.visibility === 'public')
       .forEach((e) => paramMap.set(e.name, { ...e, type: 'event' }));
