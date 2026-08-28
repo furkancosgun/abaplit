@@ -3,7 +3,7 @@ sap.ui.define(["sap/ui/core/Element"], (Element) => {
   return {
     find(id) {
       return (
-        Element.getElementById(id) || [...Element.registry.values()].find((c) => c.getId().endsWith("--" + id)) || null
+        Element.getElementById(id) || [...Element.registry.values()].find((c) => c.getId().endsWith(`--${id}`)) || null
       );
     },
     blurActive() {

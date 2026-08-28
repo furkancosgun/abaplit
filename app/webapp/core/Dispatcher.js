@@ -44,7 +44,11 @@ sap.ui.define(
         if (app) State.setApp(app);
         if (state) State.setModelData(state);
         if (view) await ViewManager.mount(view);
-        const ctx = { controller: State.get().controller, model: State.getModel(), dispatch: (o) => this.send(o) };
+        const ctx = {
+          controller: State.getCurrent().controller,
+          model: State.getModel(),
+          dispatch: (o) => this.send(o),
+        };
         for (const a of t_actions) {
           try {
             await ActionRegistry.execute(a, ctx);

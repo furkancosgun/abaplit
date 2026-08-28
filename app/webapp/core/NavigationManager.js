@@ -6,24 +6,21 @@ sap.ui.define(["z2fiori/core/State", "z2fiori/core/PopupManager"], (State, Popup
   return {
     callApp({ APP, STATE }) {
       PopupManager.closeAll();
-      State.pushNav({ app: State.getApp(), state: JSON.stringify(State.getModelData()) });
+      State.pushSnapshot();
       history.pushState({ z2fioriNav: true }, "");
-      State.setApp(APP);
-      State.setModelData(STATE);
+      State.createNext({ app: APP, state: STATE });
       sap.ui.require(["z2fiori/core/Dispatcher"], (D) => D.send({ checkInit: true, state: STATE }));
     },
 
     leaveApp(result = "", fromPopState = false) {
       PopupManager.closeAll();
-      const prev = State.popNav();
-      if (!prev) return;
+      if (!State.hasNavStack()) return;
       if (!fromPopState) {
         isPopping = true;
         history.back();
         setTimeout(() => (isPopping = false), 100);
       }
-      State.setApp(prev.app);
-      State.setModelData(prev.state);
+      State.popSnapshot();
       State.setNavigated(true, result);
       sap.ui.require(["z2fiori/core/Dispatcher"], (D) => D.send({}));
     },

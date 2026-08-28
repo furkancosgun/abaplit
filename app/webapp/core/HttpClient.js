@@ -3,7 +3,7 @@ sap.ui.define(["z2fiori/core/State"], (State) => {
 
   let csrfToken = null;
 
-  return {
+  const HttpClient = {
     buildPayload({ event = "", args = [], checkInit = false, state } = {}) {
       const cleanArgs = args.map((a) => (typeof a === "object" && a !== null ? JSON.stringify(a) : String(a)));
       const reqState =
@@ -54,4 +54,6 @@ sap.ui.define(["z2fiori/core/State"], (State) => {
       return res.json();
     },
   };
+
+  return HttpClient;
 });

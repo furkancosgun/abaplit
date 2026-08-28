@@ -50,9 +50,11 @@ sap.ui.define(
       close() {
         stack.at(-1)?.dialog.close();
       },
+
       closeAll() {
         [...stack].reverse().forEach((e) => e.dialog.close());
       },
+
       hasPopups() {
         return stack.length > 0;
       },

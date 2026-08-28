@@ -1,100 +1,168 @@
 sap.ui.define(["sap/ui/model/json/JSONModel"], (JSONModel) => {
   "use strict";
 
-  const state = {
-    booted: false,
-    app: "",
-    endpoint: "",
-    model: null,
-    container: null,
-    controller: null,
-    navStack: [],
-    shortcuts: [],
-    prevArg: "",
-    navigated: false,
-    dirty: false,
-  };
+  class AppState {
+    constructor({ app, endpoint, modelData, controller, container }) {
+      this.app = app;
+      this.endpoint = endpoint;
+      this.model = new JSONModel(modelData || {});
+      this.model.setSizeLimit(10000);
+      this.controller = controller;
+      this.container = container;
+      this.dirty = false;
+      this.shortcuts = [];
+      this.navigated = false;
+      this.prevArg = "";
+    }
+  }
 
-  return {
-    get() {
-      return state;
-    },
+  let current = null;
+  const stack = [];
 
+  const State = {
     init(controller) {
-      state.controller = controller;
-      if (!state.booted) {
-        state.booted = true;
-        state.model = new JSONModel({});
-        state.model.setSizeLimit(10000);
+      if (!current) {
         const comp = controller.getOwnerComponent();
-        state.endpoint = comp.getManifest()["sap.app"].dataSources.http.uri;
-        const startupApp = comp.getComponentData()?.startupParameters?.app?.[0] || "";
-        const appFromSearch = new URLSearchParams(location.search).get("app") || "";
-        state.app = (startupApp || appFromSearch).trim().toUpperCase();
+        const endpoint = comp.getManifest()["sap.app"].dataSources.http.uri;
+        const startupApp =
+          comp.getComponentData()?.startupParameters?.app?.[0] || new URLSearchParams(location.search).get("app") || "";
+        const app = startupApp.trim().toUpperCase();
+        current = new AppState({
+          app,
+          endpoint,
+          modelData: {},
+          controller,
+          container: controller.byId("appContainer"),
+        });
+      } else {
+        current.controller = controller;
+        current.container = controller.byId("appContainer");
       }
-      controller.getView().setModel(state.model);
-      state.container = controller.byId("appContainer");
+      controller.getView().setModel(current.model);
+      return current;
     },
 
-    setApp(appName) {
-      state.app = appName.trim().toUpperCase();
+    getCurrent() {
+      return current;
     },
+
+    get() {
+      return current;
+    },
+
     getApp() {
-      return state.app;
+      return current?.app || "";
     },
+
+    setApp(app) {
+      if (current) current.app = app.trim().toUpperCase();
+    },
+
     getModel() {
-      return state.model;
+      return current?.model || null;
     },
+
     getModelData() {
-      return state.model.getData();
+      return current?.model.getData() || {};
     },
+
     setModelData(data) {
-      state.model.setData(typeof data === "string" ? JSON.parse(data) : data);
+      if (!current) return;
+      const parsed = typeof data === "string" ? JSON.parse(data) : data;
+      current.model.setData(parsed || {});
     },
+
     getEndpoint() {
-      return state.endpoint;
+      return current?.endpoint || "";
     },
+
     getContainer() {
-      return state.container;
+      return current?.container || null;
     },
 
     getQuery() {
       return Array.from(new URLSearchParams(location.search), ([name, value]) => ({ name, value }));
     },
 
-    pushNav(entry) {
-      state.navStack.push(entry);
+    pushSnapshot() {
+      if (!current) return;
+      stack.push({
+        app: current.app,
+        modelData: structuredClone(current.model.getData()),
+        dirty: current.dirty,
+        shortcuts: [...current.shortcuts],
+        navigated: current.navigated,
+        prevArg: current.prevArg,
+      });
     },
-    popNav() {
-      return state.navStack.pop();
+
+    createNext({ app, state }) {
+      if (!current) throw new Error("State not initialized");
+      const data = typeof state === "string" ? JSON.parse(state || "{}") : state || {};
+      current = new AppState({
+        app: app.trim().toUpperCase(),
+        endpoint: current.endpoint,
+        modelData: data,
+        controller: current.controller,
+        container: current.container,
+      });
+      current.controller.getView().setModel(current.model);
+      return current;
     },
+
+    popSnapshot() {
+      const snap = stack.pop();
+      if (!snap) return null;
+      current.app = snap.app;
+      current.model.setData(snap.modelData);
+      current.dirty = snap.dirty;
+      current.shortcuts = snap.shortcuts;
+      current.navigated = snap.navigated;
+      current.prevArg = snap.prevArg;
+      current.controller.getView().setModel(current.model);
+      return current;
+    },
+
     hasNavStack() {
-      return state.navStack.length > 0;
+      return stack.length > 0;
     },
 
     setNavigated(flag, prevArg = "") {
-      state.navigated = flag;
-      state.prevArg = prevArg;
+      if (current) {
+        current.navigated = flag;
+        current.prevArg = prevArg;
+      }
     },
+
     consumeNavigated() {
-      const res = { navigated: state.navigated, prevArg: state.prevArg };
-      state.navigated = false;
-      state.prevArg = "";
+      const res = { navigated: !!current?.navigated, prevArg: current?.prevArg || "" };
+      if (current) {
+        current.navigated = false;
+        current.prevArg = "";
+      }
       return res;
     },
 
     setDirty(flag) {
-      state.dirty = flag;
+      if (current) current.dirty = flag;
     },
+
     isDirty() {
-      return state.dirty;
+      return !!current?.dirty;
     },
 
     addShortcut(s) {
-      state.shortcuts.push(s);
+      current?.shortcuts.push(s);
     },
+
     getShortcuts() {
-      return state.shortcuts;
+      return current?.shortcuts || [];
+    },
+
+    clearShortcuts() {
+      if (current) current.shortcuts = [];
     },
   };
+
+  return State;
 });

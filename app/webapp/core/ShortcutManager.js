@@ -4,13 +4,14 @@ sap.ui.define(["z2fiori/core/State"], (State) => {
     register({ KEY, CTRL, ALT, SHIFT, EVENT, EVENT_ARGS }) {
       State.addShortcut({
         key: KEY.toLowerCase(),
-        ctrl: CTRL,
-        alt: ALT,
-        shift: SHIFT,
+        ctrl: !!CTRL,
+        alt: !!ALT,
+        shift: !!SHIFT,
         event: EVENT,
         args: EVENT_ARGS || [],
       });
     },
+
     handleKeyDown(e) {
       for (const s of State.getShortcuts()) {
         if (e.ctrlKey === s.ctrl && e.altKey === s.alt && e.shiftKey === s.shift && e.key.toLowerCase() === s.key) {
@@ -19,6 +20,10 @@ sap.ui.define(["z2fiori/core/State"], (State) => {
           return;
         }
       }
+    },
+
+    clear() {
+      State.clearShortcuts();
     },
   };
 });
