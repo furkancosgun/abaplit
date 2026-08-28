@@ -12,10 +12,14 @@ sap.ui.define(
     "use strict";
 
     let busy = false;
+    let queue = [];
 
     return {
       async send({ event = "", args = [], checkInit = false, state } = {}) {
-        if (busy) return;
+        if (busy) {
+          queue = [{ event, args, checkInit, state }];
+          return;
+        }
         busy = true;
         ControlUtil.blurActive();
         BusyIndicator.show(0);
@@ -27,6 +31,11 @@ sap.ui.define(
         } finally {
           BusyIndicator.hide();
           busy = false;
+          if (queue.length) {
+            const next = queue.shift();
+            queue = [];
+            this.send(next);
+          }
         }
       },
 
