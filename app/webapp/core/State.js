@@ -46,10 +46,6 @@ sap.ui.define(["sap/ui/model/json/JSONModel"], (JSONModel) => {
       return current;
     },
 
-    get() {
-      return current;
-    },
-
     getApp() {
       return current?.app || "";
     },
