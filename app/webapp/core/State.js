@@ -86,9 +86,11 @@ sap.ui.define(["sap/ui/model/json/JSONModel"], (JSONModel) => {
 
     pushSnapshot() {
       if (!current) return;
+      const data = current.model.getData();
+      const clone = typeof structuredClone === "function" ? structuredClone(data) : JSON.parse(JSON.stringify(data));
       stack.push({
         app: current.app,
-        modelData: structuredClone(current.model.getData()),
+        modelData: clone,
         dirty: current.dirty,
         shortcuts: [...current.shortcuts],
         navigated: current.navigated,

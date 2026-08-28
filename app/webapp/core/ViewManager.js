@@ -9,15 +9,55 @@ sap.ui.define(
       },
     });
 
+    const cache = new Map();
+
+    function hashXml(xml) {
+      let h = 0;
+      for (let i = 0; i < xml.length; i++) h = (h * 31 + xml.charCodeAt(i)) >>> 0;
+      return String(h);
+    }
+
     return {
       async mount(xml) {
-        const view = await XMLView.create({ definition: xml, controller: new ViewController() });
+        const key = hashXml(xml);
+        let view = cache.get(key);
+
+        if (!view || view.isDestroyed?.()) {
+          view = await XMLView.create({ definition: xml, controller: new ViewController() });
+          cache.set(key, view);
+          if (cache.size > 20) {
+            const firstKey = cache.keys().next().value;
+            const evict = cache.get(firstKey);
+            if (evict && evict !== view && !evict.isDestroyed?.()) {
+              try {
+                evict.destroy();
+              } catch (e) {
+                void e;
+              }
+            }
+            cache.delete(firstKey);
+          }
+        }
+
         view.setModel(State.getModel());
         const container = State.getContainer();
         const old = container.getPages().slice();
         container.addPage(view);
         container.to(view.getId());
-        old.forEach((p) => p.destroy());
+        old.forEach((p) => {
+          if (p !== view) p.destroy();
+        });
+      },
+
+      clearCache() {
+        cache.forEach((v) => {
+          try {
+            if (!v.isDestroyed?.()) v.destroy();
+          } catch (e) {
+            void e;
+          }
+        });
+        cache.clear();
       },
     };
   },
