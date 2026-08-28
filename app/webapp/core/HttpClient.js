@@ -28,7 +28,10 @@ sap.ui.define(["z2fiori/core/State"], (State) => {
     },
 
     async fetchCsrfToken() {
-      const res = await fetch(State.getEndpoint(), { headers: { "X-CSRF-Token": "Fetch" } });
+      const res = await fetch(State.getEndpoint(), {
+        credentials: "same-origin",
+        headers: { "X-CSRF-Token": "Fetch" },
+      });
       const token = res.headers.get("x-csrf-token");
       if (token) csrfToken = token;
       return token;
@@ -37,6 +40,7 @@ sap.ui.define(["z2fiori/core/State"], (State) => {
     async post(payload, retry = true) {
       const res = await fetch(State.getEndpoint(), {
         method: "POST",
+        credentials: "same-origin",
         headers: { "Content-Type": "application/json", "X-CSRF-Token": csrfToken || "Fetch" },
         body: JSON.stringify(payload),
       });
