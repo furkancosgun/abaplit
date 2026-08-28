@@ -68,8 +68,12 @@ sap.ui.define(["sap/ui/model/json/JSONModel"], (JSONModel) => {
 
     setModelData(data) {
       if (!current) return;
-      const parsed = typeof data === "string" ? JSON.parse(data) : data;
-      current.model.setData(parsed || {});
+      try {
+        const parsed = typeof data === "string" ? JSON.parse(data) : data;
+        current.model.setData(parsed || {});
+      } catch (e) {
+        sap.ui.require(["sap/m/MessageBox"], (MessageBox) => MessageBox.error(`State parse failed: ${e.message}`));
+      }
     },
 
     getEndpoint() {
@@ -100,7 +104,13 @@ sap.ui.define(["sap/ui/model/json/JSONModel"], (JSONModel) => {
 
     createNext({ app, state }) {
       if (!current) throw new Error("State not initialized");
-      const data = typeof state === "string" ? JSON.parse(state || "{}") : state || {};
+      let data;
+      try {
+        data = typeof state === "string" ? JSON.parse(state || "{}") : state || {};
+      } catch (e) {
+        sap.ui.require(["sap/m/MessageBox"], (MessageBox) => MessageBox.error(`State parse failed: ${e.message}`));
+        data = {};
+      }
       current = new AppState({
         app: app.trim().toUpperCase(),
         endpoint: current.endpoint,

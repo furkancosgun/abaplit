@@ -1,6 +1,6 @@
 sap.ui.define(
-  ["sap/ui/core/mvc/Controller", "sap/ui/core/mvc/XMLView", "z2fiori/core/State"],
-  (Controller, XMLView, State) => {
+  ["sap/ui/core/mvc/Controller", "sap/ui/core/mvc/XMLView", "sap/m/MessageBox", "z2fiori/core/State"],
+  (Controller, XMLView, MessageBox, State) => {
     "use strict";
 
     const ViewController = Controller.extend("z2fiori.controller.ViewDelegate", {
@@ -19,34 +19,38 @@ sap.ui.define(
 
     return {
       async mount(xml) {
-        const key = hashXml(xml);
-        let view = cache.get(key);
+        try {
+          const key = hashXml(xml);
+          let view = cache.get(key);
 
-        if (!view || view.isDestroyed?.()) {
-          view = await XMLView.create({ definition: xml, controller: new ViewController() });
-          cache.set(key, view);
-          if (cache.size > 20) {
-            const firstKey = cache.keys().next().value;
-            const evict = cache.get(firstKey);
-            if (evict && evict !== view && !evict.isDestroyed?.()) {
-              try {
-                evict.destroy();
-              } catch (e) {
-                void e;
+          if (!view || view.isDestroyed?.()) {
+            view = await XMLView.create({ definition: xml, controller: new ViewController() });
+            cache.set(key, view);
+            if (cache.size > 20) {
+              const firstKey = cache.keys().next().value;
+              const evict = cache.get(firstKey);
+              if (evict && evict !== view && !evict.isDestroyed?.()) {
+                try {
+                  evict.destroy();
+                } catch (e) {
+                  void e;
+                }
               }
+              cache.delete(firstKey);
             }
-            cache.delete(firstKey);
           }
-        }
 
-        view.setModel(State.getModel());
-        const container = State.getContainer();
-        const old = container.getPages().slice();
-        container.addPage(view);
-        container.to(view.getId());
-        old.forEach((p) => {
-          if (p !== view) p.destroy();
-        });
+          view.setModel(State.getModel());
+          const container = State.getContainer();
+          const old = container.getPages().slice();
+          container.addPage(view);
+          container.to(view.getId());
+          old.forEach((p) => {
+            if (p !== view) p.destroy();
+          });
+        } catch (e) {
+          MessageBox.error(`View mount failed: ${e.message}`);
+        }
       },
 
       clearCache() {
