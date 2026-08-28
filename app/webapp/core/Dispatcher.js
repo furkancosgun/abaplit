@@ -22,7 +22,7 @@ sap.ui.define(
         }
         busy = true;
         ControlUtil.blurActive();
-        BusyIndicator.show(0);
+        BusyIndicator.show(300);
         try {
           const res = await HttpClient.post(HttpClient.buildPayload({ event, args, checkInit, state }));
           await this.handleResponse(res);
