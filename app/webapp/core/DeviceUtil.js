@@ -12,8 +12,8 @@ sap.ui.define(["sap/ui/Device"], (Device) => {
         support: Device.support,
         camera: {
           supported: hasMedia && typeof navigator.mediaDevices.getUserMedia === "function",
-          hasMediaDevices: hasMedia,
-          hasGetUserMedia: hasMedia && typeof navigator.mediaDevices.getUserMedia === "function",
+          has_media_devices: hasMedia,
+          has_get_user_media: hasMedia && typeof navigator.mediaDevices.getUserMedia === "function",
           count: 0,
           list: [],
         },
@@ -27,9 +27,9 @@ sap.ui.define(["sap/ui/Device"], (Device) => {
         return devices
           .filter((d) => d.kind === "videoinput")
           .map((d, i) => ({
-            deviceId: d.deviceId,
+            device_id: d.deviceId,
             label: d.label || `Camera ${i + 1}`,
-            groupId: d.groupId,
+            group_id: d.groupId,
             kind: d.kind,
           }));
       } catch {

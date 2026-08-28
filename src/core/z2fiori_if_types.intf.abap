@@ -35,6 +35,22 @@ INTERFACE z2fiori_if_types PUBLIC.
       retina  TYPE abap_bool,
     END OF ty_s_device_support.
   TYPES:
+    BEGIN OF ty_s_device_camera_entry,
+      device_id TYPE string,
+      label     TYPE string,
+      group_id  TYPE string,
+      kind      TYPE string,
+    END OF ty_s_device_camera_entry,
+    ty_t_device_camera_list TYPE STANDARD TABLE OF ty_s_device_camera_entry WITH EMPTY KEY.
+  TYPES:
+    BEGIN OF ty_s_device_camera,
+      supported          TYPE abap_bool,
+      has_media_devices  TYPE abap_bool,
+      has_get_user_media TYPE abap_bool,
+      count              TYPE i,
+      list               TYPE ty_t_device_camera_list,
+    END OF ty_s_device_camera.
+  TYPES:
     BEGIN OF ty_s_device,
       system      TYPE string,
       orientation TYPE string,
@@ -42,6 +58,7 @@ INTERFACE z2fiori_if_types PUBLIC.
       os          TYPE ty_s_device_os,
       resize      TYPE ty_s_device_resize,
       support     TYPE ty_s_device_support,
+      camera      TYPE ty_s_device_camera,
     END OF ty_s_device.
   TYPES:
     BEGIN OF ty_s_action,
