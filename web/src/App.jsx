@@ -2,7 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import WidgetRenderer from './components/WidgetRenderer';
+import ToastContainer from './components/common/ToastContainer';
 import { setBindingValue } from './core/binding';
+import { dispatchActions } from './core/actions';
 
 export default function App() {
   const [appName, setAppName] = useState(() => {
@@ -23,6 +25,7 @@ export default function App() {
     return localStorage.getItem('abaplit_theme') === 'dark';
   });
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [toasts, setToasts] = useState([]);
 
   // Sync with URL popstate
   useEffect(() => {
@@ -78,6 +81,18 @@ export default function App() {
         if (data.view) {
           const parsedView = typeof data.view === 'string' ? JSON.parse(data.view) : data.view;
           setViewTree(parsedView);
+        }
+        const actionList = data.t_actions || data.T_ACTIONS;
+        if (actionList && Array.isArray(actionList)) {
+          dispatchActions(actionList, {
+            addToast: ({ text, duration }) => {
+              const id = Date.now() + Math.random();
+              setToasts((prev) => [...prev, { id, text, duration }]);
+              setTimeout(() => {
+                setToasts((prev) => prev.filter((t) => t.id !== id));
+              }, duration || 3000);
+            },
+          });
         }
       } else {
         console.error('abaplit execution error:', data.message);
@@ -162,6 +177,11 @@ export default function App() {
           />
         ))}
       </main>
+
+      <ToastContainer
+        toasts={toasts}
+        onDismiss={(id) => setToasts((prev) => prev.filter((t) => t.id !== id))}
+      />
     </div>
   );
 }
