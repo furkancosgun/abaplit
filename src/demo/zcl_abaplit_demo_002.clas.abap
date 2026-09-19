@@ -102,7 +102,7 @@ CLASS zcl_abaplit_demo_002 IMPLEMENTATION.
     st->divider( ).
 
     st->button( text  = 'Submit Form to ABAP'
-                event = client->event( 'SUBMIT_FORM' )
+                event = 'SUBMIT_FORM'
                 type  = 'primary' ).
 
     st->header( 'Logged Submissions Table' ).

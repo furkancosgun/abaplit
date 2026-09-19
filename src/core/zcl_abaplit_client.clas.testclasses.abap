@@ -93,7 +93,7 @@ CLASS ltcl_client IMPLEMENTATION.
     cl_abap_unit_assert=>assert_false( lo_cut->zif_abaplit_client~check_event( 'OTHER' ) ).
 
     DATA(lv_ev_str) = lo_cut->zif_abaplit_client~event( 'ROW_CLICK' ).
-    cl_abap_unit_assert=>assert_equals( exp = `onEvent('ROW_CLICK')`
+    cl_abap_unit_assert=>assert_equals( exp = `ROW_CLICK`
                                         act = lv_ev_str ).
 
     DATA(ls_get) = lo_cut->zif_abaplit_client~get( ).

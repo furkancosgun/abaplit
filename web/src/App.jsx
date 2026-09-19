@@ -10,6 +10,12 @@ export default function App() {
   });
 
   const [state, setState] = useState({});
+  const stateRef = React.useRef(state);
+
+  useEffect(() => {
+    stateRef.current = state;
+  }, [state]);
+
   const [viewTree, setViewTree] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
   const [isDark, setIsDark] = useState(() => {
@@ -49,12 +55,14 @@ export default function App() {
         if (match) eventName = match[1];
       }
 
+      const curState = customState !== null ? customState : stateRef.current;
+
       const payload = {
         app: appName,
         event: eventName,
         event_args: Array.isArray(eventArgs) ? eventArgs : [eventArgs],
         check_init: checkInit,
-        state: customState !== null ? customState : state,
+        state: curState,
       };
 
       const res = await fetch('/api/run', {
@@ -67,6 +75,7 @@ export default function App() {
       if (data.success) {
         if (data.state) {
           const parsedState = typeof data.state === 'string' ? JSON.parse(data.state) : data.state;
+          stateRef.current = parsedState;
           setState(parsedState);
         }
         if (data.view) {
@@ -81,7 +90,7 @@ export default function App() {
     } finally {
       setIsRunning(false);
     }
-  }, [appName, state]);
+  }, [appName]);
 
   // Initial load
   useEffect(() => {
@@ -101,6 +110,10 @@ export default function App() {
   }, [executeRun]);
 
   const handleValueChange = (key, val) => {
+    stateRef.current = {
+      ...stateRef.current,
+      [key]: val,
+    };
     setState((prev) => ({
       ...prev,
       [key]: val,

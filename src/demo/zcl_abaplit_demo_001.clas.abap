@@ -53,7 +53,7 @@ CLASS zcl_abaplit_demo_001 IMPLEMENTATION.
     sb->metric( label = 'Target KPI' value = mv_target_kpi delta = '+14%' ).
     sb->divider( ).
     sb->button( text  = 'Simulate Growth Spike'
-                event = client->event( 'SPIKE_DATA' )
+                event = 'SPIKE_DATA'
                 type  = 'primary' ).
 
     " Handle event to dynamically alter internal table data

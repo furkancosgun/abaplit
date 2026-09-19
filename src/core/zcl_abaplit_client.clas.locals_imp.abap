@@ -14,11 +14,14 @@ CLASS lcl_event_helper IMPLEMENTATION.
   METHOD event.
     DATA lv_args TYPE string.
 
-    LOOP AT t_arg ASSIGNING FIELD-SYMBOL(<lv_arg>).
-      lv_args = |{ lv_args }, { js_quote( <lv_arg> ) }|.
-    ENDLOOP.
-
-    result = |onEvent({ js_quote( event ) }{ lv_args })|.
+    IF t_arg IS INITIAL.
+      result = event.
+    ELSE.
+      LOOP AT t_arg ASSIGNING FIELD-SYMBOL(<lv_arg>).
+        lv_args = |{ lv_args }, { js_quote( <lv_arg> ) }|.
+      ENDLOOP.
+      result = |{ event }({ substring( val = lv_args off = 2 ) })|.
+    ENDIF.
   ENDMETHOD.
 ENDCLASS.
 

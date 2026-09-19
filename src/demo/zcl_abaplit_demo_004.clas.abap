@@ -64,7 +64,7 @@ CLASS zcl_abaplit_demo_004 IMPLEMENTATION.
                 value = |{ lines( mt_chat_history ) } Messages|
                 delta = '+1' ).
     sb->button( text  = 'Clear History'
-                event = client->event( 'CLEAR_CHAT' ) ).
+                event = 'CLEAR_CHAT' ).
 
     " Handle Clear History
     IF client->check_event( 'CLEAR_CHAT' ).
@@ -104,7 +104,7 @@ CLASS zcl_abaplit_demo_004 IMPLEMENTATION.
     ENDLOOP.
 
     st->chat_input( placeholder = 'Ask the ABAP assistant anything...'
-                    event       = client->event( 'CHAT_SEND' ) ).
+                    event       = 'CHAT_SEND' ).
 
     st->divider( ).
     DATA(exp) = st->expander( 'Chat Session Table (Internal Table)' ).
