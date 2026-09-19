@@ -3,7 +3,8 @@ output_std/
 output_cld/
 node_modules/
 dist/
-app/dist/
+web/node_modules/
+web/dist/
 *.log
 .DS_Store
 *.swp

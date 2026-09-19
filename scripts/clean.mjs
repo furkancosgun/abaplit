@@ -7,13 +7,8 @@ const ROOT_DIR = path.resolve(__dirname, "..");
 
 const CLEAN_TARGETS = [
   "output",
-  "output_std",
-  "output_cld",
   "build",
   "dist",
-  "app/dist",
-  ".temp_transpile_std.json",
-  ".temp_transpile_cld.json",
 ];
 
 for (const target of CLEAN_TARGETS) {

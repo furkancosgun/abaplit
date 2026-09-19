@@ -32,16 +32,16 @@ const sourceFolders = [
 ];
 
 const renameMap = [
-  ['zcl_ajson_ref_initializer_lib', 'z2fiori_cl_ajson_ref_init_lib'],
-  ['ZCL_AJSON_REF_INITIALIZER_LIB', 'Z2FIORI_CL_AJSON_REF_INIT_LIB'],
-  ['zif_ajson_ref_initializer', 'z2fiori_if_ajson_ref_init'],
-  ['ZIF_AJSON_REF_INITIALIZER', 'Z2FIORI_IF_AJSON_REF_INIT'],
-  ['zcl_ajson', 'z2fiori_cl_ajson'],
-  ['zif_ajson', 'z2fiori_if_ajson'],
-  ['zcx_ajson', 'z2fiori_cx_ajson'],
-  ['ZCL_AJSON', 'Z2FIORI_CL_AJSON'],
-  ['ZIF_AJSON', 'Z2FIORI_IF_AJSON'],
-  ['ZCX_AJSON', 'Z2FIORI_CX_AJSON']
+  ['zcl_ajson_ref_initializer_lib', 'zcl_abaplit_ajson_ref_init_lib'],
+  ['ZCL_AJSON_REF_INITIALIZER_LIB', 'ZCL_ABAPLIT_AJSON_REF_INIT_LIB'],
+  ['zif_ajson_ref_initializer', 'zif_abaplit_ajson_ref_init'],
+  ['ZIF_AJSON_REF_INITIALIZER', 'ZIF_ABAPLIT_AJSON_REF_INIT'],
+  ['zcl_ajson', 'zcl_abaplit_ajson'],
+  ['zif_ajson', 'zif_abaplit_ajson'],
+  ['zcx_ajson', 'zcx_abaplit_ajson'],
+  ['ZCL_AJSON', 'ZCL_ABAPLIT_AJSON'],
+  ['ZIF_AJSON', 'ZIF_ABAPLIT_AJSON'],
+  ['ZCX_AJSON', 'ZCX_ABAPLIT_AJSON']
 ];
 
 for (const folder of sourceFolders) {

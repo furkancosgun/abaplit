@@ -1,5 +1,5 @@
 {
-  "name": "abap2fiori",
+  "name": "abaplit",
   "version": "1.0.0",
   "type": "module",
   "engines": {
@@ -11,28 +11,16 @@
     "clean": "node scripts/clean.mjs",
     "deps": "git submodule update --init --recursive",
     "pull": "node scripts/pull_ajson.mjs",
-    "views": "node scripts/generate_views.mjs",
     "lint": "abaplint",
     "lint:fix": "abaplint --fix",
-    "lint:js": "eslint app/webapp --ext .js",
-    "lint:js:fix": "eslint app/webapp --ext .js --fix",
-    "format": "prettier --write app/webapp",
-    "format:check": "prettier --check app/webapp",
-    "lint:all": "npm run lint && abaplint abaplint-cloud.json && abaplint abaplint-downport.json && npm run lint:js && npm run format:check",
-    "build:ui": "npx ui5 build --clean-dest --dest dist --config app/ui5.yaml",
-    "build:abap": "abap_transpile abaplint-transpiler.json && node scripts/build_dist.mjs",
-    "build": "npm run clean && npm run build:ui && npm run build:abap && npm run lint:all",
-    "test": "npm run clean && abap_transpile abaplint-transpiler.json && node --expose-gc output/index.mjs",
-    "test:all": "npm run lint:all && npm run test",
-    "deploy": "node scripts/deploy_branches.mjs"
+    "build": "npm run clean && abap_transpile abaplint-transpiler.json",
+    "bundle:abap": "node scripts/bundle_to_abap.mjs",
+    "test": "npm run clean && abap_transpile abaplint-transpiler.json && node --expose-gc output/index.mjs"
   },
   "devDependencies": {
     "@abaplint/cli": "latest",
     "@abaplint/runtime": "latest",
     "@abaplint/transpiler-cli": "latest",
-    "@ui5/cli": "^4.0.33",
-    "abap-kit": "latest",
-    "eslint": "^8.57.0",
-    "prettier": "^3.3.3"
+    "abap-kit": "latest"
   }
 }

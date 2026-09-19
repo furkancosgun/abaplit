@@ -14,12 +14,6 @@ if (!fs.existsSync(initPath)) {
   execSync("npx abap_transpile abaplint-transpiler.json", { cwd: rootDir, stdio: "inherit" });
 }
 
-const distPath = path.resolve(rootDir, "dist");
-if (!fs.existsSync(distPath) || !fs.existsSync(path.resolve(distPath, "Component.js"))) {
-  console.log("⚙️  Building UI5 frontend...");
-  execSync("npm run build:ui", { cwd: rootDir, stdio: "inherit" });
-}
-
 const { initializeABAP } = await import(pathToFileURL(path.resolve(rootDir, "output/init.mjs")).href);
 await initializeABAP();
 
@@ -32,42 +26,90 @@ try {
   process.exit(1);
 }
 
-// Register z2fiori_cl_lp_handler shim dynamically so src/ remains untouched
-if (!abap.Classes["Z2FIORI_CL_LP_HANDLER"]) {
-  class z2fiori_cl_lp_handler {
+// Register zcl_abaplit_lp_handler shim dynamically
+if (!abap.Classes["ZCL_ABAPLIT_LP_HANDLER"]) {
+  class zcl_abaplit_lp_handler {
     async constructor_() {
       return this;
     }
     async if_http_extension$handle_request(INPUT) {
-      await abap.Classes["Z2FIORI_CL_HTTP_HANDLER"].factory_onprem({ server: INPUT.server });
+      await abap.Classes["ZCL_ABAPLIT_HTTP_HANDLER"].factory_onprem({ server: INPUT.server });
     }
   }
-  abap.Classes["Z2FIORI_CL_LP_HANDLER"] = z2fiori_cl_lp_handler;
+  abap.Classes["ZCL_ABAPLIT_LP_HANDLER"] = zcl_abaplit_lp_handler;
 }
 
 const PORT = parseInt(process.env.PORT, 10) || 3000;
-const HANDLER_CLASS = process.env.HANDLER_CLASS || "Z2FIORI_CL_LP_HANDLER";
+const HANDLER_CLASS = process.env.HANDLER_CLASS || "ZCL_ABAPLIT_LP_HANDLER";
 
 const app = express();
 app.disable("x-powered-by");
 app.set("etag", false);
 
-// 1. Root redirect if app query is missing
-app.get("/", (req, res, next) => {
-  if (!req.query.app && !req.query["app"]) {
-    return res.redirect("/?app=z2fiori_cl_demo_002");
+// JSON body parser for modern API
+app.use(express.json({ limit: "10mb" }));
+
+// Serve embedded Streamlit frontend on root
+app.get("/", async (req, res) => {
+  const distHtml = path.resolve(rootDir, "web/dist/index.html");
+  if (fs.existsSync(distHtml)) {
+    return res.sendFile(distHtml);
   }
-  next();
+  const AssetsClass = abap.Classes["ZCL_ABAPLIT_WEB_ASSETS"];
+  if (AssetsClass) {
+    const html = (await AssetsClass.get_html()).get();
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    return res.send(html);
+  }
+  res.send("abaplit web assets not built. Run: npm run bundle:abap");
 });
 
-// 2. Static UI5 Frontend
-app.use(express.static(distPath));
+// Direct REST endpoint for ABAPlit app runner
+app.post("/api/run", async (req, res) => {
+  try {
+    const Runner = abap.Classes["ZCL_ABAPLIT_APP_RUNNER"];
+    if (!Runner) {
+      return res.status(500).json({ success: false, message: "ZCL_ABAPLIT_APP_RUNNER not found" });
+    }
 
-// 3. Raw body parsing for ABAP ICF requests
+    const httpReq = new abap.types.Structure({
+      app: new abap.types.String().set(req.body.app || ""),
+      event: new abap.types.String().set(req.body.event || ""),
+      event_args: new abap.types.Table(new abap.types.String()),
+      check_init: new abap.types.Character(1).set(req.body.check_init ? "X" : " "),
+      check_navigated: new abap.types.Character(1).set(req.body.check_navigated ? "X" : " "),
+      check_nav_stack: new abap.types.Character(1).set(req.body.check_nav_stack ? "X" : " "),
+      state: new abap.types.String().set(typeof req.body.state === "string" ? req.body.state : JSON.stringify(req.body.state || {})),
+      nav_prev_arg: new abap.types.String().set(req.body.nav_prev_arg || "")
+    });
+
+    if (Array.isArray(req.body.event_args)) {
+      for (const arg of req.body.event_args) {
+        httpReq.get().event_args.append(new abap.types.String().set(String(arg)));
+      }
+    }
+
+    const result = await Runner.run({ req: httpReq });
+    const resData = result.get();
+
+    res.json({
+      success: resData.success.get() === "X",
+      app: resData.app.get(),
+      view: resData.view.get(),
+      state: resData.state.get(),
+      message: resData.message.get()
+    });
+  } catch (err) {
+    console.error("API error:", err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+// Raw body parsing for ABAP ICF requests
 app.use(express.raw({ type: "*/*", limit: "10mb" }));
 
-// 4. ICF handler route
-app.all(/^\/sap\/bc\/(http\/sap\/)?z2fiori/, async (req, res) => {
+// ICF handler route: /sap/bc/abaplit
+app.all(/^\/sap\/bc\/(http\/sap\/)?abaplit/, async (req, res) => {
   if (!req.body) {
     req.body = Buffer.alloc(0);
   }
@@ -76,7 +118,7 @@ app.all(/^\/sap\/bc\/(http\/sap\/)?z2fiori/, async (req, res) => {
       req,
       res,
       class: HANDLER_CLASS,
-      base: new abap.types.String().set("/sap/bc/z2fiori")
+      base: new abap.types.String().set("/sap/bc/abaplit")
     });
   } catch (err) {
     console.error("❌ Error processing ICF request:", err);
@@ -88,13 +130,10 @@ app.all(/^\/sap\/bc\/(http\/sap\/)?z2fiori/, async (req, res) => {
 
 export const server = app.listen(PORT, () => {
   console.log(`\n=============================================================`);
-  console.log(`🚀 abap2fiori Dev Server is RUNNING at http://localhost:${PORT}`);
-  console.log(`📡 ICF Backend Handler: ${HANDLER_CLASS.toUpperCase()} -> /sap/bc/z2fiori`);
-  console.log(`=============================================================`);
-  console.log(`\nReady-to-use Demos:`);
-  console.log(`  🔹 Demo 001 (Basic Form & Counter):  http://localhost:${PORT}/?app=z2fiori_cl_demo_001`);
-  console.log(`  🔹 Demo 002 (All 6 Popups Showcase): http://localhost:${PORT}/?app=z2fiori_cl_demo_002`);
-  console.log(`\n=============================================================\n`);
+  console.log(`🚀 abaplit Dev Server is RUNNING at http://localhost:${PORT}`);
+  console.log(`📡 ICF Backend Handler: ${HANDLER_CLASS.toUpperCase()} -> /sap/bc/abaplit`);
+  console.log(`📡 Direct REST API: POST http://localhost:${PORT}/api/run`);
+  console.log(`=============================================================\n`);
 });
 
 server.on("error", (err) => {

@@ -3,8 +3,7 @@
     "files": "/src/**/*.*",
     "exclude": [],
     "noIssues": [
-      "/src/vendor/*",
-      "z2fiori_cl_xml_view_builder.clas.abap"
+      "/src/vendor/*"
     ]
   },
   "dependencies": [

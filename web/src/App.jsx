@@ -1,0 +1,145 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import Header from './components/Header';
+import Sidebar from './components/Sidebar';
+import WidgetRenderer from './components/WidgetRenderer';
+
+export default function App() {
+  const [appName, setAppName] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('app') || 'zcl_abaplit_demo';
+  });
+
+  const [state, setState] = useState({});
+  const [viewTree, setViewTree] = useState(null);
+  const [isRunning, setIsRunning] = useState(false);
+  const [isDark, setIsDark] = useState(() => {
+    return localStorage.getItem('abaplit_theme') === 'dark';
+  });
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  // Sync theme
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      localStorage.setItem('abaplit_theme', 'dark');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+      localStorage.setItem('abaplit_theme', 'light');
+    }
+  }, [isDark]);
+
+  // Execute roundtrip
+  const executeRun = useCallback(async (event = '', customState = null, checkInit = false) => {
+    setIsRunning(true);
+    try {
+      const payload = {
+        app: appName,
+        event: event || '',
+        event_args: [],
+        check_init: checkInit,
+        state: customState !== null ? customState : state,
+      };
+
+      const res = await fetch('/api/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        if (data.state) {
+          const parsedState = typeof data.state === 'string' ? JSON.parse(data.state) : data.state;
+          setState(parsedState);
+        }
+        if (data.view) {
+          const parsedView = typeof data.view === 'string' ? JSON.parse(data.view) : data.view;
+          setViewTree(parsedView);
+        }
+      } else {
+        console.error('abaplit execution error:', data.message);
+      }
+    } catch (err) {
+      console.error('Request failed:', err);
+    } finally {
+      setIsRunning(false);
+    }
+  }, [appName, state]);
+
+  // Initial load
+  useEffect(() => {
+    executeRun('', {}, true);
+  }, [appName]);
+
+  // Keyboard shortcut 'R' for rerun
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.key === 'r' || e.key === 'R') && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
+        e.preventDefault();
+        executeRun();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [executeRun]);
+
+  const handleValueChange = (key, val) => {
+    setState((prev) => ({
+      ...prev,
+      [key]: val,
+    }));
+  };
+
+  // Separate sidebar children from main content
+  let sidebarNodes = [];
+  let mainNodes = [];
+
+  if (viewTree && viewTree.children) {
+    for (const child of viewTree.children) {
+      if (child.type === 'sidebar') {
+        sidebarNodes = child.children || [];
+      } else {
+        mainNodes.push(child);
+      }
+    }
+  }
+
+  const hasSidebar = sidebarNodes.length > 0;
+
+  return (
+    <div className="st-app">
+      <Header
+        isRunning={isRunning}
+        onRerun={() => executeRun()}
+        isDark={isDark}
+        onToggleTheme={() => setIsDark(!isDark)}
+        appName={appName}
+      />
+
+      {hasSidebar && (
+        <Sidebar
+          isOpen={sidebarOpen}
+          onToggle={() => setSidebarOpen(!sidebarOpen)}
+          nodes={sidebarNodes}
+          state={state}
+          onValueChange={handleValueChange}
+          onEvent={(evt) => executeRun(evt)}
+          isRunning={isRunning}
+        />
+      )}
+
+      <main className={`st-main ${hasSidebar ? 'with-sidebar' : ''}`}>
+        {mainNodes.map((child, idx) => (
+          <WidgetRenderer
+            key={idx}
+            node={child}
+            state={state}
+            onValueChange={handleValueChange}
+            onEvent={(evt) => executeRun(evt)}
+            isRunning={isRunning}
+          />
+        ))}
+      </main>
+    </div>
+  );
+}
