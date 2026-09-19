@@ -56,12 +56,10 @@ export default function App() {
         event: event || '',
         event_args: Array.isArray(eventArgs) ? eventArgs : [eventArgs],
         check_init: checkInit,
-        state: curState,
+        state: typeof curState === 'string' ? curState : JSON.stringify(curState || {}),
       };
 
-      const endpoint = window.location.pathname.startsWith('/sap/bc/')
-        ? window.location.pathname
-        : '/sap/bc/abaplit';
+      const endpoint = window.location.pathname || '/';
 
       const res = await fetch(endpoint, {
         method: 'POST',
