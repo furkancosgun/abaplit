@@ -85,6 +85,7 @@ export const server = app.listen(PORT, () => {
   console.log(`  🔹 Demo 003 (Business DataFrames):   http://localhost:${PORT}/?app=zcl_abaplit_demo_003`);
   console.log(`  🔹 Demo 004 (AI Chat Assistant):    http://localhost:${PORT}/?app=zcl_abaplit_demo_004`);
   console.log(`  🔹 Demo 005 (Tabs & Progress):       http://localhost:${PORT}/?app=zcl_abaplit_demo_005`);
+  console.log(`  🔹 Demo 006 (Modern Widgets):        http://localhost:${PORT}/?app=zcl_abaplit_demo_006`);
   console.log(`\n=============================================================\n`);
 });
 

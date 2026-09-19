@@ -134,7 +134,8 @@ CLASS lcl_binding_resolver IMPLEMENTATION.
     FIELD-SYMBOLS <fs_field> TYPE any.
 
     LOOP AT io_desc->components ASSIGNING FIELD-SYMBOL(<ls_comp>).
-      DATA(lv_field) = |{ iv_path }/{ <ls_comp>-name }|.
+      DATA(lv_field) = COND string( WHEN iv_path IS INITIAL THEN |{ <ls_comp>-name }|
+                                    ELSE |{ iv_path }.{ <ls_comp>-name }| ).
       ASSIGN COMPONENT <ls_comp>-name OF STRUCTURE iv_data TO <fs_field>.
       IF sy-subrc = 0.
         lr_field = REF #( <fs_field> ).
@@ -173,7 +174,8 @@ CLASS lcl_binding_resolver IMPLEMENTATION.
       WHERE visibility = cl_abap_classdescr=>public
         AND is_constant = abap_false.
 
-      DATA(lv_path) = |{ iv_path }/{ <ls_attr>-name }|.
+      DATA(lv_path) = COND string( WHEN iv_path IS INITIAL THEN |{ <ls_attr>-name }|
+                                   ELSE |{ iv_path }.{ <ls_attr>-name }| ).
       ASSIGN io_data->(<ls_attr>-name) TO <fs_attr>.
       IF sy-subrc = 0.
         APPEND VALUE #( path = lv_path

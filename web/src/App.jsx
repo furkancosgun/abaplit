@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import WidgetRenderer from './components/WidgetRenderer';
+import { setBindingValue } from './core/binding';
 
 export default function App() {
   const [appName, setAppName] = useState(() => {
@@ -105,15 +106,10 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [executeRun]);
 
-  const handleValueChange = (key, val) => {
-    stateRef.current = {
-      ...stateRef.current,
-      [key]: val,
-    };
-    setState((prev) => ({
-      ...prev,
-      [key]: val,
-    }));
+  const handleValueChange = (path, val) => {
+    const nextState = setBindingValue(stateRef.current, path, val);
+    stateRef.current = nextState;
+    setState(nextState);
   };
 
   // Separate sidebar children from main content

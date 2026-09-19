@@ -15,12 +15,14 @@
     "lint:fix": "abaplint --fix",
     "build": "npm run clean && abap_transpile abaplint-transpiler.json",
     "bundle:abap": "node scripts/bundle_to_abap.mjs",
-    "test": "npm run clean && abap_transpile abaplint-transpiler.json && node --expose-gc output/index.mjs"
+    "test": "node scripts/test_binding.mjs && npm run clean && abap_transpile abaplint-transpiler.json && node --expose-gc output/index.mjs",
+    "test:e2e": "playwright test"
   },
   "devDependencies": {
     "@abaplint/cli": "latest",
     "@abaplint/runtime": "latest",
     "@abaplint/transpiler-cli": "latest",
+    "@playwright/test": "^1.63.0",
     "abap-kit": "latest"
   }
 }

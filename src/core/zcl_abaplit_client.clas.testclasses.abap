@@ -54,7 +54,7 @@ CLASS ltcl_client IMPLEMENTATION.
     DATA(lo_cut) = NEW zcl_abaplit_client( app = lo_app
                                           req  = ls_req ).
 
-    cl_abap_unit_assert=>assert_equals( exp = '{/MS_STATE/TEXT_INPUT}'
+    cl_abap_unit_assert=>assert_equals( exp = '{MS_STATE.TEXT_INPUT}'
                                         act = lo_cut->zif_abaplit_client~bind( lo_app->ms_state-text_input ) ).
 
     TRY.

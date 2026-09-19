@@ -97,6 +97,19 @@ CLASS zcl_abaplit_view_builder DEFINITION
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
+    METHODS status
+      IMPORTING
+        label         TYPE clike
+        state         TYPE clike OPTIONAL
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
+    METHODS popover
+      IMPORTING
+        label         TYPE clike
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
     " --- Chat & AI Assistant ---
     METHODS chat_message
       IMPORTING
@@ -281,6 +294,33 @@ CLASS zcl_abaplit_view_builder DEFINITION
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
+    METHODS pills
+      IMPORTING
+        label         TYPE clike
+        options       TYPE clike OPTIONAL
+        value         TYPE clike OPTIONAL
+        event         TYPE clike OPTIONAL
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
+    METHODS segmented_control
+      IMPORTING
+        label         TYPE clike
+        options       TYPE clike OPTIONAL
+        value         TYPE clike OPTIONAL
+        event         TYPE clike OPTIONAL
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
+    METHODS feedback
+      IMPORTING
+        label         TYPE clike OPTIONAL
+        options       TYPE clike OPTIONAL
+        value         TYPE clike OPTIONAL
+        event         TYPE clike OPTIONAL
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
     METHODS slider
       IMPORTING
         label         TYPE clike
@@ -360,6 +400,13 @@ CLASS zcl_abaplit_view_builder DEFINITION
     METHODS json
       IMPORTING
         data          TYPE clike
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
+    METHODS badge
+      IMPORTING
+        text          TYPE clike
+        color         TYPE clike OPTIONAL
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
@@ -580,6 +627,19 @@ CLASS zcl_abaplit_view_builder IMPLEMENTATION.
   METHOD dialog.
     result = ele( 'dialog' ).
     result->prop( name = 'title' value = |{ title }| ).
+  ENDMETHOD.
+
+  METHOD status.
+    result = ele( 'status' ).
+    result->prop( name = 'label' value = |{ label }| ).
+    IF state IS SUPPLIED.
+      result->prop( name = 'state' value = |{ state }| ).
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD popover.
+    result = ele( 'popover' ).
+    result->prop( name = 'label' value = |{ label }| ).
   ENDMETHOD.
 
   METHOD chat_message.
@@ -827,6 +887,54 @@ CLASS zcl_abaplit_view_builder IMPLEMENTATION.
     result = me.
   ENDMETHOD.
 
+  METHOD pills.
+    DATA(lo_inp) = ele( 'pills' )->prop( name = 'label' value = |{ label }| ).
+    IF options IS SUPPLIED.
+      lo_inp->prop( name = 'options' value = |{ options }| ).
+    ENDIF.
+    IF value IS SUPPLIED.
+      lo_inp->prop( name = 'value' value = |{ value }| ).
+    ENDIF.
+    IF event IS SUPPLIED AND event IS NOT INITIAL.
+      lo_inp->prop( name = 'event' value = |{ event }| ).
+    ENDIF.
+    lo_inp->end( ).
+    result = me.
+  ENDMETHOD.
+
+  METHOD segmented_control.
+    DATA(lo_inp) = ele( 'segmented_control' )->prop( name = 'label' value = |{ label }| ).
+    IF options IS SUPPLIED.
+      lo_inp->prop( name = 'options' value = |{ options }| ).
+    ENDIF.
+    IF value IS SUPPLIED.
+      lo_inp->prop( name = 'value' value = |{ value }| ).
+    ENDIF.
+    IF event IS SUPPLIED AND event IS NOT INITIAL.
+      lo_inp->prop( name = 'event' value = |{ event }| ).
+    ENDIF.
+    lo_inp->end( ).
+    result = me.
+  ENDMETHOD.
+
+  METHOD feedback.
+    DATA(lo_inp) = ele( 'feedback' ).
+    IF label IS SUPPLIED.
+      lo_inp->prop( name = 'label' value = |{ label }| ).
+    ENDIF.
+    IF options IS SUPPLIED.
+      lo_inp->prop( name = 'options' value = |{ options }| ).
+    ENDIF.
+    IF value IS SUPPLIED.
+      lo_inp->prop( name = 'value' value = |{ value }| ).
+    ENDIF.
+    IF event IS SUPPLIED AND event IS NOT INITIAL.
+      lo_inp->prop( name = 'event' value = |{ event }| ).
+    ENDIF.
+    lo_inp->end( ).
+    result = me.
+  ENDMETHOD.
+
   METHOD slider.
     DATA(lo_inp) = ele( 'slider' )->prop( name = 'label' value = |{ label }| ).
     IF min IS SUPPLIED AND min IS NOT INITIAL.
@@ -997,6 +1105,15 @@ CLASS zcl_abaplit_view_builder IMPLEMENTATION.
 
   METHOD snow.
     ele( 'snow' )->end( ).
+    result = me.
+  ENDMETHOD.
+
+  METHOD badge.
+    DATA(lo_b) = ele( 'badge' )->prop( name = 'text' value = |{ text }| ).
+    IF color IS SUPPLIED.
+      lo_b->prop( name = 'color' value = |{ color }| ).
+    ENDIF.
+    lo_b->end( ).
     result = me.
   ENDMETHOD.
 
