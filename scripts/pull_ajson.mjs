@@ -102,7 +102,7 @@ const devcXml = `<?xml version="1.0" encoding="utf-8"?>
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <DEVC>
-    <CTEXT>abap2fiori - Vendored ajson Library</CTEXT>
+    <CTEXT>abaplit - Vendored ajson Library</CTEXT>
    </DEVC>
   </asx:values>
  </asx:abap>
@@ -111,4 +111,4 @@ const devcXml = `<?xml version="1.0" encoding="utf-8"?>
 fs.writeFileSync(path.join(vendorDir, 'package.devc.xml'), devcXml, 'utf8');
 
 fs.rmSync(tempCloneDir, { recursive: true, force: true });
-console.log('✅ ajson successfully pulled and renamed to z2fiori_* in src/vendor/');
+console.log('✅ ajson successfully pulled and renamed to zcl_abaplit_ajson_* in src/vendor/');

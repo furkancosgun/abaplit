@@ -75,10 +75,6 @@ ENDCLASS.
 
 CLASS lcl_event_helper DEFINITION FINAL.
   PUBLIC SECTION.
-    CLASS-METHODS js_quote
-      IMPORTING val           TYPE clike
-      RETURNING VALUE(result) TYPE string.
-
     CLASS-METHODS event
       IMPORTING event         TYPE clike
                 t_arg         TYPE string_table OPTIONAL

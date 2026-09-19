@@ -1,26 +1,10 @@
 CLASS lcl_event_helper IMPLEMENTATION.
-  METHOD js_quote.
-    IF val CP '${*}'.
-      result = val.
-      RETURN.
-    ENDIF.
-
-    result = val.
-    REPLACE ALL OCCURRENCES OF `\` IN result WITH `\\`.
-    REPLACE ALL OCCURRENCES OF `'` IN result WITH `\'`.
-    result = |'{ result }'|.
-  ENDMETHOD.
-
   METHOD event.
-    DATA lv_args TYPE string.
-
     IF t_arg IS INITIAL.
       result = event.
     ELSE.
-      LOOP AT t_arg ASSIGNING FIELD-SYMBOL(<lv_arg>).
-        lv_args = |{ lv_args }, { js_quote( <lv_arg> ) }|.
-      ENDLOOP.
-      result = |{ event }({ substring( val = lv_args off = 2 ) })|.
+      DATA(lv_args) = concat_lines_of( table = t_arg sep = ',' ).
+      result = |{ event }({ lv_args })|.
     ENDIF.
   ENDMETHOD.
 ENDCLASS.
