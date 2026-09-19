@@ -73,15 +73,12 @@ app.post("/api/run", async (req, res) => {
     }
 
     const httpReq = new abap.types.Structure({
-      app: new abap.types.String().set(req.body.app || ""),
-      event: new abap.types.String().set(req.body.event || ""),
-      event_args: new abap.types.Table(new abap.types.String()),
-      check_init: new abap.types.Character(1).set(req.body.check_init ? "X" : " "),
-      check_navigated: new abap.types.Character(1).set(req.body.check_navigated ? "X" : " "),
-      check_nav_stack: new abap.types.Character(1).set(req.body.check_nav_stack ? "X" : " "),
-      state: new abap.types.String().set(typeof req.body.state === "string" ? req.body.state : JSON.stringify(req.body.state || {})),
-      nav_prev_arg: new abap.types.String().set(req.body.nav_prev_arg || "")
-    });
+      app: new abap.types.String({ qualifiedName: "ZIF_ABAPLIT_TYPES=>TY_S_HTTP_REQ-APP" }).set(req.body.app || ""),
+      event: new abap.types.String({ qualifiedName: "ZIF_ABAPLIT_TYPES=>TY_S_HTTP_REQ-EVENT" }).set(req.body.event || ""),
+      event_args: abap.types.TableFactory.construct(new abap.types.String({ qualifiedName: "STRING" }), { withHeader: false, keyType: "DEFAULT", primaryKey: { isUnique: false, type: "STANDARD", keyFields: [], name: "primary_key" }, secondary: [] }, "STRING_TABLE"),
+      check_init: new abap.types.Character(1, { qualifiedName: "ABAP_BOOL", ddicName: "ABAP_BOOL" }).set(req.body.check_init ? "X" : " "),
+      state: new abap.types.String({ qualifiedName: "ZIF_ABAPLIT_TYPES=>TY_S_HTTP_REQ-STATE" }).set(typeof req.body.state === "string" ? req.body.state : JSON.stringify(req.body.state || {}))
+    }, "zif_abaplit_types=>ty_s_http_req");
 
     if (Array.isArray(req.body.event_args)) {
       for (const arg of req.body.event_args) {
