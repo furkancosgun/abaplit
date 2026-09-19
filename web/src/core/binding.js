@@ -3,12 +3,7 @@ import { BindingError } from './errors.js';
 export function isBindingExpression(val) {
   if (typeof val !== 'string') return false;
   const trimmed = val.trim();
-  if (trimmed.startsWith('{') && trimmed.endsWith('}')) return true;
-  if (trimmed.startsWith('/')) return true;
-  if (trimmed.includes('/') && !trimmed.includes(' ') && !trimmed.includes('\n')) return true;
-  if (trimmed.includes('.') && !trimmed.includes(' ') && !trimmed.includes('\n')) return true;
-  if (/^[A-Za-z0-9_]+-[A-Za-z0-9_]+(-[A-Za-z0-9_]+)*$/.test(trimmed)) return true;
-  return false;
+  return trimmed.startsWith('{') && trimmed.endsWith('}') && trimmed.length > 2;
 }
 
 export function normalizeBindingPath(raw) {
