@@ -19,7 +19,7 @@ CLASS zcl_abaplit_request_parser IMPLEMENTATION.
         zcl_abaplit_ajson=>parse( json )->to_abap( EXPORTING iv_corresponding = abap_true
                                                   IMPORTING ev_container      = result ).
       CATCH zcx_abaplit_ajson_error INTO DATA(lx_ajson).
-        zcx_abaplit_error=>raise( val     = 'Invalid JSON request payload.'
+        zcx_abaplit_error=>raise( val     = |JSON Parse Error: { lx_ajson->get_text( ) }|
                                  previous = lx_ajson ).
     ENDTRY.
 

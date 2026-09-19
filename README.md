@@ -1,80 +1,109 @@
 # abaplit ⚡
 
-> **Streamlit for ABAP**: The fastest way to build interactive, reactive web applications in pure ABAP.
+> **Streamlit for ABAP**: The fastest, most elegant way to build interactive, reactive web applications in pure ABAP.
 
 ---
 
-## 💡 Overview
+## 💡 What is abaplit?
 
-**abaplit** transforms how ABAP developers build user interfaces. Inspired by Python's **Streamlit**, you write simple, top-down ABAP scripts or classes that automatically generate dynamic, reactive web user interfaces with two-way data binding.
+**abaplit** transforms enterprise ABAP UI development. Inspired by Python's **Streamlit**, you write top-down, reactive ABAP classes that automatically render modern, pixel-perfect web applications with real-time two-way data binding.
 
-- 🚀 **Pure ABAP**: No JavaScript or UI5 XML configuration required.
-- ⚡ **Streamlit-style Reactive Execution**: Script runs on interaction, UI updates instantly.
-- 🧱 **Rich Widgets**: Titles, metrics, markdown, text/number inputs, checkboxes, sliders, tables, columns, sidebars, alerts and more.
-- 🌐 **JSON Widget Tree**: Decoupled, clean backend architecture that feeds modern web frontends via REST / ICF.
-- 🧪 **Full Transpiler & Cloud Ready**: Fully transpiles via `@abaplint/transpiler-cli` and runs anywhere (SAP on-prem, BTP, Node.js runtime).
+- 🚀 **Pure ABAP**: No JavaScript or complex XML view configuration required.
+- ⚡ **Streamlit Reactive Execution**: Your ABAP class runs top-to-bottom on interaction; state is synchronized automatically.
+- 📊 **Native ABAP Internal Table Binding**: Bind internal tables directly using `client->bind( lt_table )` — backend auto-serializes to structured JSON.
+- 💎 **Pixel-Perfect Streamlit Theme**: Dark/light modes, vibrant modern colors, typography, and fluid micro-animations.
+- 📦 **Embedded Single-Class Deployment**: Frontend SPA is inlined into a single ABAP class (`zcl_abaplit_web_assets.clas.abap`) — zero external CDN or separate static hosting needed.
+- 🌐 **SAP ICF & Cloud Native**: Seamlessly runs via SICF on SAP NetWeaver/S/4HANA (`/sap/bc/abaplit`), SAP BTP Cloud, or Node.js via `@abaplint/transpiler-cli`.
 
 ---
 
-## 🛠️ Architecture
+## 🏛️ Architecture
 
 ```
-User Browser  <--->  [ REST / ICF API ]  <--->  zcl_abaplit_app_runner
-                                                      │
-                                                      ├──> zcl_abaplit_state_codec (Hydrate / Serialize)
-                                                      ├──> zcl_abaplit_client
-                                                      └──> zcl_abaplit_view_builder (Streamlit UI Tree)
+Browser (React SingleFile SPA)
+       │
+       │  HTTP GET  --> Serves embedded HTML from zcl_abaplit_web_assets
+       │  HTTP POST --> /sap/bc/abaplit (State + Event Payload)
+       ▼
+[ SAP ICF Handler / zcl_abaplit_http_handler ]
+       │
+       ├──> zcl_abaplit_request_parser   (Parses event & incoming state)
+       │
+       ▼
+[ zcl_abaplit_app_runner ]
+       │
+       ├──> zcl_abaplit_state_codec     (Hydrates ABAP object attributes)
+       ├──> zcl_abaplit_client          (Binding resolver & event handling)
+       ├──> Your App -> zif_abaplit_app~main( client )
+       │        └──> zcl_abaplit_view_builder (Streamlit widget tree)
+       │
+       └──> zcl_abaplit_response_builder (Serializes widget tree + updated state)
 ```
-
-1. **State Hydration:** Public attributes of your ABAP application class are automatically hydrated from client state via `zcl_abaplit_state_codec` and `zcl_abaplit_ajson`.
-2. **Execution:** Your class implements `zif_abaplit_app~main( client )`.
-3. **View Building:** You build the UI using the fluent `client->new_view( )` (or `zcl_abaplit_view_builder`).
-4. **Response:** A reactive JSON widget tree and updated state are returned to the frontend.
 
 ---
 
-## 💻 Hello World Example
+## 🚀 Ready-to-use Demos
+
+abaplit includes a suite of interactive demos demonstrating real-world SAP workflows:
+
+| Demo Class | Topic & Features | URL |
+| :--- | :--- | :--- |
+| **`zcl_abaplit_demo_000`** | **Central Hub & Showcase Dashboard**<br>Navigation launchpad, catalog table, metrics | `http://localhost:3000/?app=zcl_abaplit_demo_000` |
+| **`zcl_abaplit_demo_001`** | **Charts & Analytics**<br>Interactive Line, Bar, and Area charts with live data | `http://localhost:3000/?app=zcl_abaplit_demo_001` |
+| **`zcl_abaplit_demo_002`** | **Forms & Reactive Controls**<br>Text inputs, selectbox, toggle, color picker, slider & dynamic submission table | `http://localhost:3000/?app=zcl_abaplit_demo_002` |
+| **`zcl_abaplit_demo_003`** | **Business DataFrames**<br>Direct ABAP internal table binding (Sales Orders, Plant Inventory) | `http://localhost:3000/?app=zcl_abaplit_demo_003` |
+| **`zcl_abaplit_demo_004`** | **AI Chat Assistant**<br>Chat bubbles, assistant avatars, and reactive `chat_input` | `http://localhost:3000/?app=zcl_abaplit_demo_004` |
+| **`zcl_abaplit_demo_005`** | **Tabs, Modals & Progress**<br>Tabbed containers, progress bars, and modal dialogs | `http://localhost:3000/?app=zcl_abaplit_demo_005` |
+
+---
+
+## 💻 Code Example: Interactive Form
 
 ```abap
-CLASS zcl_demo_app DEFINITION PUBLIC FINAL CREATE PUBLIC.
+CLASS zcl_my_app DEFINITION PUBLIC FINAL CREATE PUBLIC.
   PUBLIC SECTION.
     INTERFACES zif_abaplit_app.
 
-    " Reactive state (bound to UI)
-    DATA mv_user_name TYPE string.
-    DATA mv_counter   TYPE i.
+    " Reactive public state
+    DATA mv_name TYPE string VALUE 'SAP Developer'.
+    DATA mv_dept TYPE string VALUE 'Cloud Platform'.
+    DATA mt_logs TYPE STANDARD TABLE OF string WITH EMPTY KEY.
 ENDCLASS.
 
-CLASS zcl_demo_app IMPLEMENTATION.
+CLASS zcl_my_app IMPLEMENTATION.
   METHOD zif_abaplit_app~main.
     DATA(st) = client->new_view( ).
 
-    st->title( 'Hello from abaplit! 🚀' ).
-    st->write( 'Streamlit-style reactive web development in pure ABAP.' ).
+    " Streamlit Top Bar & Sidebar
+    st->title( 'Developer Workspace' ).
+    st->sidebar( )->header( 'Session Status' ).
+    st->sidebar( )->metric( label = 'Total Entries' value = |{ lines( mt_logs ) }| ).
 
-    " Sidebar
-    st->sidebar( )->header( 'Navigation & Settings' ).
-    st->sidebar( )->write( 'Configure your app parameters here.' ).
+    " Responsive Columns
+    DATA(cols) = st->columns( 2 ).
+    DATA(col1) = cols->col( 1 ).
+    col1->text_input( label = 'Full Name'
+                      value = client->bind( mv_name ) ).
 
-    " Two-way binding
-    st->text_input( label = 'What is your name?'
-                    value = client->bind( mv_user_name ) ).
+    DATA(col2) = cols->col( 2 ).
+    col2->selectbox( label   = 'Department'
+                     options = 'Cloud Platform,Core ERP,Security'
+                     value   = client->bind( mv_dept ) ).
 
-    " Interaction & Events
-    IF client->check_event( 'BTN_CLICK' ).
-      mv_counter = mv_counter + 1.
-      st->success( |Great job, { mv_user_name }! Button clicked { mv_counter } times.| ).
+    " Event Handling
+    IF client->check_event( 'SUBMIT_ENTRY' ).
+      APPEND |{ mv_name } ({ mv_dept }) at { sy-uzeit }| TO mt_logs.
+      st->success( |Entry created for { mv_name }!| ).
       st->balloons( ).
     ENDIF.
 
-    st->button( text  = 'Click Me'
-                event = client->event( 'BTN_CLICK' )
+    st->button( text  = 'Save Entry'
+                event = 'SUBMIT_ENTRY'
                 type  = 'primary' ).
 
-    " Layout: Responsive Columns
-    DATA(cols) = st->columns( 2 ).
-    cols->col( 1 )->metric( label = 'Clicks' value = |{ mv_counter }| ).
-    cols->col( 2 )->metric( label = 'Status' value = 'Active' delta = '+100%' ).
+    st->divider( ).
+    st->subheader( 'Logged Submissions' ).
+    st->table( client->bind( mt_logs ) ).
 
     client->view_display( st->stringify( ) ).
   ENDMETHOD.
@@ -83,31 +112,45 @@ ENDCLASS.
 
 ---
 
-## 🧰 Available Streamlit Widgets
+## 🧰 Available Widgets
 
-| Category | Methods |
+| Category | Available ABAP Methods |
 | :--- | :--- |
 | **Typography** | `title`, `header`, `subheader`, `write`, `text`, `markdown`, `caption`, `code`, `divider` |
-| **Inputs** | `text_input`, `number_input`, `text_area`, `checkbox`, `radio`, `selectbox`, `multiselect`, `slider`, `date_input`, `time_input` |
-| **Action** | `button` |
-| **Display** | `metric`, `table`, `dataframe` |
-| **Layout** | `columns( count )`, `col( index )`, `sidebar( )`, `container( )`, `expander( label )` |
+| **Inputs** | `text_input`, `number_input`, `text_area`, `checkbox`, `toggle`, `radio`, `selectbox`, `multiselect`, `slider`, `date_input`, `time_input`, `color_picker`, `file_uploader` |
+| **Actions** | `button`, `link_button`, `download_button` |
+| **Data & Charts** | `metric`, `table`, `dataframe`, `line_chart`, `bar_chart`, `area_chart`, `json` |
+| **Layout** | `columns( count )`, `col( index )`, `sidebar( )`, `container( )`, `expander( label )`, `tabs( 'Tab1,Tab2' )`, `dialog( title )` |
+| **Chat** | `chat_message( name, avatar )`, `chat_input( placeholder, event )` |
 | **Feedback** | `success`, `info`, `warning`, `error`, `toast`, `progress`, `spinner`, `balloons`, `snow` |
 
 ---
 
-## 🧪 Testing & Development
+## 🛠️ Development & Tooling
 
 ```bash
-# Clean build artifacts
-npm run clean
+# Install dependencies
+npm install
 
-# Run ABAP transpiler and all automated unit tests
+# Run transpilation and automated unit tests
 npm test
 
-# Run syntax and style checks
+# Run abaplint checks
 npm run lint
 
-# Start local test dev server
+# Build web frontend and embed into ABAP class
+npm run bundle:abap
+
+# Start local dev server (Express ICF Shim)
 npm start
 ```
+
+Access the application in your browser:
+- Dashboard: [http://localhost:3000/?app=zcl_abaplit_demo_000](http://localhost:3000/?app=zcl_abaplit_demo_000)
+- ICF Path: [http://localhost:3000/sap/bc/abaplit?app=zcl_abaplit_demo_000](http://localhost:3000/sap/bc/abaplit?app=zcl_abaplit_demo_000)
+
+---
+
+## 📄 License
+
+MIT
