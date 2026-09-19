@@ -26,7 +26,7 @@ try {
   process.exit(1);
 }
 
-// Register zcl_abaplit_lp_handler shim dynamically
+// Register zcl_abaplit_lp_handler shim dynamically so src/ remains untouched
 if (!abap.Classes["ZCL_ABAPLIT_LP_HANDLER"]) {
   class zcl_abaplit_lp_handler {
     async constructor_() {
@@ -46,67 +46,11 @@ const app = express();
 app.disable("x-powered-by");
 app.set("etag", false);
 
-// JSON body parser for modern API
-app.use(express.json({ limit: "10mb" }));
-
-// Serve embedded Streamlit frontend on root
-app.get("/", async (req, res) => {
-  const distHtml = path.resolve(rootDir, "web/dist/index.html");
-  if (fs.existsSync(distHtml)) {
-    return res.sendFile(distHtml);
-  }
-  const AssetsClass = abap.Classes["ZCL_ABAPLIT_WEB_ASSETS"];
-  if (AssetsClass) {
-    const html = (await AssetsClass.get_html()).get();
-    res.setHeader("Content-Type", "text/html; charset=utf-8");
-    return res.send(html);
-  }
-  res.send("abaplit web assets not built. Run: npm run bundle:abap");
-});
-
-// Direct REST endpoint for ABAPlit app runner
-app.post("/api/run", async (req, res) => {
-  try {
-    const Runner = abap.Classes["ZCL_ABAPLIT_APP_RUNNER"];
-    if (!Runner) {
-      return res.status(500).json({ success: false, message: "ZCL_ABAPLIT_APP_RUNNER not found" });
-    }
-
-    const httpReq = new abap.types.Structure({
-      app: new abap.types.String({ qualifiedName: "ZIF_ABAPLIT_TYPES=>TY_S_HTTP_REQ-APP" }).set(req.body.app || ""),
-      event: new abap.types.String({ qualifiedName: "ZIF_ABAPLIT_TYPES=>TY_S_HTTP_REQ-EVENT" }).set(req.body.event || ""),
-      event_args: abap.types.TableFactory.construct(new abap.types.String({ qualifiedName: "STRING" }), { withHeader: false, keyType: "DEFAULT", primaryKey: { isUnique: false, type: "STANDARD", keyFields: [], name: "primary_key" }, secondary: [] }, "STRING_TABLE"),
-      check_init: new abap.types.Character(1, { qualifiedName: "ABAP_BOOL", ddicName: "ABAP_BOOL" }).set(req.body.check_init ? "X" : " "),
-      state: new abap.types.String({ qualifiedName: "ZIF_ABAPLIT_TYPES=>TY_S_HTTP_REQ-STATE" }).set(typeof req.body.state === "string" ? req.body.state : JSON.stringify(req.body.state || {}))
-    }, "zif_abaplit_types=>ty_s_http_req");
-
-    if (Array.isArray(req.body.event_args)) {
-      for (const arg of req.body.event_args) {
-        httpReq.get().event_args.append(new abap.types.String().set(String(arg)));
-      }
-    }
-
-    const result = await Runner.run({ req: httpReq });
-    const resData = result.get();
-
-    res.json({
-      success: resData.success.get() === "X",
-      app: resData.app.get(),
-      view: resData.view.get(),
-      state: resData.state.get(),
-      message: resData.message.get()
-    });
-  } catch (err) {
-    console.error("API error:", err);
-    res.status(500).json({ success: false, message: err.message });
-  }
-});
-
-// Raw body parsing for ABAP ICF requests
+// 1. Raw body parsing for ABAP ICF requests
 app.use(express.raw({ type: "*/*", limit: "10mb" }));
 
-// ICF handler route: /sap/bc/abaplit
-app.all(/^\/sap\/bc\/(http\/sap\/)?abaplit/, async (req, res) => {
+// 2. ICF handler logic
+const handleIcf = async (req, res) => {
   if (!req.body) {
     req.body = Buffer.alloc(0);
   }
@@ -123,14 +67,25 @@ app.all(/^\/sap\/bc\/(http\/sap\/)?abaplit/, async (req, res) => {
       res.status(500).send("Internal Server Error in ABAP ICF Handler");
     }
   }
-});
+};
+
+// 3. ICF handler routes
+app.all(/^\/sap\/bc\/(http\/sap\/)?abaplit/, handleIcf);
+app.all("/", handleIcf);
 
 export const server = app.listen(PORT, () => {
   console.log(`\n=============================================================`);
   console.log(`🚀 abaplit Dev Server is RUNNING at http://localhost:${PORT}`);
   console.log(`📡 ICF Backend Handler: ${HANDLER_CLASS.toUpperCase()} -> /sap/bc/abaplit`);
-  console.log(`📡 Direct REST API: POST http://localhost:${PORT}/api/run`);
-  console.log(`=============================================================\n`);
+  console.log(`=============================================================`);
+  console.log(`\nReady-to-use Demos:`);
+  console.log(`  🔹 Demo 000 (Hub Dashboard):         http://localhost:${PORT}/?app=zcl_abaplit_demo_000`);
+  console.log(`  🔹 Demo 001 (Charts & Analytics):    http://localhost:${PORT}/?app=zcl_abaplit_demo_001`);
+  console.log(`  🔹 Demo 002 (Forms & Controls):      http://localhost:${PORT}/?app=zcl_abaplit_demo_002`);
+  console.log(`  🔹 Demo 003 (Business DataFrames):   http://localhost:${PORT}/?app=zcl_abaplit_demo_003`);
+  console.log(`  🔹 Demo 004 (AI Chat Assistant):    http://localhost:${PORT}/?app=zcl_abaplit_demo_004`);
+  console.log(`  🔹 Demo 005 (Tabs & Progress):       http://localhost:${PORT}/?app=zcl_abaplit_demo_005`);
+  console.log(`\n=============================================================\n`);
 });
 
 server.on("error", (err) => {

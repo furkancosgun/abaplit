@@ -59,7 +59,11 @@ export default function App() {
         state: curState,
       };
 
-      const res = await fetch('/api/run', {
+      const endpoint = window.location.pathname.startsWith('/sap/bc/')
+        ? window.location.pathname
+        : '/sap/bc/abaplit';
+
+      const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
