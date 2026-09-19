@@ -342,7 +342,7 @@ export default function WidgetRenderer({ node, state, onValueChange, onEvent, is
 
       case 'balloons':
       case 'snow':
-        return <ConfettiWidget type={node.type} />;
+        return <ConfettiWidget key={Date.now()} type={node.type} />;
 
       default:
         return null;

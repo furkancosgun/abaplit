@@ -17,7 +17,7 @@ export default function ConfettiWidget({ type }) {
         origin: { y: 0 },
       });
     }
-  }, [type]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   return null;
 }
