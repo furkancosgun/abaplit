@@ -49,17 +49,11 @@ export default function App() {
   const executeRun = useCallback(async (event = '', customState = null, checkInit = false, eventArgs = []) => {
     setIsRunning(true);
     try {
-      let eventName = event || '';
-      if (typeof eventName === 'string') {
-        const match = eventName.match(/^onEvent\(['"]([^'"]+)['"]\)/);
-        if (match) eventName = match[1];
-      }
-
       const curState = customState !== null ? customState : stateRef.current;
 
       const payload = {
         app: appName,
-        event: eventName,
+        event: event || '',
         event_args: Array.isArray(eventArgs) ? eventArgs : [eventArgs],
         check_init: checkInit,
         state: curState,
