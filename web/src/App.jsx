@@ -6,7 +6,7 @@ import WidgetRenderer from './components/WidgetRenderer';
 export default function App() {
   const [appName, setAppName] = useState(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('app') || 'zcl_abaplit_demo';
+    return params.get('app') || 'zcl_abaplit_demo_000';
   });
 
   const [state, setState] = useState({});
@@ -16,6 +16,17 @@ export default function App() {
     return localStorage.getItem('abaplit_theme') === 'dark';
   });
   const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  // Sync with URL popstate
+  useEffect(() => {
+    const handleLocationChange = () => {
+      const params = new URLSearchParams(window.location.search);
+      const curApp = params.get('app') || 'zcl_abaplit_demo_000';
+      setAppName(curApp);
+    };
+    window.addEventListener('popstate', handleLocationChange);
+    return () => window.removeEventListener('popstate', handleLocationChange);
+  }, []);
 
   // Sync theme
   useEffect(() => {
@@ -29,13 +40,19 @@ export default function App() {
   }, [isDark]);
 
   // Execute roundtrip
-  const executeRun = useCallback(async (event = '', customState = null, checkInit = false) => {
+  const executeRun = useCallback(async (event = '', customState = null, checkInit = false, eventArgs = []) => {
     setIsRunning(true);
     try {
+      let eventName = event || '';
+      if (typeof eventName === 'string') {
+        const match = eventName.match(/^onEvent\(['"]([^'"]+)['"]\)/);
+        if (match) eventName = match[1];
+      }
+
       const payload = {
         app: appName,
-        event: event || '',
-        event_args: [],
+        event: eventName,
+        event_args: Array.isArray(eventArgs) ? eventArgs : [eventArgs],
         check_init: checkInit,
         state: customState !== null ? customState : state,
       };
@@ -123,7 +140,7 @@ export default function App() {
           nodes={sidebarNodes}
           state={state}
           onValueChange={handleValueChange}
-          onEvent={(evt) => executeRun(evt)}
+          onEvent={(evt, args) => executeRun(evt, null, false, args)}
           isRunning={isRunning}
         />
       )}
@@ -135,7 +152,7 @@ export default function App() {
             node={child}
             state={state}
             onValueChange={handleValueChange}
-            onEvent={(evt) => executeRun(evt)}
+            onEvent={(evt, args) => executeRun(evt, null, false, args)}
             isRunning={isRunning}
           />
         ))}

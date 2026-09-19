@@ -78,6 +78,40 @@ CLASS zcl_abaplit_view_builder DEFINITION
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
+    METHODS tabs
+      IMPORTING
+        count         TYPE i DEFAULT 2
+        titles        TYPE clike OPTIONAL
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
+    METHODS tab
+      IMPORTING
+        index         TYPE i
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
+    METHODS dialog
+      IMPORTING
+        title         TYPE clike
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
+    " --- Chat & AI Assistant ---
+    METHODS chat_message
+      IMPORTING
+        name          TYPE clike
+        avatar        TYPE clike OPTIONAL
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
+    METHODS chat_input
+      IMPORTING
+        placeholder   TYPE clike OPTIONAL
+        event         TYPE clike OPTIONAL
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
     " --- Text & Typography ---
     METHODS title
       IMPORTING
@@ -141,6 +175,22 @@ CLASS zcl_abaplit_view_builder DEFINITION
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
+    METHODS link_button
+      IMPORTING
+        label         TYPE clike
+        url           TYPE clike
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
+    METHODS download_button
+      IMPORTING
+        label         TYPE clike
+        data          TYPE clike
+        file_name     TYPE clike
+        mime          TYPE clike OPTIONAL
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
     METHODS text_input
       IMPORTING
         label         TYPE clike
@@ -176,6 +226,30 @@ CLASS zcl_abaplit_view_builder DEFINITION
       IMPORTING
         label         TYPE clike
         value         TYPE clike OPTIONAL
+        event         TYPE clike OPTIONAL
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
+    METHODS toggle
+      IMPORTING
+        label         TYPE clike
+        value         TYPE clike OPTIONAL
+        event         TYPE clike OPTIONAL
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
+    METHODS color_picker
+      IMPORTING
+        label         TYPE clike
+        value         TYPE clike OPTIONAL
+        event         TYPE clike OPTIONAL
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
+    METHODS file_uploader
+      IMPORTING
+        label         TYPE clike
+        accept        TYPE clike OPTIONAL
         event         TYPE clike OPTIONAL
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
@@ -233,7 +307,36 @@ CLASS zcl_abaplit_view_builder DEFINITION
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
-    " --- Data Display ---
+    " --- Charts & Visualizations ---
+    METHODS line_chart
+      IMPORTING
+        data          TYPE clike
+        height        TYPE clike OPTIONAL
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
+    METHODS bar_chart
+      IMPORTING
+        data          TYPE clike
+        height        TYPE clike OPTIONAL
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
+    METHODS area_chart
+      IMPORTING
+        data          TYPE clike
+        height        TYPE clike OPTIONAL
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
+    METHODS scatter_chart
+      IMPORTING
+        data          TYPE clike
+        height        TYPE clike OPTIONAL
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
+    " --- Data & Media Display ---
     METHODS metric
       IMPORTING
         label         TYPE clike
@@ -251,6 +354,32 @@ CLASS zcl_abaplit_view_builder DEFINITION
     METHODS dataframe
       IMPORTING
         data          TYPE clike
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
+    METHODS json
+      IMPORTING
+        data          TYPE clike
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
+    METHODS image
+      IMPORTING
+        src           TYPE clike
+        caption       TYPE clike OPTIONAL
+        width         TYPE clike OPTIONAL
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
+    METHODS audio
+      IMPORTING
+        src           TYPE clike
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
+    METHODS video
+      IMPORTING
+        src           TYPE clike
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
@@ -427,6 +556,52 @@ CLASS zcl_abaplit_view_builder IMPLEMENTATION.
     ENDIF.
   ENDMETHOD.
 
+  METHOD tabs.
+    result = ele( 'tabs' ).
+    result->prop( name = 'count' value = |{ count }| ).
+    IF titles IS SUPPLIED.
+      result->prop( name = 'titles' value = |{ titles }| ).
+    ENDIF.
+    DATA(lv_i) = 1.
+    WHILE lv_i <= count.
+      result->ele( 'tab' )->prop( name = 'index' value = |{ lv_i }| )->end( ).
+      lv_i = lv_i + 1.
+    ENDWHILE.
+  ENDMETHOD.
+
+  METHOD tab.
+    IF lines( mt_child ) >= index AND index > 0.
+      result = mt_child[ index ].
+    ELSE.
+      result = me.
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD dialog.
+    result = ele( 'dialog' ).
+    result->prop( name = 'title' value = |{ title }| ).
+  ENDMETHOD.
+
+  METHOD chat_message.
+    result = ele( 'chat_message' ).
+    result->prop( name = 'name' value = |{ name }| ).
+    IF avatar IS SUPPLIED.
+      result->prop( name = 'avatar' value = |{ avatar }| ).
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD chat_input.
+    DATA(lo_chat) = ele( 'chat_input' ).
+    IF placeholder IS SUPPLIED.
+      lo_chat->prop( name = 'placeholder' value = |{ placeholder }| ).
+    ENDIF.
+    IF event IS SUPPLIED.
+      lo_chat->prop( name = 'event' value = |{ event }| ).
+    ENDIF.
+    lo_chat->end( ).
+    result = me.
+  ENDMETHOD.
+
   METHOD title.
     ele( 'title' )->prop( name = 'text' value = |{ val }| )->end( ).
     result = me.
@@ -485,6 +660,20 @@ CLASS zcl_abaplit_view_builder IMPLEMENTATION.
       lo_btn->prop( name = 'btn_type' value = |{ type }| ).
     ENDIF.
     lo_btn->end( ).
+    result = me.
+  ENDMETHOD.
+
+  METHOD link_button.
+    ele( 'link_button' )->prop( name = 'label' value = |{ label }| )->prop( name = 'url' value = |{ url }| )->end( ).
+    result = me.
+  ENDMETHOD.
+
+  METHOD download_button.
+    DATA(lo_dl) = ele( 'download_button' )->prop( name = 'label' value = |{ label }| )->prop( name = 'data' value = |{ data }| )->prop( name = 'file_name' value = |{ file_name }| ).
+    IF mime IS SUPPLIED.
+      lo_dl->prop( name = 'mime' value = |{ mime }| ).
+    ENDIF.
+    lo_dl->end( ).
     result = me.
   ENDMETHOD.
 
@@ -551,6 +740,42 @@ CLASS zcl_abaplit_view_builder IMPLEMENTATION.
       lo_inp->prop( name = 'value' value = |{ value }| ).
     ENDIF.
     IF event IS SUPPLIED AND event IS NOT INITIAL.
+      lo_inp->prop( name = 'event' value = |{ event }| ).
+    ENDIF.
+    lo_inp->end( ).
+    result = me.
+  ENDMETHOD.
+
+  METHOD toggle.
+    DATA(lo_inp) = ele( 'toggle' )->prop( name = 'label' value = |{ label }| ).
+    IF value IS SUPPLIED.
+      lo_inp->prop( name = 'value' value = |{ value }| ).
+    ENDIF.
+    IF event IS SUPPLIED AND event IS NOT INITIAL.
+      lo_inp->prop( name = 'event' value = |{ event }| ).
+    ENDIF.
+    lo_inp->end( ).
+    result = me.
+  ENDMETHOD.
+
+  METHOD color_picker.
+    DATA(lo_inp) = ele( 'color_picker' )->prop( name = 'label' value = |{ label }| ).
+    IF value IS SUPPLIED.
+      lo_inp->prop( name = 'value' value = |{ value }| ).
+    ENDIF.
+    IF event IS SUPPLIED AND event IS NOT INITIAL.
+      lo_inp->prop( name = 'event' value = |{ event }| ).
+    ENDIF.
+    lo_inp->end( ).
+    result = me.
+  ENDMETHOD.
+
+  METHOD file_uploader.
+    DATA(lo_inp) = ele( 'file_uploader' )->prop( name = 'label' value = |{ label }| ).
+    IF accept IS SUPPLIED.
+      lo_inp->prop( name = 'accept' value = |{ accept }| ).
+    ENDIF.
+    IF event IS SUPPLIED.
       lo_inp->prop( name = 'event' value = |{ event }| ).
     ENDIF.
     lo_inp->end( ).
@@ -644,6 +869,42 @@ CLASS zcl_abaplit_view_builder IMPLEMENTATION.
     result = me.
   ENDMETHOD.
 
+  METHOD line_chart.
+    DATA(lo_c) = ele( 'line_chart' )->prop( name = 'data' value = |{ data }| ).
+    IF height IS SUPPLIED.
+      lo_c->prop( name = 'height' value = |{ height }| ).
+    ENDIF.
+    lo_c->end( ).
+    result = me.
+  ENDMETHOD.
+
+  METHOD bar_chart.
+    DATA(lo_c) = ele( 'bar_chart' )->prop( name = 'data' value = |{ data }| ).
+    IF height IS SUPPLIED.
+      lo_c->prop( name = 'height' value = |{ height }| ).
+    ENDIF.
+    lo_c->end( ).
+    result = me.
+  ENDMETHOD.
+
+  METHOD area_chart.
+    DATA(lo_c) = ele( 'area_chart' )->prop( name = 'data' value = |{ data }| ).
+    IF height IS SUPPLIED.
+      lo_c->prop( name = 'height' value = |{ height }| ).
+    ENDIF.
+    lo_c->end( ).
+    result = me.
+  ENDMETHOD.
+
+  METHOD scatter_chart.
+    DATA(lo_c) = ele( 'scatter_chart' )->prop( name = 'data' value = |{ data }| ).
+    IF height IS SUPPLIED.
+      lo_c->prop( name = 'height' value = |{ height }| ).
+    ENDIF.
+    lo_c->end( ).
+    result = me.
+  ENDMETHOD.
+
   METHOD metric.
     DATA(lo_m) = ele( 'metric' )->prop( name = 'label' value = |{ label }| )->prop( name = 'value' value = |{ value }| ).
     IF delta IS SUPPLIED AND delta IS NOT INITIAL.
@@ -660,6 +921,33 @@ CLASS zcl_abaplit_view_builder IMPLEMENTATION.
 
   METHOD dataframe.
     ele( 'dataframe' )->prop( name = 'data' value = |{ data }| )->end( ).
+    result = me.
+  ENDMETHOD.
+
+  METHOD json.
+    ele( 'json' )->prop( name = 'data' value = |{ data }| )->end( ).
+    result = me.
+  ENDMETHOD.
+
+  METHOD image.
+    DATA(lo_img) = ele( 'image' )->prop( name = 'src' value = |{ src }| ).
+    IF caption IS SUPPLIED.
+      lo_img->prop( name = 'caption' value = |{ caption }| ).
+    ENDIF.
+    IF width IS SUPPLIED.
+      lo_img->prop( name = 'width' value = |{ width }| ).
+    ENDIF.
+    lo_img->end( ).
+    result = me.
+  ENDMETHOD.
+
+  METHOD audio.
+    ele( 'audio' )->prop( name = 'src' value = |{ src }| )->end( ).
+    result = me.
+  ENDMETHOD.
+
+  METHOD video.
+    ele( 'video' )->prop( name = 'src' value = |{ src }| )->end( ).
     result = me.
   ENDMETHOD.
 

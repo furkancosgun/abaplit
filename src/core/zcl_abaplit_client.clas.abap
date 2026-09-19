@@ -49,10 +49,19 @@ CLASS zcl_abaplit_client IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD zif_abaplit_client~check_event.
+    DATA lv_clean TYPE string.
+    lv_clean = ms_req-event.
+    IF lv_clean CP 'onEvent(''*'')'.
+      DATA(lv_len) = strlen( lv_clean ) - 10.
+      IF lv_len > 0.
+        lv_clean = substring( val = lv_clean off = 9 len = lv_len ).
+      ENDIF.
+    ENDIF.
+
     IF event IS INITIAL.
       result = xsdbool( ms_req-event IS NOT INITIAL ).
     ELSE.
-      result = xsdbool( ms_req-event = event ).
+      result = xsdbool( ms_req-event = event OR lv_clean = event ).
     ENDIF.
   ENDMETHOD.
 
