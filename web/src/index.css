@@ -202,6 +202,67 @@ body {
   margin-bottom: 0.75rem;
 }
 
+.st-markdown {
+  font-size: 1rem;
+  color: var(--text-color);
+  margin-bottom: 0.75rem;
+  line-height: 1.6;
+}
+
+.st-markdown p {
+  margin: 0 0 0.5rem 0;
+}
+
+.st-markdown p:last-child {
+  margin-bottom: 0;
+}
+
+.st-markdown strong {
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.st-markdown em {
+  font-style: italic;
+}
+
+.st-markdown .st-inline-code {
+  font-family: var(--font-code);
+  background-color: var(--secondary-background);
+  border: 1px solid var(--border-color);
+  padding: 0.15rem 0.35rem;
+  border-radius: 4px;
+  font-size: 0.88em;
+}
+
+.st-markdown a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.st-markdown a:hover {
+  text-decoration: underline;
+}
+
+.st-markdown ul,
+.st-markdown ol {
+  margin: 0.25rem 0 0.5rem 1.5rem;
+  padding: 0;
+}
+
+.st-markdown li {
+  margin-bottom: 0.25rem;
+}
+
+.st-markdown blockquote {
+  border-left: 3px solid var(--primary-color);
+  margin: 0.5rem 0;
+  padding: 0.25rem 0.75rem;
+  color: var(--text-muted);
+  background: var(--secondary-background);
+  border-radius: 0 4px 4px 0;
+}
+
 .st-caption {
   font-size: 0.85rem;
   color: var(--text-muted);

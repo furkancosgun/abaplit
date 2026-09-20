@@ -43,6 +43,7 @@ import JsonWidget from './data/JsonWidget';
 import CodeWidget from './data/CodeWidget';
 import BadgeWidget from './data/BadgeWidget';
 import HtmlWidget from './data/HtmlWidget';
+import MarkdownWidget from './data/MarkdownWidget';
 import StreamlitChart from './charts/StreamlitChart';
 
 import ChatMessage from './chat/ChatMessage';
@@ -103,6 +104,7 @@ const WIDGET_COMPONENTS = {
   metric: MetricWidget,
   json: JsonWidget,
   html: HtmlWidget,
+  markdown: MarkdownWidget,
 
   image: ImageWidget,
   audio: AudioWidget,
@@ -140,7 +142,7 @@ export default function WidgetRenderer({ node, state, onValueChange, onEvent, is
     if (node.type === 'title') return <h1 className="st-title">{textContent}</h1>;
     if (node.type === 'header') return <h2 className="st-header-title">{textContent}</h2>;
     if (node.type === 'subheader') return <h3 className="st-subheader">{textContent}</h3>;
-    if (node.type === 'write' || node.type === 'text' || node.type === 'markdown') {
+    if (node.type === 'write' || node.type === 'text') {
       return <p className="st-text">{textContent}</p>;
     }
     if (node.type === 'caption') return <p className="st-caption">{textContent}</p>;
