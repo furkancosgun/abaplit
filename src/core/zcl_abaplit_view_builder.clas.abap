@@ -370,12 +370,6 @@ CLASS zcl_abaplit_view_builder DEFINITION
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
-    METHODS latex
-      IMPORTING
-        body          TYPE clike
-      RETURNING
-        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
-
     METHODS html
       IMPORTING
         body          TYPE clike
@@ -1140,11 +1134,6 @@ CLASS zcl_abaplit_view_builder IMPLEMENTATION.
 
   METHOD empty.
     ele( 'empty' )->end( ).
-    result = me.
-  ENDMETHOD.
-
-  METHOD latex.
-    ele( 'latex' )->prop( name = 'body' value = |{ body }| )->end( ).
     result = me.
   ENDMETHOD.
 

@@ -11,6 +11,10 @@ export default function Slider({ node, state, onValueChange, onEvent }) {
   }
 
   const curVal = bound.isBound ? (bound.value ?? min ?? '0') : (value ?? min ?? '0');
+  const minNum = parseFloat(min ?? '0') || 0;
+  const maxNum = parseFloat(max ?? '100') || 100;
+  const curNum = parseFloat(curVal) || 0;
+  const pct = Math.max(0, Math.min(100, ((curNum - minNum) / (maxNum - minNum || 1)) * 100));
 
   return (
     <div className="st-input-group">
@@ -25,6 +29,7 @@ export default function Slider({ node, state, onValueChange, onEvent }) {
         max={max || '100'}
         step={step || '1'}
         value={curVal}
+        style={{ '--value-percent': `${pct}%` }}
         onChange={(e) => {
           if (bound.isBound) {
             onValueChange(bound.key, e.target.value);

@@ -42,7 +42,6 @@ import MetricWidget from './data/MetricWidget';
 import JsonWidget from './data/JsonWidget';
 import CodeWidget from './data/CodeWidget';
 import BadgeWidget from './data/BadgeWidget';
-import LatexWidget from './data/LatexWidget';
 import HtmlWidget from './data/HtmlWidget';
 import StreamlitChart from './charts/StreamlitChart';
 
@@ -343,9 +342,6 @@ export default function WidgetRenderer({ node, state, onValueChange, onEvent, is
 
       case 'empty':
         return <EmptyWidget node={node} renderChildren={renderChildren} />;
-
-      case 'latex':
-        return <LatexWidget node={node} />;
 
       case 'html':
         return <HtmlWidget node={node} />;

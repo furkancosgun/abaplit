@@ -239,10 +239,9 @@ CLASS zcl_abaplit_demo_007 IMPLEMENTATION.
     ch_cols2->col( 2 )->write( 'Scatter Chart (quarterly):' ).
     ch_cols2->col( 2 )->scatter_chart( data = client->bind( mt_chart_q ) height = '220' ).
     t2->divider( ).
-    t2->subheader( 'Code, JSON, Latex, HTML' ).
+    t2->subheader( 'Code, JSON, HTML' ).
     t2->code( value = 'DATA(st) = client->new_view( ). st->pills( label = ''Stack'' options = ''React,Vue'' value = client->bind( mv_stack ) ).' language = 'abap' ).
     t2->json( client->bind( mt_employees ) ).
-    t2->latex( '\sum_{i=1}^{n} x_i = \frac{n(n+1)}{2}' ).
     t2->html( '<div style="padding:10px;border:1px dashed #ff4b4b;border-radius:8px">Custom <b>HTML</b> block rendered via HtmlWidget</div>' ).
     t2->badge( text = 'Data Verified' color = '#09ab3b' ).
 
@@ -316,9 +315,8 @@ CLASS zcl_abaplit_demo_007 IMPLEMENTATION.
     ENDLOOP.
     t4->chat_input( placeholder = 'Type a message and press Enter...' on_submit = client->event( 'EV_CHAT_SEND' ) value = client->bind( mv_chat_draft ) ).
     t4->divider( ).
-    t4->subheader( 'HTML / Latex / Code / Badge / Empty' ).
+    t4->subheader( 'HTML / Code / Badge / Empty' ).
     t4->html( '<b>HTML Widget:</b> renders raw HTML (sanitized). <i>abaplit</i> vs <i>Streamlit</i> theme diff: abaplit uses --st-* CSS vars.' ).
-    t4->latex( 'e^{i\pi} + 1 = 0' ).
     t4->code( value = 'st.text_input("Name", value=st.session_state.name)' language = 'python' ).
     t4->badge( text = 'New' color = '#1e88e5' ).
     t4->empty( ).

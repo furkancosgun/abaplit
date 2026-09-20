@@ -11,6 +11,8 @@ export default function SelectSlider({ node, state, onValueChange, onEvent }) {
   const currentIndex = optionList.indexOf(String(currentValue));
   const sliderIndex = currentIndex >= 0 ? currentIndex : 0;
 
+  const pct = optionList.length > 1 ? (sliderIndex / (optionList.length - 1)) * 100 : 0;
+
   return (
     <div className="st-input-group">
       {label && <label className="st-label">{label}</label>}
@@ -20,6 +22,7 @@ export default function SelectSlider({ node, state, onValueChange, onEvent }) {
         max={Math.max(0, optionList.length - 1)}
         value={sliderIndex}
         className="st-slider"
+        style={{ '--value-percent': `${pct}%` }}
         onChange={(e) => {
           const idx = parseInt(e.target.value, 10);
           const nextVal = optionList[idx] ?? '';
