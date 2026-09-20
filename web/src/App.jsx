@@ -54,11 +54,16 @@ export default function App() {
     setIsRunning(true);
     try {
       const curState = customState !== null ? customState : stateRef.current;
+      const normalizedArgs = (() => {
+        if (eventArgs == null) return [];
+        if (Array.isArray(eventArgs)) return eventArgs.map((v) => (v == null ? '' : String(v)));
+        return [String(eventArgs)];
+      })();
 
       const payload = {
         app: appName,
         event: event || '',
-        event_args: Array.isArray(eventArgs) ? eventArgs : [eventArgs],
+        event_args: normalizedArgs,
         check_init: checkInit,
         state: typeof curState === 'string' ? curState : JSON.stringify(curState || {}),
       };

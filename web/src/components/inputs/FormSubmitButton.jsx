@@ -1,9 +1,8 @@
 import React from 'react';
 
-export default function Button({ node, onEvent, isRunning }) {
-  const { text, label, btn_type, on_click } = node;
+export default function FormSubmitButton({ node, onEvent, isRunning }) {
+  const { label, text, btn_type, on_click } = node;
   const isPrimary = btn_type === 'primary';
-
   return (
     <button
       type="button"
@@ -13,7 +12,7 @@ export default function Button({ node, onEvent, isRunning }) {
         if (on_click) onEvent(on_click);
       }}
     >
-      {text || label || 'Button'}
+      {label || text || 'Submit'}
     </button>
   );
 }

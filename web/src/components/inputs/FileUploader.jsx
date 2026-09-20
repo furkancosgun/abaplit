@@ -3,7 +3,7 @@ import { Upload } from 'lucide-react';
 
 export default function FileUploader({ node, onEvent }) {
   const [fileName, setFileName] = useState('');
-  const { label, accept, event } = node;
+  const { label, accept, on_change, on_submit } = node;
 
   return (
     <div className="st-input-group">
@@ -21,7 +21,8 @@ export default function FileUploader({ node, onEvent }) {
           onChange={(e) => {
             if (e.target.files && e.target.files[0]) {
               setFileName(e.target.files[0].name);
-              if (event) onEvent(event);
+              if (on_change) onEvent(on_change);
+          if (on_submit) onEvent(on_submit);
             }
           }}
         />

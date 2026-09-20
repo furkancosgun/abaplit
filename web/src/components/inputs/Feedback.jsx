@@ -4,7 +4,7 @@ import { resolveBinding } from '../../core/binding';
 import ErrorDisplay from '../common/ErrorDisplay';
 
 export default function Feedback({ node, state, onValueChange, onEvent }) {
-  const { label, value, options, event } = node;
+  const { label, value, options, on_change, on_submit } = node;
   const bound = resolveBinding(value, state);
 
   if (bound.error) {
@@ -16,12 +16,16 @@ export default function Feedback({ node, state, onValueChange, onEvent }) {
   const [hovered, setHovered] = useState(null);
 
   const handleClick = (ratingVal) => {
+    const ratingStr = String(ratingVal);
     if (bound.isBound) {
-      onValueChange(bound.key, ratingVal);
+      onValueChange(bound.key, ratingStr);
     }
-    if (event) {
-      onEvent(event, { rating: ratingVal });
+    if (on_change) {
+      onEvent(on_change, ratingStr);
     }
+          if (on_submit) {
+            onEvent(on_submit, ratingStr);
+          }
   };
 
   return (

@@ -2,8 +2,8 @@ import React from 'react';
 import { resolveBinding } from '../../core/binding';
 import ErrorDisplay from '../common/ErrorDisplay';
 
-export default function TextArea({ node, state, onValueChange }) {
-  const { label, value, placeholder, height } = node;
+export default function TextArea({ node, state, onValueChange, onEvent }) {
+  const { label, value, placeholder, height, on_change, on_submit } = node;
   const bound = resolveBinding(value, state);
 
   if (bound.error) {
@@ -23,6 +23,12 @@ export default function TextArea({ node, state, onValueChange }) {
         onChange={(e) => {
           if (bound.isBound) {
             onValueChange(bound.key, e.target.value);
+          }
+          if (on_change) onEvent(on_change, e.target.value);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && on_submit) {
+            onEvent(on_submit, e.target.value);
           }
         }}
       />

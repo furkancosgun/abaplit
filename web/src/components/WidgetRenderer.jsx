@@ -10,6 +10,8 @@ import Tabs from './layout/Tabs';
 import Dialog from './layout/Dialog';
 import StatusContainer from './layout/StatusContainer';
 import Popover from './layout/Popover';
+import Form from './layout/Form';
+import EmptyWidget from './layout/EmptyWidget';
 
 import Button from './inputs/Button';
 import LinkButton from './inputs/LinkButton';
@@ -28,6 +30,10 @@ import Slider from './inputs/Slider';
 import ColorPicker from './inputs/ColorPicker';
 import DateInput from './inputs/DateInput';
 import TimeInput from './inputs/TimeInput';
+import DateTimeInput from './inputs/DateTimeInput';
+import SelectSlider from './inputs/SelectSlider';
+import FormSubmitButton from './inputs/FormSubmitButton';
+import PageLink from './inputs/PageLink';
 import FileUploader from './inputs/FileUploader';
 
 import TableWidget from './data/TableWidget';
@@ -36,6 +42,8 @@ import MetricWidget from './data/MetricWidget';
 import JsonWidget from './data/JsonWidget';
 import CodeWidget from './data/CodeWidget';
 import BadgeWidget from './data/BadgeWidget';
+import LatexWidget from './data/LatexWidget';
+import HtmlWidget from './data/HtmlWidget';
 import StreamlitChart from './charts/StreamlitChart';
 
 import ChatMessage from './chat/ChatMessage';
@@ -46,6 +54,7 @@ import ProgressWidget from './feedback/ProgressWidget';
 import SpinnerWidget from './feedback/SpinnerWidget';
 import ToastWidget from './feedback/ToastWidget';
 import ConfettiWidget from './feedback/ConfettiWidget';
+import ExceptionWidget from './feedback/ExceptionWidget';
 
 import { ImageWidget, AudioWidget, VideoWidget, DownloadButton } from './media/MediaWidgets';
 
@@ -154,6 +163,7 @@ export default function WidgetRenderer({ node, state, onValueChange, onEvent, is
             node={node}
             state={state}
             onValueChange={onValueChange}
+            onEvent={onEvent}
           />
         );
 
@@ -314,7 +324,34 @@ export default function WidgetRenderer({ node, state, onValueChange, onEvent, is
         return <ChatMessage node={node} renderChildren={renderChildren} />;
 
       case 'chat_input':
-        return <ChatInput node={node} onEvent={onEvent} isRunning={isRunning} />;
+        return <ChatInput node={node} state={state} onValueChange={onValueChange} onEvent={onEvent} isRunning={isRunning} />;
+
+      case 'select_slider':
+        return <SelectSlider node={node} state={state} onValueChange={onValueChange} onEvent={onEvent} />;
+
+      case 'datetime_input':
+        return <DateTimeInput node={node} state={state} onValueChange={onValueChange} onEvent={onEvent} />;
+
+      case 'form':
+        return <Form node={node} renderChildren={renderChildren} />;
+
+      case 'form_submit_button':
+        return <FormSubmitButton node={node} onEvent={onEvent} isRunning={isRunning} />;
+
+      case 'page_link':
+        return <PageLink node={node} />;
+
+      case 'empty':
+        return <EmptyWidget node={node} renderChildren={renderChildren} />;
+
+      case 'latex':
+        return <LatexWidget node={node} />;
+
+      case 'html':
+        return <HtmlWidget node={node} />;
+
+      case 'exception':
+        return <ExceptionWidget node={node} />;
 
       case 'image':
         return <ImageWidget node={node} />;

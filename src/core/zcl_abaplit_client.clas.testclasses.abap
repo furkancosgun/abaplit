@@ -28,8 +28,8 @@ CLASS lcl_test_app_1 IMPLEMENTATION.
 
     DATA(lo_view) = client->new_view( ).
     lo_view->title( 'Test App 1' ).
-    lo_view->button( text  = 'Test App 1'
-                     event = client->event( 'INCREMENT' ) ).
+    lo_view->button( text     = 'Test App 1'
+                     on_click = client->event( 'INCREMENT' ) ).
     client->view_display( lo_view->stringify( ) ).
   ENDMETHOD.
 ENDCLASS.

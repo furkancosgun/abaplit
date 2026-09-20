@@ -101,9 +101,9 @@ CLASS zcl_abaplit_demo_002 IMPLEMENTATION.
 
     st->divider( ).
 
-    st->button( text  = 'Submit Form to ABAP'
-                event = 'SUBMIT_FORM'
-                type  = 'primary' ).
+    st->button( text     = 'Submit Form to ABAP'
+                on_click = 'SUBMIT_FORM'
+                type     = 'primary' ).
 
     st->header( 'Logged Submissions Table' ).
     st->write( 'This table is bound to the internal table MT_SUBMISSIONS:' ).

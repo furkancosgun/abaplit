@@ -41,11 +41,11 @@ CLASS zcl_abaplit_demo_006 IMPLEMENTATION.
     ENDIF.
     IF client->check_event( 'COPY_TOKEN' ).
       client->clipboard_write( 'abaplit-token-xyz-123' ).
-      client->toast_display( text = 'Token copied to clipboard!' ).
+      client->toast_display( 'Token copied to clipboard!' ).
     ENDIF.
     IF client->check_event( 'UPDATE_TITLE' ).
       client->set_title( 'abaplit: Action Triggered Title' ).
-      client->toast_display( text = 'Window title changed!' ).
+      client->toast_display( 'Window title changed!' ).
     ENDIF.
 
     DATA(st) = client->new_view( ).
@@ -83,10 +83,10 @@ CLASS zcl_abaplit_demo_006 IMPLEMENTATION.
     st->divider( ).
 
     " --- Popover & Status Container ---
-    DATA(pop) = st->popover( label = 'Configure Display Settings' ).
+    DATA(pop) = st->popover( 'Configure Display Settings' ).
     pop->write( 'Customize interactive data table options.' ).
-    pop->checkbox( label = 'Highlight Out of Stock Items' ).
-    pop->button( text = 'Apply Settings' ).
+    pop->checkbox( 'Highlight Out of Stock Items' ).
+    pop->button( 'Apply Settings' ).
 
     DATA(stat) = st->status( label = 'Data Pipeline Synchronization' state = 'complete' ).
     stat->write( 'Step 1: Extracted records from SAP CDS view I_Product.' ).
@@ -104,7 +104,7 @@ CLASS zcl_abaplit_demo_006 IMPLEMENTATION.
 
     " --- Copyable Code Block ---
     st->header( 'ABAP Implementation Sample' ).
-    st->code( val = |" ABAP view declaration for Demo 006\nDATA(st) = client->new_view( ).\nst->pills( label = 'Choose' options = 'A,B,C' value = client->bind( mv_choice ) ).\nst->dataframe( client->bind( mt_products ) ).| ).
+    st->code( |" ABAP view declaration for Demo 006\nDATA(st) = client->new_view( ).\nst->pills( label = 'Choose' options = 'A,B,C' value = client->bind( mv_choice ) ).\nst->dataframe( client->bind( mt_products ) ).| ).
 
     st->divider( ).
 
@@ -112,9 +112,9 @@ CLASS zcl_abaplit_demo_006 IMPLEMENTATION.
     st->header( 'Backend Actions (Toast, Clipboard, Title)' ).
     st->caption( 'Demonstrates server-dispatched client events and notifications:' ).
     DATA(action_cols) = st->columns( 3 ).
-    action_cols->col( 1 )->button( text = 'Trigger Toast' event = client->event( 'TRIGGER_TOAST' ) ).
-    action_cols->col( 2 )->button( text = 'Copy to Clipboard' event = client->event( 'COPY_TOKEN' ) ).
-    action_cols->col( 3 )->button( text = 'Change Window Title' event = client->event( 'UPDATE_TITLE' ) ).
+    action_cols->col( 1 )->button( text = 'Trigger Toast' on_click = client->event( 'TRIGGER_TOAST' ) ).
+    action_cols->col( 2 )->button( text = 'Copy to Clipboard' on_click = client->event( 'COPY_TOKEN' ) ).
+    action_cols->col( 3 )->button( text = 'Change Window Title' on_click = client->event( 'UPDATE_TITLE' ) ).
 
     client->view_display( st->stringify( ) ).
   ENDMETHOD.

@@ -25,9 +25,9 @@ CLASS ltcl_view_builder IMPLEMENTATION.
 
   METHOD test_button_and_inputs.
     DATA(st) = zcl_abaplit_view_builder=>factory( ).
-    st->text_input( label = 'Your Name' value = 'Furkan' event = 'INPUT_CHANGE' ).
+    st->text_input( label = 'Your Name' value = 'Furkan' on_change = 'INPUT_CHANGE' ).
     st->number_input( label = 'Age' value = '25' min = '0' max = '100' ).
-    st->button( text = 'Submit' event = 'BTN_SUBMIT' type = 'primary' ).
+    st->button( text = 'Submit' on_click = 'BTN_SUBMIT' type = 'primary' ).
 
     DATA(lv_json) = st->stringify( ).
     cl_abap_unit_assert=>assert_char_cp( act = lv_json
@@ -35,7 +35,7 @@ CLASS ltcl_view_builder IMPLEMENTATION.
     cl_abap_unit_assert=>assert_char_cp( act = lv_json
                                          exp = '*"type":"number_input"*"label":"Age"*"min":"0"*"max":"100"*' ).
     cl_abap_unit_assert=>assert_char_cp( act = lv_json
-                                         exp = '*"type":"button"*"text":"Submit"*"event":"BTN_SUBMIT"*"btn_type":"primary"*' ).
+                                         exp = '*"type":"button"*"text":"Submit"*"on_click":"BTN_SUBMIT"*"btn_type":"primary"*' ).
   ENDMETHOD.
 
   METHOD test_columns_and_sidebar.

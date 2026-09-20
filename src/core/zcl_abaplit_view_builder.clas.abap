@@ -3,48 +3,9 @@ CLASS zcl_abaplit_view_builder DEFINITION
   CREATE PUBLIC.
 
   PUBLIC SECTION.
-    TYPES:
-      BEGIN OF ty_s_prop,
-        name  TYPE string,
-        value TYPE string,
-      END OF ty_s_prop,
-      ty_t_prop TYPE STANDARD TABLE OF ty_s_prop WITH EMPTY KEY.
-
     CLASS-METHODS factory
       IMPORTING
         type          TYPE string OPTIONAL
-      RETURNING
-        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
-
-    " --- Layout & Hierarchy ---
-    METHODS ele
-      IMPORTING
-        type          TYPE string
-      RETURNING
-        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
-
-    METHODS tag
-      IMPORTING
-        type          TYPE string
-      RETURNING
-        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
-
-    METHODS a
-      IMPORTING
-        n             TYPE string
-        v             TYPE string    OPTIONAL
-        b             TYPE abap_bool OPTIONAL
-      RETURNING
-        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
-
-    METHODS prop
-      IMPORTING
-        name          TYPE string
-        value         TYPE string
-      RETURNING
-        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
-
-    METHODS end
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
@@ -121,56 +82,58 @@ CLASS zcl_abaplit_view_builder DEFINITION
     METHODS chat_input
       IMPORTING
         placeholder   TYPE clike OPTIONAL
-        event         TYPE clike OPTIONAL
+        value         TYPE clike OPTIONAL
+        on_change     TYPE clike OPTIONAL
+        on_submit     TYPE clike OPTIONAL
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
     " --- Text & Typography ---
     METHODS title
       IMPORTING
-        val           TYPE clike
+        value         TYPE clike
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
     METHODS header
       IMPORTING
-        val           TYPE clike
+        value         TYPE clike
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
     METHODS subheader
       IMPORTING
-        val           TYPE clike
+        value         TYPE clike
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
     METHODS write
       IMPORTING
-        val           TYPE clike
+        value         TYPE clike
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
     METHODS text
       IMPORTING
-        val           TYPE clike
+        value         TYPE clike
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
     METHODS markdown
       IMPORTING
-        val           TYPE clike
+        value         TYPE clike
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
     METHODS caption
       IMPORTING
-        val           TYPE clike
+        value         TYPE clike
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
     METHODS code
       IMPORTING
-        val           TYPE clike
+        value         TYPE clike
         language      TYPE clike OPTIONAL
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
@@ -183,7 +146,7 @@ CLASS zcl_abaplit_view_builder DEFINITION
     METHODS button
       IMPORTING
         text          TYPE clike
-        event         TYPE clike OPTIONAL
+        on_click      TYPE clike OPTIONAL
         type          TYPE clike OPTIONAL
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
@@ -209,7 +172,8 @@ CLASS zcl_abaplit_view_builder DEFINITION
         label         TYPE clike
         value         TYPE clike OPTIONAL
         placeholder   TYPE clike OPTIONAL
-        event         TYPE clike OPTIONAL
+        on_change     TYPE clike OPTIONAL
+        on_submit     TYPE clike OPTIONAL
         type          TYPE clike OPTIONAL
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
@@ -221,7 +185,8 @@ CLASS zcl_abaplit_view_builder DEFINITION
         min           TYPE clike OPTIONAL
         max           TYPE clike OPTIONAL
         step          TYPE clike OPTIONAL
-        event         TYPE clike OPTIONAL
+        on_change     TYPE clike OPTIONAL
+        on_submit     TYPE clike OPTIONAL
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
@@ -231,7 +196,8 @@ CLASS zcl_abaplit_view_builder DEFINITION
         value         TYPE clike OPTIONAL
         placeholder   TYPE clike OPTIONAL
         height        TYPE clike OPTIONAL
-        event         TYPE clike OPTIONAL
+        on_change     TYPE clike OPTIONAL
+        on_submit     TYPE clike OPTIONAL
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
@@ -239,7 +205,8 @@ CLASS zcl_abaplit_view_builder DEFINITION
       IMPORTING
         label         TYPE clike
         value         TYPE clike OPTIONAL
-        event         TYPE clike OPTIONAL
+        on_change     TYPE clike OPTIONAL
+        on_submit     TYPE clike OPTIONAL
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
@@ -247,7 +214,8 @@ CLASS zcl_abaplit_view_builder DEFINITION
       IMPORTING
         label         TYPE clike
         value         TYPE clike OPTIONAL
-        event         TYPE clike OPTIONAL
+        on_change     TYPE clike OPTIONAL
+        on_submit     TYPE clike OPTIONAL
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
@@ -255,7 +223,8 @@ CLASS zcl_abaplit_view_builder DEFINITION
       IMPORTING
         label         TYPE clike
         value         TYPE clike OPTIONAL
-        event         TYPE clike OPTIONAL
+        on_change     TYPE clike OPTIONAL
+        on_submit     TYPE clike OPTIONAL
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
@@ -263,7 +232,8 @@ CLASS zcl_abaplit_view_builder DEFINITION
       IMPORTING
         label         TYPE clike
         accept        TYPE clike OPTIONAL
-        event         TYPE clike OPTIONAL
+        on_change     TYPE clike OPTIONAL
+        on_submit     TYPE clike OPTIONAL
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
@@ -272,7 +242,8 @@ CLASS zcl_abaplit_view_builder DEFINITION
         label         TYPE clike
         options       TYPE clike OPTIONAL
         value         TYPE clike OPTIONAL
-        event         TYPE clike OPTIONAL
+        on_change     TYPE clike OPTIONAL
+        on_submit     TYPE clike OPTIONAL
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
@@ -281,7 +252,8 @@ CLASS zcl_abaplit_view_builder DEFINITION
         label         TYPE clike
         options       TYPE clike OPTIONAL
         value         TYPE clike OPTIONAL
-        event         TYPE clike OPTIONAL
+        on_change     TYPE clike OPTIONAL
+        on_submit     TYPE clike OPTIONAL
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
@@ -290,7 +262,8 @@ CLASS zcl_abaplit_view_builder DEFINITION
         label         TYPE clike
         options       TYPE clike OPTIONAL
         value         TYPE clike OPTIONAL
-        event         TYPE clike OPTIONAL
+        on_change     TYPE clike OPTIONAL
+        on_submit     TYPE clike OPTIONAL
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
@@ -299,7 +272,8 @@ CLASS zcl_abaplit_view_builder DEFINITION
         label         TYPE clike
         options       TYPE clike OPTIONAL
         value         TYPE clike OPTIONAL
-        event         TYPE clike OPTIONAL
+        on_change     TYPE clike OPTIONAL
+        on_submit     TYPE clike OPTIONAL
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
@@ -308,7 +282,8 @@ CLASS zcl_abaplit_view_builder DEFINITION
         label         TYPE clike
         options       TYPE clike OPTIONAL
         value         TYPE clike OPTIONAL
-        event         TYPE clike OPTIONAL
+        on_change     TYPE clike OPTIONAL
+        on_submit     TYPE clike OPTIONAL
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
@@ -317,7 +292,8 @@ CLASS zcl_abaplit_view_builder DEFINITION
         label         TYPE clike OPTIONAL
         options       TYPE clike OPTIONAL
         value         TYPE clike OPTIONAL
-        event         TYPE clike OPTIONAL
+        on_change     TYPE clike OPTIONAL
+        on_submit     TYPE clike OPTIONAL
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
@@ -327,7 +303,8 @@ CLASS zcl_abaplit_view_builder DEFINITION
         min           TYPE clike OPTIONAL
         max           TYPE clike OPTIONAL
         value         TYPE clike OPTIONAL
-        event         TYPE clike OPTIONAL
+        on_change     TYPE clike OPTIONAL
+        on_submit     TYPE clike OPTIONAL
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
@@ -335,7 +312,8 @@ CLASS zcl_abaplit_view_builder DEFINITION
       IMPORTING
         label         TYPE clike
         value         TYPE clike OPTIONAL
-        event         TYPE clike OPTIONAL
+        on_change     TYPE clike OPTIONAL
+        on_submit     TYPE clike OPTIONAL
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
@@ -343,7 +321,70 @@ CLASS zcl_abaplit_view_builder DEFINITION
       IMPORTING
         label         TYPE clike
         value         TYPE clike OPTIONAL
-        event         TYPE clike OPTIONAL
+        on_change     TYPE clike OPTIONAL
+        on_submit     TYPE clike OPTIONAL
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
+    METHODS select_slider
+      IMPORTING
+        label         TYPE clike
+        options       TYPE clike OPTIONAL
+        value         TYPE clike OPTIONAL
+        on_change     TYPE clike OPTIONAL
+        on_submit     TYPE clike OPTIONAL
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
+    METHODS datetime_input
+      IMPORTING
+        label         TYPE clike
+        value         TYPE clike OPTIONAL
+        on_change     TYPE clike OPTIONAL
+        on_submit     TYPE clike OPTIONAL
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
+    METHODS form
+      IMPORTING
+        key           TYPE clike OPTIONAL
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
+    METHODS form_submit_button
+      IMPORTING
+        label         TYPE clike
+        on_click      TYPE clike OPTIONAL
+        type          TYPE clike OPTIONAL
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
+    METHODS page_link
+      IMPORTING
+        label         TYPE clike
+        page          TYPE clike
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
+    METHODS empty
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
+    METHODS latex
+      IMPORTING
+        body          TYPE clike
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
+    METHODS html
+      IMPORTING
+        body          TYPE clike
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
+    METHODS exception
+      IMPORTING
+        value         TYPE clike
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
@@ -433,44 +474,44 @@ CLASS zcl_abaplit_view_builder DEFINITION
     " --- Feedback & Alerts ---
     METHODS success
       IMPORTING
-        val           TYPE clike
+        value         TYPE clike
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
     METHODS info
       IMPORTING
-        val           TYPE clike
+        value         TYPE clike
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
     METHODS warning
       IMPORTING
-        val           TYPE clike
+        value         TYPE clike
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
     METHODS error
       IMPORTING
-        val           TYPE clike
+        value         TYPE clike
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
     METHODS toast
       IMPORTING
-        val           TYPE clike
+        value         TYPE clike
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
     METHODS progress
       IMPORTING
-        val           TYPE clike
+        value         TYPE clike
         text          TYPE clike OPTIONAL
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
     METHODS spinner
       IMPORTING
-        val           TYPE clike
+        value         TYPE clike
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
 
@@ -490,6 +531,13 @@ CLASS zcl_abaplit_view_builder DEFINITION
   PROTECTED SECTION.
     TYPES ty_t_node TYPE STANDARD TABLE OF REF TO zcl_abaplit_view_builder WITH EMPTY KEY.
 
+    TYPES:
+      BEGIN OF ty_s_prop,
+        name  TYPE string,
+        value TYPE string,
+      END OF ty_s_prop,
+      ty_t_prop TYPE STANDARD TABLE OF ty_s_prop WITH EMPTY KEY.
+
     DATA mv_type   TYPE string.
     DATA mt_props  TYPE ty_t_prop.
     DATA mt_child  TYPE ty_t_node.
@@ -506,10 +554,31 @@ CLASS zcl_abaplit_view_builder DEFINITION
       RETURNING
         VALUE(result) TYPE string.
 
+    METHODS ele
+      IMPORTING
+        type          TYPE string
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
+
+
+    METHODS prop
+      IMPORTING
+        name          TYPE string
+        value         TYPE string
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
+    METHODS end
+      RETURNING
+        VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
 ENDCLASS.
 
 
 CLASS zcl_abaplit_view_builder IMPLEMENTATION.
+
+
 
   METHOD factory.
     result = NEW #( ).
@@ -529,28 +598,9 @@ CLASS zcl_abaplit_view_builder IMPLEMENTATION.
     APPEND result TO mt_child.
   ENDMETHOD.
 
-  METHOD tag.
-    ele( type ).
-    result = me.
-  ENDMETHOD.
-
   METHOD prop.
     APPEND VALUE #( name  = name
                     value = value ) TO mt_props.
-    result = me.
-  ENDMETHOD.
-
-  METHOD a.
-    DATA(lv_val) = v.
-    IF b IS SUPPLIED.
-      lv_val = COND #( WHEN b = abap_true THEN 'true' ELSE 'false' ).
-    ENDIF.
-    IF mt_child IS INITIAL.
-      prop( name = n value = lv_val ).
-    ELSE.
-      DATA(lo_target) = mt_child[ lines( mt_child ) ].
-      lo_target->prop( name = n value = lv_val ).
-    ENDIF.
     result = me.
   ENDMETHOD.
 
@@ -655,50 +705,56 @@ CLASS zcl_abaplit_view_builder IMPLEMENTATION.
     IF placeholder IS SUPPLIED.
       lo_chat->prop( name = 'placeholder' value = |{ placeholder }| ).
     ENDIF.
-    IF event IS SUPPLIED.
-      lo_chat->prop( name = 'event' value = |{ event }| ).
+    IF value IS SUPPLIED.
+      lo_chat->prop( name = 'value' value = |{ value }| ).
+    ENDIF.
+    IF on_change IS SUPPLIED AND on_change IS NOT INITIAL.
+      lo_chat->prop( name = 'on_change' value = |{ on_change }| ).
+    ENDIF.
+    IF on_submit IS SUPPLIED.
+      lo_chat->prop( name = 'on_submit' value = |{ on_submit }| ).
     ENDIF.
     lo_chat->end( ).
     result = me.
   ENDMETHOD.
 
   METHOD title.
-    ele( 'title' )->prop( name = 'text' value = |{ val }| )->end( ).
+    ele( 'title' )->prop( name = 'text' value = |{ value }| )->end( ).
     result = me.
   ENDMETHOD.
 
   METHOD header.
-    ele( 'header' )->prop( name = 'text' value = |{ val }| )->end( ).
+    ele( 'header' )->prop( name = 'text' value = |{ value }| )->end( ).
     result = me.
   ENDMETHOD.
 
   METHOD subheader.
-    ele( 'subheader' )->prop( name = 'text' value = |{ val }| )->end( ).
+    ele( 'subheader' )->prop( name = 'text' value = |{ value }| )->end( ).
     result = me.
   ENDMETHOD.
 
   METHOD write.
-    ele( 'write' )->prop( name = 'text' value = |{ val }| )->end( ).
+    ele( 'write' )->prop( name = 'text' value = |{ value }| )->end( ).
     result = me.
   ENDMETHOD.
 
   METHOD text.
-    ele( 'text' )->prop( name = 'text' value = |{ val }| )->end( ).
+    ele( 'text' )->prop( name = 'text' value = |{ value }| )->end( ).
     result = me.
   ENDMETHOD.
 
   METHOD markdown.
-    ele( 'markdown' )->prop( name = 'body' value = |{ val }| )->end( ).
+    ele( 'markdown' )->prop( name = 'body' value = |{ value }| )->end( ).
     result = me.
   ENDMETHOD.
 
   METHOD caption.
-    ele( 'caption' )->prop( name = 'text' value = |{ val }| )->end( ).
+    ele( 'caption' )->prop( name = 'text' value = |{ value }| )->end( ).
     result = me.
   ENDMETHOD.
 
   METHOD code.
-    DATA(lo_code) = ele( 'code' )->prop( name = 'code' value = |{ val }| ).
+    DATA(lo_code) = ele( 'code' )->prop( name = 'code' value = |{ value }| ).
     IF language IS SUPPLIED AND language IS NOT INITIAL.
       lo_code->prop( name = 'language' value = |{ language }| ).
     ENDIF.
@@ -713,8 +769,8 @@ CLASS zcl_abaplit_view_builder IMPLEMENTATION.
 
   METHOD button.
     DATA(lo_btn) = ele( 'button' )->prop( name = 'text' value = |{ text }| ).
-    IF event IS SUPPLIED AND event IS NOT INITIAL.
-      lo_btn->prop( name = 'event' value = |{ event }| ).
+    IF on_click IS SUPPLIED AND on_click IS NOT INITIAL.
+      lo_btn->prop( name = 'on_click' value = |{ on_click }| ).
     ENDIF.
     IF type IS SUPPLIED AND type IS NOT INITIAL.
       lo_btn->prop( name = 'btn_type' value = |{ type }| ).
@@ -745,8 +801,11 @@ CLASS zcl_abaplit_view_builder IMPLEMENTATION.
     IF placeholder IS SUPPLIED AND placeholder IS NOT INITIAL.
       lo_inp->prop( name = 'placeholder' value = |{ placeholder }| ).
     ENDIF.
-    IF event IS SUPPLIED AND event IS NOT INITIAL.
-      lo_inp->prop( name = 'event' value = |{ event }| ).
+    IF on_change IS SUPPLIED AND on_change IS NOT INITIAL.
+      lo_inp->prop( name = 'on_change' value = |{ on_change }| ).
+    ENDIF.
+    IF on_submit IS SUPPLIED AND on_submit IS NOT INITIAL.
+      lo_inp->prop( name = 'on_submit' value = |{ on_submit }| ).
     ENDIF.
     IF type IS SUPPLIED AND type IS NOT INITIAL.
       lo_inp->prop( name = 'input_type' value = |{ type }| ).
@@ -769,8 +828,11 @@ CLASS zcl_abaplit_view_builder IMPLEMENTATION.
     IF step IS SUPPLIED AND step IS NOT INITIAL.
       lo_inp->prop( name = 'step' value = |{ step }| ).
     ENDIF.
-    IF event IS SUPPLIED AND event IS NOT INITIAL.
-      lo_inp->prop( name = 'event' value = |{ event }| ).
+    IF on_change IS SUPPLIED AND on_change IS NOT INITIAL.
+      lo_inp->prop( name = 'on_change' value = |{ on_change }| ).
+    ENDIF.
+    IF on_submit IS SUPPLIED AND on_submit IS NOT INITIAL.
+      lo_inp->prop( name = 'on_submit' value = |{ on_submit }| ).
     ENDIF.
     lo_inp->end( ).
     result = me.
@@ -787,8 +849,11 @@ CLASS zcl_abaplit_view_builder IMPLEMENTATION.
     IF height IS SUPPLIED AND height IS NOT INITIAL.
       lo_inp->prop( name = 'height' value = |{ height }| ).
     ENDIF.
-    IF event IS SUPPLIED AND event IS NOT INITIAL.
-      lo_inp->prop( name = 'event' value = |{ event }| ).
+    IF on_change IS SUPPLIED AND on_change IS NOT INITIAL.
+      lo_inp->prop( name = 'on_change' value = |{ on_change }| ).
+    ENDIF.
+    IF on_submit IS SUPPLIED AND on_submit IS NOT INITIAL.
+      lo_inp->prop( name = 'on_submit' value = |{ on_submit }| ).
     ENDIF.
     lo_inp->end( ).
     result = me.
@@ -799,8 +864,11 @@ CLASS zcl_abaplit_view_builder IMPLEMENTATION.
     IF value IS SUPPLIED.
       lo_inp->prop( name = 'value' value = |{ value }| ).
     ENDIF.
-    IF event IS SUPPLIED AND event IS NOT INITIAL.
-      lo_inp->prop( name = 'event' value = |{ event }| ).
+    IF on_change IS SUPPLIED AND on_change IS NOT INITIAL.
+      lo_inp->prop( name = 'on_change' value = |{ on_change }| ).
+    ENDIF.
+    IF on_submit IS SUPPLIED AND on_submit IS NOT INITIAL.
+      lo_inp->prop( name = 'on_submit' value = |{ on_submit }| ).
     ENDIF.
     lo_inp->end( ).
     result = me.
@@ -811,8 +879,11 @@ CLASS zcl_abaplit_view_builder IMPLEMENTATION.
     IF value IS SUPPLIED.
       lo_inp->prop( name = 'value' value = |{ value }| ).
     ENDIF.
-    IF event IS SUPPLIED AND event IS NOT INITIAL.
-      lo_inp->prop( name = 'event' value = |{ event }| ).
+    IF on_change IS SUPPLIED AND on_change IS NOT INITIAL.
+      lo_inp->prop( name = 'on_change' value = |{ on_change }| ).
+    ENDIF.
+    IF on_submit IS SUPPLIED AND on_submit IS NOT INITIAL.
+      lo_inp->prop( name = 'on_submit' value = |{ on_submit }| ).
     ENDIF.
     lo_inp->end( ).
     result = me.
@@ -823,8 +894,11 @@ CLASS zcl_abaplit_view_builder IMPLEMENTATION.
     IF value IS SUPPLIED.
       lo_inp->prop( name = 'value' value = |{ value }| ).
     ENDIF.
-    IF event IS SUPPLIED AND event IS NOT INITIAL.
-      lo_inp->prop( name = 'event' value = |{ event }| ).
+    IF on_change IS SUPPLIED AND on_change IS NOT INITIAL.
+      lo_inp->prop( name = 'on_change' value = |{ on_change }| ).
+    ENDIF.
+    IF on_submit IS SUPPLIED AND on_submit IS NOT INITIAL.
+      lo_inp->prop( name = 'on_submit' value = |{ on_submit }| ).
     ENDIF.
     lo_inp->end( ).
     result = me.
@@ -835,8 +909,11 @@ CLASS zcl_abaplit_view_builder IMPLEMENTATION.
     IF accept IS SUPPLIED.
       lo_inp->prop( name = 'accept' value = |{ accept }| ).
     ENDIF.
-    IF event IS SUPPLIED.
-      lo_inp->prop( name = 'event' value = |{ event }| ).
+    IF on_change IS SUPPLIED AND on_change IS NOT INITIAL.
+      lo_inp->prop( name = 'on_change' value = |{ on_change }| ).
+    ENDIF.
+    IF on_submit IS SUPPLIED AND on_submit IS NOT INITIAL.
+      lo_inp->prop( name = 'on_submit' value = |{ on_submit }| ).
     ENDIF.
     lo_inp->end( ).
     result = me.
@@ -850,8 +927,11 @@ CLASS zcl_abaplit_view_builder IMPLEMENTATION.
     IF value IS SUPPLIED.
       lo_inp->prop( name = 'value' value = |{ value }| ).
     ENDIF.
-    IF event IS SUPPLIED AND event IS NOT INITIAL.
-      lo_inp->prop( name = 'event' value = |{ event }| ).
+    IF on_change IS SUPPLIED AND on_change IS NOT INITIAL.
+      lo_inp->prop( name = 'on_change' value = |{ on_change }| ).
+    ENDIF.
+    IF on_submit IS SUPPLIED AND on_submit IS NOT INITIAL.
+      lo_inp->prop( name = 'on_submit' value = |{ on_submit }| ).
     ENDIF.
     lo_inp->end( ).
     result = me.
@@ -865,8 +945,11 @@ CLASS zcl_abaplit_view_builder IMPLEMENTATION.
     IF value IS SUPPLIED.
       lo_inp->prop( name = 'value' value = |{ value }| ).
     ENDIF.
-    IF event IS SUPPLIED AND event IS NOT INITIAL.
-      lo_inp->prop( name = 'event' value = |{ event }| ).
+    IF on_change IS SUPPLIED AND on_change IS NOT INITIAL.
+      lo_inp->prop( name = 'on_change' value = |{ on_change }| ).
+    ENDIF.
+    IF on_submit IS SUPPLIED AND on_submit IS NOT INITIAL.
+      lo_inp->prop( name = 'on_submit' value = |{ on_submit }| ).
     ENDIF.
     lo_inp->end( ).
     result = me.
@@ -880,8 +963,11 @@ CLASS zcl_abaplit_view_builder IMPLEMENTATION.
     IF value IS SUPPLIED.
       lo_inp->prop( name = 'value' value = |{ value }| ).
     ENDIF.
-    IF event IS SUPPLIED AND event IS NOT INITIAL.
-      lo_inp->prop( name = 'event' value = |{ event }| ).
+    IF on_change IS SUPPLIED AND on_change IS NOT INITIAL.
+      lo_inp->prop( name = 'on_change' value = |{ on_change }| ).
+    ENDIF.
+    IF on_submit IS SUPPLIED AND on_submit IS NOT INITIAL.
+      lo_inp->prop( name = 'on_submit' value = |{ on_submit }| ).
     ENDIF.
     lo_inp->end( ).
     result = me.
@@ -895,8 +981,11 @@ CLASS zcl_abaplit_view_builder IMPLEMENTATION.
     IF value IS SUPPLIED.
       lo_inp->prop( name = 'value' value = |{ value }| ).
     ENDIF.
-    IF event IS SUPPLIED AND event IS NOT INITIAL.
-      lo_inp->prop( name = 'event' value = |{ event }| ).
+    IF on_change IS SUPPLIED AND on_change IS NOT INITIAL.
+      lo_inp->prop( name = 'on_change' value = |{ on_change }| ).
+    ENDIF.
+    IF on_submit IS SUPPLIED AND on_submit IS NOT INITIAL.
+      lo_inp->prop( name = 'on_submit' value = |{ on_submit }| ).
     ENDIF.
     lo_inp->end( ).
     result = me.
@@ -910,8 +999,11 @@ CLASS zcl_abaplit_view_builder IMPLEMENTATION.
     IF value IS SUPPLIED.
       lo_inp->prop( name = 'value' value = |{ value }| ).
     ENDIF.
-    IF event IS SUPPLIED AND event IS NOT INITIAL.
-      lo_inp->prop( name = 'event' value = |{ event }| ).
+    IF on_change IS SUPPLIED AND on_change IS NOT INITIAL.
+      lo_inp->prop( name = 'on_change' value = |{ on_change }| ).
+    ENDIF.
+    IF on_submit IS SUPPLIED AND on_submit IS NOT INITIAL.
+      lo_inp->prop( name = 'on_submit' value = |{ on_submit }| ).
     ENDIF.
     lo_inp->end( ).
     result = me.
@@ -928,8 +1020,11 @@ CLASS zcl_abaplit_view_builder IMPLEMENTATION.
     IF value IS SUPPLIED.
       lo_inp->prop( name = 'value' value = |{ value }| ).
     ENDIF.
-    IF event IS SUPPLIED AND event IS NOT INITIAL.
-      lo_inp->prop( name = 'event' value = |{ event }| ).
+    IF on_change IS SUPPLIED AND on_change IS NOT INITIAL.
+      lo_inp->prop( name = 'on_change' value = |{ on_change }| ).
+    ENDIF.
+    IF on_submit IS SUPPLIED AND on_submit IS NOT INITIAL.
+      lo_inp->prop( name = 'on_submit' value = |{ on_submit }| ).
     ENDIF.
     lo_inp->end( ).
     result = me.
@@ -946,8 +1041,11 @@ CLASS zcl_abaplit_view_builder IMPLEMENTATION.
     IF value IS SUPPLIED.
       lo_inp->prop( name = 'value' value = |{ value }| ).
     ENDIF.
-    IF event IS SUPPLIED AND event IS NOT INITIAL.
-      lo_inp->prop( name = 'event' value = |{ event }| ).
+    IF on_change IS SUPPLIED AND on_change IS NOT INITIAL.
+      lo_inp->prop( name = 'on_change' value = |{ on_change }| ).
+    ENDIF.
+    IF on_submit IS SUPPLIED AND on_submit IS NOT INITIAL.
+      lo_inp->prop( name = 'on_submit' value = |{ on_submit }| ).
     ENDIF.
     lo_inp->end( ).
     result = me.
@@ -958,8 +1056,11 @@ CLASS zcl_abaplit_view_builder IMPLEMENTATION.
     IF value IS SUPPLIED.
       lo_inp->prop( name = 'value' value = |{ value }| ).
     ENDIF.
-    IF event IS SUPPLIED AND event IS NOT INITIAL.
-      lo_inp->prop( name = 'event' value = |{ event }| ).
+    IF on_change IS SUPPLIED AND on_change IS NOT INITIAL.
+      lo_inp->prop( name = 'on_change' value = |{ on_change }| ).
+    ENDIF.
+    IF on_submit IS SUPPLIED AND on_submit IS NOT INITIAL.
+      lo_inp->prop( name = 'on_submit' value = |{ on_submit }| ).
     ENDIF.
     lo_inp->end( ).
     result = me.
@@ -970,10 +1071,90 @@ CLASS zcl_abaplit_view_builder IMPLEMENTATION.
     IF value IS SUPPLIED.
       lo_inp->prop( name = 'value' value = |{ value }| ).
     ENDIF.
-    IF event IS SUPPLIED AND event IS NOT INITIAL.
-      lo_inp->prop( name = 'event' value = |{ event }| ).
+    IF on_change IS SUPPLIED AND on_change IS NOT INITIAL.
+      lo_inp->prop( name = 'on_change' value = |{ on_change }| ).
+    ENDIF.
+    IF on_submit IS SUPPLIED AND on_submit IS NOT INITIAL.
+      lo_inp->prop( name = 'on_submit' value = |{ on_submit }| ).
     ENDIF.
     lo_inp->end( ).
+    result = me.
+  ENDMETHOD.
+
+  METHOD select_slider.
+    DATA(lo_inp) = ele( 'select_slider' )->prop( name = 'label' value = |{ label }| ).
+    IF options IS SUPPLIED.
+      lo_inp->prop( name = 'options' value = |{ options }| ).
+    ENDIF.
+    IF value IS SUPPLIED.
+      lo_inp->prop( name = 'value' value = |{ value }| ).
+    ENDIF.
+    IF on_change IS SUPPLIED AND on_change IS NOT INITIAL.
+      lo_inp->prop( name = 'on_change' value = |{ on_change }| ).
+    ENDIF.
+    IF on_submit IS SUPPLIED AND on_submit IS NOT INITIAL.
+      lo_inp->prop( name = 'on_submit' value = |{ on_submit }| ).
+    ENDIF.
+    lo_inp->end( ).
+    result = me.
+  ENDMETHOD.
+
+  METHOD datetime_input.
+    DATA(lo_inp) = ele( 'datetime_input' )->prop( name = 'label' value = |{ label }| ).
+    IF value IS SUPPLIED.
+      lo_inp->prop( name = 'value' value = |{ value }| ).
+    ENDIF.
+    IF on_change IS SUPPLIED AND on_change IS NOT INITIAL.
+      lo_inp->prop( name = 'on_change' value = |{ on_change }| ).
+    ENDIF.
+    IF on_submit IS SUPPLIED AND on_submit IS NOT INITIAL.
+      lo_inp->prop( name = 'on_submit' value = |{ on_submit }| ).
+    ENDIF.
+    lo_inp->end( ).
+    result = me.
+  ENDMETHOD.
+
+  METHOD form.
+    result = ele( 'form' ).
+    IF key IS SUPPLIED.
+      result->prop( name = 'key' value = |{ key }| ).
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD form_submit_button.
+    DATA(lo_btn) = ele( 'form_submit_button' )->prop( name = 'label' value = |{ label }| ).
+    IF on_click IS SUPPLIED AND on_click IS NOT INITIAL.
+      lo_btn->prop( name = 'on_click' value = |{ on_click }| ).
+    ENDIF.
+    IF type IS SUPPLIED AND type IS NOT INITIAL.
+      lo_btn->prop( name = 'btn_type' value = |{ type }| ).
+    ENDIF.
+    lo_btn->end( ).
+    result = me.
+  ENDMETHOD.
+
+  METHOD page_link.
+    ele( 'page_link' )->prop( name = 'label' value = |{ label }| )->prop( name = 'page' value = |{ page }| )->end( ).
+    result = me.
+  ENDMETHOD.
+
+  METHOD empty.
+    ele( 'empty' )->end( ).
+    result = me.
+  ENDMETHOD.
+
+  METHOD latex.
+    ele( 'latex' )->prop( name = 'body' value = |{ body }| )->end( ).
+    result = me.
+  ENDMETHOD.
+
+  METHOD html.
+    ele( 'html' )->prop( name = 'body' value = |{ body }| )->end( ).
+    result = me.
+  ENDMETHOD.
+
+  METHOD exception.
+    ele( 'exception' )->prop( name = 'text' value = |{ value }| )->end( ).
     result = me.
   ENDMETHOD.
 
@@ -1060,32 +1241,32 @@ CLASS zcl_abaplit_view_builder IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD success.
-    ele( 'success' )->prop( name = 'text' value = |{ val }| )->end( ).
+    ele( 'success' )->prop( name = 'text' value = |{ value }| )->end( ).
     result = me.
   ENDMETHOD.
 
   METHOD info.
-    ele( 'info' )->prop( name = 'text' value = |{ val }| )->end( ).
+    ele( 'info' )->prop( name = 'text' value = |{ value }| )->end( ).
     result = me.
   ENDMETHOD.
 
   METHOD warning.
-    ele( 'warning' )->prop( name = 'text' value = |{ val }| )->end( ).
+    ele( 'warning' )->prop( name = 'text' value = |{ value }| )->end( ).
     result = me.
   ENDMETHOD.
 
   METHOD error.
-    ele( 'error' )->prop( name = 'text' value = |{ val }| )->end( ).
+    ele( 'error' )->prop( name = 'text' value = |{ value }| )->end( ).
     result = me.
   ENDMETHOD.
 
   METHOD toast.
-    ele( 'toast' )->prop( name = 'text' value = |{ val }| )->end( ).
+    ele( 'toast' )->prop( name = 'text' value = |{ value }| )->end( ).
     result = me.
   ENDMETHOD.
 
   METHOD progress.
-    DATA(lo_p) = ele( 'progress' )->prop( name = 'value' value = |{ val }| ).
+    DATA(lo_p) = ele( 'progress' )->prop( name = 'value' value = |{ value }| ).
     IF text IS SUPPLIED AND text IS NOT INITIAL.
       lo_p->prop( name = 'text' value = |{ text }| ).
     ENDIF.
@@ -1094,7 +1275,7 @@ CLASS zcl_abaplit_view_builder IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD spinner.
-    ele( 'spinner' )->prop( name = 'text' value = |{ val }| )->end( ).
+    ele( 'spinner' )->prop( name = 'text' value = |{ value }| )->end( ).
     result = me.
   ENDMETHOD.
 

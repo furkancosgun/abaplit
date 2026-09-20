@@ -74,7 +74,7 @@ CLASS zcl_abaplit_demo_005 IMPLEMENTATION.
     kpis->col( 3 )->metric( label = 'Availability' value = '100.0%' delta = 'All OK' ).
 
     tab1->subheader( 'Capacity Utilization' ).
-    tab1->progress( val = '51' text = 'Cluster Capacity: 51%' ).
+    tab1->progress( value = '51' text = 'Cluster Capacity: 51%' ).
 
     tab1->subheader( 'Node Telemetry (Internal Table MT_NODES)' ).
     tab1->table( client->bind( mt_nodes ) ).

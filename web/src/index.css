@@ -1019,6 +1019,104 @@ body {
   background-color: var(--background-color);
 }
 
+/* Form */
+.st-form {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.25rem 1.5rem;
+  background-color: var(--secondary-background);
+  margin-bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+/* Page Link */
+.st-page-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--primary-color);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.st-page-link:hover {
+  color: var(--primary-hover);
+  border-bottom-color: var(--primary-color);
+}
+
+/* Latex */
+.st-latex {
+  background-color: var(--secondary-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  font-family: var(--font-code);
+  font-size: 1.05rem;
+  color: var(--text-color);
+  overflow-x: auto;
+}
+
+/* HTML */
+.st-html {
+  margin-bottom: 1rem;
+  color: var(--text-color);
+  line-height: 1.6;
+}
+
+/* Empty */
+.st-empty {
+  min-height: 1px;
+  margin-bottom: 0.5rem;
+}
+
+/* Select Slider Value */
+.st-select-slider-value {
+  font-size: 0.85rem;
+  color: var(--text-color);
+  font-weight: 500;
+  text-align: center;
+  margin-top: 0.35rem;
+  padding: 0.25rem 0.5rem;
+  background-color: var(--secondary-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  display: inline-block;
+  align-self: center;
+}
+
+/* DateTime Input */
+.st-datetime-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.st-datetime-group .st-date-input,
+.st-datetime-group .st-time-input,
+.st-date-input,
+.st-time-input {
+  font-family: var(--font-family);
+  font-size: 0.875rem;
+  padding: 0.45rem 0.75rem;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.st-date-input:focus,
+.st-time-input:focus {
+  border-color: var(--primary-color);
+}
+
 /* Keyframes */
 @keyframes pulse {
   0%, 100% { opacity: 1; }

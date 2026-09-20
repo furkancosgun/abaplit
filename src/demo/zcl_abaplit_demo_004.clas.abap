@@ -63,8 +63,8 @@ CLASS zcl_abaplit_demo_004 IMPLEMENTATION.
     sb->metric( label = 'Conversation Length'
                 value = |{ lines( mt_chat_history ) } Messages|
                 delta = '+1' ).
-    sb->button( text  = 'Clear History'
-                event = 'CLEAR_CHAT' ).
+    sb->button( text     = 'Clear History'
+                on_click = 'CLEAR_CHAT' ).
 
     " Handle Clear History
     IF client->check_event( 'CLEAR_CHAT' ).
@@ -104,7 +104,7 @@ CLASS zcl_abaplit_demo_004 IMPLEMENTATION.
     ENDLOOP.
 
     st->chat_input( placeholder = 'Ask the ABAP assistant anything...'
-                    event       = 'CHAT_SEND' ).
+                    on_submit   = 'CHAT_SEND' ).
 
     st->divider( ).
     DATA(exp) = st->expander( 'Chat Session Table (Internal Table)' ).

@@ -1,16 +1,26 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Send } from 'lucide-react';
+import { resolveBinding } from '../../core/binding';
+import ErrorDisplay from '../common/ErrorDisplay';
 
-export default function ChatInput({ node, onEvent, isRunning }) {
-  const [inputVal, setInputVal] = useState('');
-  const { placeholder, event } = node;
+export default function ChatInput({ node, state, onValueChange, onEvent, isRunning }) {
+  const { placeholder, value, on_change, on_submit } = node;
+  const bound = value ? resolveBinding(value, state) : { isBound: false, error: null };
+
+  if (bound.error) {
+    return <ErrorDisplay error={bound.error} title="Binding Error (ChatInput)" />;
+  }
+
+  const curVal = bound.isBound ? (bound.value ?? '') : (value ?? '');
 
   const handleSend = () => {
-    if (!inputVal.trim()) return;
-    if (event) {
-      onEvent(event, { text: inputVal });
+    if (!String(curVal).trim()) return;
+    if (on_submit) {
+      onEvent(on_submit, String(curVal));
     }
-    setInputVal('');
+    if (bound.isBound) {
+      onValueChange(bound.key, '');
+    }
   };
 
   return (
@@ -18,9 +28,14 @@ export default function ChatInput({ node, onEvent, isRunning }) {
       <input
         type="text"
         className="st-chat-input"
-        value={inputVal}
+        value={curVal}
         placeholder={placeholder || 'Send a message...'}
-        onChange={(e) => setInputVal(e.target.value)}
+        onChange={(e) => {
+          if (bound.isBound) {
+            onValueChange(bound.key, e.target.value);
+          }
+          if (on_change) onEvent(on_change, e.target.value);
+        }}
         onKeyDown={(e) => {
           if (e.key === 'Enter') handleSend();
         }}
@@ -28,7 +43,7 @@ export default function ChatInput({ node, onEvent, isRunning }) {
       <button
         type="button"
         className="st-chat-send-btn"
-        disabled={!inputVal.trim() || isRunning}
+        disabled={!String(curVal).trim() || isRunning}
         onClick={handleSend}
         aria-label="Send message"
       >

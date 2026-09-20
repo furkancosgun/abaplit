@@ -3,7 +3,7 @@ import { resolveBinding } from '../../core/binding';
 import ErrorDisplay from '../common/ErrorDisplay';
 
 export default function Pills({ node, state, onValueChange, onEvent }) {
-  const { label, value, options, event } = node;
+  const { label, value, options, on_change, on_submit } = node;
   const bound = resolveBinding(value, state);
 
   if (bound.error) {
@@ -18,7 +18,8 @@ export default function Pills({ node, state, onValueChange, onEvent }) {
     if (bound.isBound) {
       onValueChange(bound.key, nextVal);
     }
-    if (event) onEvent(event);
+    if (on_change) onEvent(on_change);
+          if (on_submit) onEvent(on_submit);
   };
 
   return (

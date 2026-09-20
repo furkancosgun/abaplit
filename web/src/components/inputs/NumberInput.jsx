@@ -3,7 +3,7 @@ import { resolveBinding } from '../../core/binding';
 import ErrorDisplay from '../common/ErrorDisplay';
 
 export default function NumberInput({ node, state, onValueChange, onEvent }) {
-  const { label, value, min, max, step, event } = node;
+  const { label, value, min, max, step, on_change, on_submit } = node;
   const bound = resolveBinding(value, state);
 
   if (bound.error) {
@@ -24,12 +24,13 @@ export default function NumberInput({ node, state, onValueChange, onEvent }) {
         step={step || '1'}
         onChange={(e) => {
           if (bound.isBound) {
-            onValueChange(bound.key, Number(e.target.value));
+            onValueChange(bound.key, e.target.value);
           }
+          if (on_change) onEvent(on_change, e.target.value);
         }}
         onKeyDown={(e) => {
-          if (e.key === 'Enter' && event) {
-            onEvent(event);
+          if (e.key === 'Enter' && on_submit) {
+            onEvent(on_submit, e.target.value);
           }
         }}
       />
