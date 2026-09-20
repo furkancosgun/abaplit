@@ -51,6 +51,9 @@ INTERFACE zif_abaplit_client PUBLIC.
   METHODS set_title
     IMPORTING title TYPE clike.
 
+  METHODS rerun_after
+    IMPORTING interval_ms TYPE i DEFAULT 2000.
+
   METHODS get
     RETURNING VALUE(result) TYPE zif_abaplit_types=>ty_s_http_req.
 

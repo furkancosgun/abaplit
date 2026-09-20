@@ -75,6 +75,17 @@ CLASS lcl_action_mgr IMPLEMENTATION.
     add_action( n = 'FILE_DOWNLOAD'
                 p = ls_download ).
   ENDMETHOD.
+
+  METHOD rerun_after.
+    TYPES:
+      BEGIN OF ty_s_rerun,
+        interval TYPE i,
+      END OF ty_s_rerun.
+    DATA ls_rerun TYPE ty_s_rerun.
+    ls_rerun-interval = interval_ms.
+    add_action( n = 'RERUN'
+                p = ls_rerun ).
+  ENDMETHOD.
 ENDCLASS.
 
 

@@ -64,12 +64,22 @@ function handleFileDownload(payload) {
   }
 }
 
+function handleRerun(payload, handlers) {
+  if (!handlers.rerun) return;
+  const interval =
+    typeof payload === 'object' && payload !== null
+      ? parseInt(payload.interval || payload.INTERVAL, 10) || 2000
+      : parseInt(payload, 10) || 2000;
+  handlers.rerun(interval);
+}
+
 const ACTION_HANDLERS = {
   TOAST: handleToast,
   TITLE: handleTitle,
   CLIPBOARD_WRITE: handleClipboardWrite,
   OPEN_NEW_TAB: handleOpenNewTab,
   FILE_DOWNLOAD: handleFileDownload,
+  RERUN: handleRerun,
 };
 
 export function dispatchActions(actions, handlers = {}) {

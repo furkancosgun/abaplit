@@ -105,7 +105,10 @@ export default function App() {
           }
           const actionList = data.t_actions || data.T_ACTIONS;
           if (Array.isArray(actionList)) {
-            dispatchActions(actionList, { addToast });
+            dispatchActions(actionList, {
+              addToast,
+              rerun: (interval) => setTimeout(() => executeRun(), interval),
+            });
           }
         } else {
           console.error('abaplit execution error:', data.message);

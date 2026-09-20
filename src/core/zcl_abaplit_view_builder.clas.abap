@@ -232,6 +232,8 @@ CLASS zcl_abaplit_view_builder DEFINITION
       IMPORTING
         label         TYPE clike
         accept        TYPE clike OPTIONAL
+        value         TYPE clike OPTIONAL
+        file_name     TYPE clike OPTIONAL
         on_change     TYPE clike OPTIONAL
         on_submit     TYPE clike OPTIONAL
       RETURNING
@@ -369,6 +371,14 @@ CLASS zcl_abaplit_view_builder DEFINITION
     METHODS empty
       RETURNING
         VALUE(result) TYPE REF TO zcl_abaplit_view_builder.
+
+    METHODS autorefresh
+      IMPORTING
+        interval_ms    TYPE i DEFAULT 3000
+        max_iterations TYPE i OPTIONAL
+        event          TYPE clike OPTIONAL
+      RETURNING
+        VALUE(result)  TYPE REF TO zcl_abaplit_view_builder.
 
     METHODS html
       IMPORTING
@@ -903,6 +913,12 @@ CLASS zcl_abaplit_view_builder IMPLEMENTATION.
     IF accept IS SUPPLIED.
       lo_inp->prop( name = 'accept' value = |{ accept }| ).
     ENDIF.
+    IF value IS SUPPLIED.
+      lo_inp->prop( name = 'value' value = |{ value }| ).
+    ENDIF.
+    IF file_name IS SUPPLIED.
+      lo_inp->prop( name = 'file_name' value = |{ file_name }| ).
+    ENDIF.
     IF on_change IS SUPPLIED AND on_change IS NOT INITIAL.
       lo_inp->prop( name = 'on_change' value = |{ on_change }| ).
     ENDIF.
@@ -1134,6 +1150,18 @@ CLASS zcl_abaplit_view_builder IMPLEMENTATION.
 
   METHOD empty.
     ele( 'empty' )->end( ).
+    result = me.
+  ENDMETHOD.
+
+  METHOD autorefresh.
+    DATA(lo_ar) = ele( 'autorefresh' )->prop( name = 'interval' value = |{ interval_ms }| ).
+    IF max_iterations IS SUPPLIED.
+      lo_ar->prop( name = 'max_iterations' value = |{ max_iterations }| ).
+    ENDIF.
+    IF event IS SUPPLIED AND event IS NOT INITIAL.
+      lo_ar->prop( name = 'event' value = |{ event }| ).
+    ENDIF.
+    lo_ar->end( ).
     result = me.
   ENDMETHOD.
 

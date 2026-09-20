@@ -94,6 +94,10 @@ CLASS zcl_abaplit_client IMPLEMENTATION.
     mo_actions->set_title( title ).
   ENDMETHOD.
 
+  METHOD zif_abaplit_client~rerun_after.
+    mo_actions->rerun_after( interval_ms ).
+  ENDMETHOD.
+
   METHOD zif_abaplit_client~get.
     result = ms_req.
   ENDMETHOD.

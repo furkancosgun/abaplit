@@ -55,12 +55,14 @@ import SpinnerWidget from './feedback/SpinnerWidget';
 import ToastWidget from './feedback/ToastWidget';
 import ConfettiWidget from './feedback/ConfettiWidget';
 import ExceptionWidget from './feedback/ExceptionWidget';
+import AutorefreshWidget from './common/AutorefreshWidget';
 
 import { ImageWidget, AudioWidget, VideoWidget, DownloadButton } from './media/MediaWidgets';
 
 export { resolveBinding };
 
 const WIDGET_COMPONENTS = {
+  autorefresh: AutorefreshWidget,
   container: Container,
   columns: Columns,
   expander: Expander,

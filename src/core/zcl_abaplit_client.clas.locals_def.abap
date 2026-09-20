@@ -68,6 +68,9 @@ CLASS lcl_action_mgr DEFINITION FINAL.
                 base64   TYPE clike
                 type     TYPE clike OPTIONAL.
 
+    METHODS rerun_after
+      IMPORTING interval_ms TYPE i DEFAULT 2000.
+
   PRIVATE SECTION.
     DATA mt_actions TYPE zif_abaplit_types=>ty_t_action.
 ENDCLASS.
