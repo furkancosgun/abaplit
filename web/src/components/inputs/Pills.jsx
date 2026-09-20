@@ -18,14 +18,19 @@ export default function Pills({ node, state, onValueChange, onEvent }) {
     if (bound.isBound) {
       onValueChange(bound.key, nextVal);
     }
-    if (on_change) onEvent(on_change);
-          if (on_submit) onEvent(on_submit);
+    if (on_change) onEvent(on_change, nextVal);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && on_submit) {
+      onEvent(on_submit, String(currentValue ?? ''));
+    }
   };
 
   return (
     <div className="st-input-group">
       {label && <label className="st-label">{label}</label>}
-      <div className="st-pills-container">
+      <div className="st-pills-container" tabIndex={0} onKeyDown={handleKeyDown}>
         {optionList.map((opt, idx) => {
           const isSelected = currentValue === opt;
           return (

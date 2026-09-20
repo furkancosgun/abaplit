@@ -27,7 +27,7 @@ export default function TextArea({ node, state, onValueChange, onEvent }) {
           if (on_change) onEvent(on_change, e.target.value);
         }}
         onKeyDown={(e) => {
-          if (e.key === 'Enter' && (e.ctrlKey || e.metaKey) && on_submit) {
+          if (e.key === 'Enter' && on_submit) {
             onEvent(on_submit, e.target.value);
           }
         }}

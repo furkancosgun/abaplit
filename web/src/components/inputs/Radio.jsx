@@ -27,8 +27,12 @@ export default function Radio({ node, state, onValueChange, onEvent }) {
                 if (bound.isBound) {
                   onValueChange(bound.key, opt);
                 }
-                if (on_change) onEvent(on_change);
-          if (on_submit) onEvent(on_submit);
+                if (on_change) onEvent(on_change, opt);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && on_submit) {
+                  onEvent(on_submit, opt);
+                }
               }}
             />
             <span>{opt}</span>

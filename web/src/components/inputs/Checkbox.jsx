@@ -25,7 +25,11 @@ export default function Checkbox({ node, state, onValueChange, onEvent }) {
             onValueChange(bound.key, nextVal);
           }
           if (on_change) onEvent(on_change, nextStr);
-          if (on_submit) onEvent(on_submit, nextStr);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && on_submit) {
+            onEvent(on_submit, String(e.target.checked));
+          }
         }}
       />
       <span>{label}</span>

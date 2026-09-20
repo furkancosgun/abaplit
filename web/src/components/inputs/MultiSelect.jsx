@@ -38,8 +38,7 @@ export default function MultiSelect({ node, state, onValueChange, onEvent }) {
     if (bound.isBound) {
       onValueChange(bound.key, updated);
     }
-    if (on_change) onEvent(on_change);
-          if (on_submit) onEvent(on_submit);
+    if (on_change) onEvent(on_change, updated);
   };
 
   const handleRemove = (opt, e) => {
@@ -48,8 +47,13 @@ export default function MultiSelect({ node, state, onValueChange, onEvent }) {
     if (bound.isBound) {
       onValueChange(bound.key, updated);
     }
-    if (on_change) onEvent(on_change);
-          if (on_submit) onEvent(on_submit);
+    if (on_change) onEvent(on_change, updated);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && on_submit) {
+      onEvent(on_submit, selectedValues);
+    }
   };
 
   return (
@@ -58,6 +62,8 @@ export default function MultiSelect({ node, state, onValueChange, onEvent }) {
       <div
         className="st-multiselect-container"
         onClick={() => setDropdownOpen(!dropdownOpen)}
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
       >
         <div className="st-multiselect-tags">
           {selectedValues.map((val, idx) => (

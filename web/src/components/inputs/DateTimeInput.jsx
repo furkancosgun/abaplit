@@ -17,16 +17,21 @@ export default function DateTimeInput({ node, state, onValueChange, onEvent }) {
     else if (d) next = d;
     else if (t) next = t;
     onValueChange(bound.key, next);
-    if (on_change) onEvent(on_change);
-          if (on_submit) onEvent(on_submit);
+    if (on_change) onEvent(on_change, next);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && on_submit) {
+      onEvent(on_submit, String(currentValue));
+    }
   };
 
   return (
     <div className="st-input-group">
       {label && <label className="st-label">{label}</label>}
       <div style={{ display: 'flex', gap: '8px' }}>
-        <input type="date" className="st-date-input" value={datePart} onChange={(e) => emit(e.target.value, timePart)} />
-        <input type="time" className="st-time-input" value={timePart} onChange={(e) => emit(datePart, e.target.value)} />
+        <input type="date" className="st-date-input" value={datePart} onChange={(e) => emit(e.target.value, timePart)} onKeyDown={handleKeyDown} />
+        <input type="time" className="st-time-input" value={timePart} onChange={(e) => emit(datePart, e.target.value)} onKeyDown={handleKeyDown} />
       </div>
     </div>
   );

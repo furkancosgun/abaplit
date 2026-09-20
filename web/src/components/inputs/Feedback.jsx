@@ -20,16 +20,17 @@ export default function Feedback({ node, state, onValueChange, onEvent }) {
     if (bound.isBound) {
       onValueChange(bound.key, ratingStr);
     }
-    if (on_change) {
-      onEvent(on_change, ratingStr);
+    if (on_change) onEvent(on_change, ratingStr);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && on_submit) {
+      onEvent(on_submit, String(currentValue ?? ''));
     }
-          if (on_submit) {
-            onEvent(on_submit, ratingStr);
-          }
   };
 
   return (
-    <div className="st-input-group">
+    <div className="st-input-group" tabIndex={0} onKeyDown={handleKeyDown}>
       {label && <label className="st-label">{label}</label>}
       <div className="st-feedback-container">
         {mode === 'thumbs' ? (

@@ -24,8 +24,12 @@ export default function SelectSlider({ node, state, onValueChange, onEvent }) {
           const idx = parseInt(e.target.value, 10);
           const nextVal = optionList[idx] ?? '';
           if (bound.isBound) onValueChange(bound.key, nextVal);
-          if (on_change) onEvent(on_change);
-          if (on_submit) onEvent(on_submit);
+          if (on_change) onEvent(on_change, nextVal);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && on_submit) {
+            onEvent(on_submit, String(currentValue));
+          }
         }}
       />
       <div className="st-select-slider-value">{optionList[sliderIndex] ?? ''}</div>

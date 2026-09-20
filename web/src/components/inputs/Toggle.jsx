@@ -19,15 +19,16 @@ export default function Toggle({ node, state, onValueChange, onEvent }) {
           type="checkbox"
           checked={isChecked}
           onChange={(e) => {
+            const nextStr = String(e.target.checked);
             if (bound.isBound) {
               onValueChange(bound.key, e.target.checked);
             }
-            if (on_change) {
-              onEvent(on_change);
+            if (on_change) onEvent(on_change, nextStr);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && on_submit) {
+              onEvent(on_submit, String(e.target.checked));
             }
-          if (on_submit) {
-            onEvent(on_submit);
-          }
           }}
         />
         <span className="st-toggle-slider"></span>

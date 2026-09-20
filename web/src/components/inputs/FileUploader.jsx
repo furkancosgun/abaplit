@@ -20,9 +20,14 @@ export default function FileUploader({ node, onEvent }) {
           className="st-file-input"
           onChange={(e) => {
             if (e.target.files && e.target.files[0]) {
-              setFileName(e.target.files[0].name);
-              if (on_change) onEvent(on_change);
-          if (on_submit) onEvent(on_submit);
+              const name = e.target.files[0].name;
+              setFileName(name);
+              if (on_change) onEvent(on_change, name);
+            }
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && on_submit) {
+              onEvent(on_submit, fileName);
             }
           }}
         />
