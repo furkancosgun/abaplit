@@ -118,7 +118,7 @@ CLASS zcl_abaplit_demo_007 IMPLEMENTATION.
       client->toast_display( 'Copied to clipboard!' ).
     ENDIF.
     IF client->check_event( 'EV_NEW_TAB' ).
-      client->open_new_tab( 'https://github.com/abaplit/abaplit' ).
+      client->open_new_tab( 'https://github.com/furkancosgun/abaplit' ).
     ENDIF.
 
     DATA(st) = client->new_view( ).
@@ -208,7 +208,7 @@ CLASS zcl_abaplit_demo_007 IMPLEMENTATION.
     act_cols->col( 1 )->button( text = 'Trigger Toast (ABAP)' on_click = client->event( 'EV_TOAST' ) type = 'primary' ).
     act_cols->col( 2 )->button( text = 'Copy Token' on_click = client->event( 'EV_COPY' ) ).
     act_cols->col( 3 )->button( text = 'Open GitHub' on_click = client->event( 'EV_NEW_TAB' ) ).
-    t1->link_button( label = 'External Docs' url = 'https://github.com/abaplit/abaplit' ).
+    t1->link_button( label = 'External Docs' url = 'https://github.com/furkancosgun/abaplit' ).
     t1->divider( ).
     t1->write( |Current state preview: text="{ mv_text }" number={ mv_number } slider={ mv_slider } color={ mv_color } date={ mv_date } pills={ mv_pills }| ).
 
@@ -324,7 +324,7 @@ CLASS zcl_abaplit_demo_007 IMPLEMENTATION.
     t4->subheader( 'Download & Page Navigation' ).
     t4->download_button( label = 'Download CSV (employees)' data = 'id,name,department' file_name = 'employees.csv' mime = 'text/csv' ).
     t4->page_link( label = 'Page Link: Back to Hub' page = '?app=zcl_abaplit_demo_000' ).
-    t4->link_button( label = 'Open abaplit Docs' url = 'https://github.com/abaplit/abaplit' ).
+    t4->link_button( label = 'Open abaplit Docs' url = 'https://github.com/furkancosgun/abaplit' ).
 
     st->divider( ).
     st->caption( 'Demo 007 generated: covers web/src/components/**/*, web/src/components/inputs/*, data/*, layout/*, chat/*, media/*, feedback/*, charts/*' ).
