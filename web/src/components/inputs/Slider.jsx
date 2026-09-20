@@ -1,46 +1,38 @@
 import React from 'react';
-import { resolveBinding } from '../../core/binding';
-import ErrorDisplay from '../common/ErrorDisplay';
+import { useBoundInput } from '../../hooks/useBoundInput';
 
 export default function Slider({ node, state, onValueChange, onEvent }) {
-  const { label, value, min, max, step, on_change, on_submit } = node;
-  const bound = resolveBinding(value, state);
+  const { value, label, handleChange, handleKeyDown, getProp } = useBoundInput(node, state, {
+    onValueChange,
+    onEvent,
+    defaultValue: '0',
+  });
 
-  if (bound.error) {
-    return <ErrorDisplay error={bound.error} title="Binding Error (Slider)" />;
-  }
+  const minVal = getProp('min', '0');
+  const maxVal = getProp('max', '100');
+  const stepVal = getProp('step', '1');
 
-  const curVal = bound.isBound ? (bound.value ?? min ?? '0') : (value ?? min ?? '0');
-  const minNum = parseFloat(min ?? '0') || 0;
-  const maxNum = parseFloat(max ?? '100') || 100;
-  const curNum = parseFloat(curVal) || 0;
-  const pct = Math.max(0, Math.min(100, ((curNum - minNum) / (maxNum - minNum || 1)) * 100));
+  const minNum = parseFloat(minVal) || 0;
+  const maxNum = parseFloat(maxVal) || 100;
+  const curNum = parseFloat(value) || 0;
+  const percent = Math.max(0, Math.min(100, ((curNum - minNum) / (maxNum - minNum || 1)) * 100));
 
   return (
     <div className="st-input-group">
       <div className="st-slider-header">
         {label && <label className="st-label">{label}</label>}
-        <span className="st-slider-val">{curVal}</span>
+        <span className="st-slider-val">{value}</span>
       </div>
       <input
         type="range"
         className="st-slider"
-        min={min || '0'}
-        max={max || '100'}
-        step={step || '1'}
-        value={curVal}
-        style={{ '--value-percent': `${pct}%` }}
-        onChange={(e) => {
-          if (bound.isBound) {
-            onValueChange(bound.key, e.target.value);
-          }
-          if (on_change) onEvent(on_change, e.target.value);
-        }}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' && on_submit) {
-            onEvent(on_submit, e.target.value);
-          }
-        }}
+        min={minVal}
+        max={maxVal}
+        step={stepVal}
+        value={value}
+        style={{ '--value-percent': `${percent}%` }}
+        onChange={(e) => handleChange(e.target.value)}
+        onKeyDown={handleKeyDown}
       />
     </div>
   );

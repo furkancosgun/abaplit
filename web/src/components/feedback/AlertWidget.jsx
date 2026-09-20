@@ -1,40 +1,23 @@
 import React from 'react';
 import { CheckCircle2, Info, AlertTriangle, AlertCircle } from 'lucide-react';
+import { getBoundValue } from '../../core/binding';
 
-export default function AlertWidget({ type, text }) {
-  const renderAlertContent = () => {
-    switch (type) {
-      case 'success':
-        return (
-          <div className="st-alert success">
-            <CheckCircle2 size={18} color="#09ab3b" />
-            <span>{text}</span>
-          </div>
-        );
-      case 'info':
-        return (
-          <div className="st-alert info">
-            <Info size={18} color="#1e88e5" />
-            <span>{text}</span>
-          </div>
-        );
-      case 'warning':
-        return (
-          <div className="st-alert warning">
-            <AlertTriangle size={18} color="#ffaa00" />
-            <span>{text}</span>
-          </div>
-        );
-      case 'error':
-      default:
-        return (
-          <div className="st-alert error">
-            <AlertCircle size={18} color="#ff2b2b" />
-            <span>{text}</span>
-          </div>
-        );
-    }
-  };
+const ALERT_CONFIG = {
+  success: { icon: CheckCircle2, color: '#09ab3b', className: 'success' },
+  info: { icon: Info, color: '#1e88e5', className: 'info' },
+  warning: { icon: AlertTriangle, color: '#ffaa00', className: 'warning' },
+  error: { icon: AlertCircle, color: '#ff2b2b', className: 'error' },
+};
 
-  return renderAlertContent();
+export default function AlertWidget({ type, text, state }) {
+  const boundText = state ? getBoundValue(text, state) : text;
+  const config = ALERT_CONFIG[type] || ALERT_CONFIG.error;
+  const IconComponent = config.icon;
+
+  return (
+    <div className={`st-alert ${config.className}`}>
+      <IconComponent size={18} color={config.color} />
+      <span>{boundText}</span>
+    </div>
+  );
 }

@@ -1,17 +1,21 @@
 import React from 'react';
 import { Bot, User } from 'lucide-react';
+import { getBoundValue } from '../../core/binding';
 
-export default function ChatMessage({ node, renderChildren }) {
+export default function ChatMessage({ node, state, renderChildren }) {
   const { name, avatar, text, body } = node;
-  const isAssistant = name === 'assistant' || name === 'bot' || name === 'ai';
-  const isUser = name === 'user' || name === 'human';
+  const boundName = getBoundValue(name, state);
+  const boundAvatar = getBoundValue(avatar, state);
+  const boundText = getBoundValue(text ?? body, state);
+  const isAssistant = boundName === 'assistant' || boundName === 'bot' || boundName === 'ai';
+  const isUser = boundName === 'user' || boundName === 'human';
 
   const renderAvatar = () => {
-    if (avatar) {
-      if (avatar.startsWith('http') || avatar.startsWith('data:image')) {
-        return <img src={avatar} alt={name} className="st-chat-avatar-img" />;
+    if (boundAvatar) {
+      if (boundAvatar.startsWith('http') || boundAvatar.startsWith('data:image')) {
+        return <img src={boundAvatar} alt={boundName} className="st-chat-avatar-img" />;
       }
-      return <span className="st-chat-avatar-emoji">{avatar}</span>;
+      return <span className="st-chat-avatar-emoji">{boundAvatar}</span>;
     }
     if (isUser) {
       return <User size={18} />;
@@ -23,11 +27,11 @@ export default function ChatMessage({ node, renderChildren }) {
     <div className={`st-chat-message ${isAssistant ? 'assistant' : 'user'}`}>
       <div className="st-chat-avatar">{renderAvatar()}</div>
       <div className="st-chat-content">
-        <div className="st-chat-name">{name || (isAssistant ? 'Assistant' : 'User')}</div>
+        <div className="st-chat-name">{boundName || (isAssistant ? 'Assistant' : 'User')}</div>
         {node.children && node.children.length > 0 ? (
           renderChildren(node.children)
         ) : (
-          <p className="st-chat-text">{text || body}</p>
+          <p className="st-chat-text">{boundText || ''}</p>
         )}
       </div>
     </div>

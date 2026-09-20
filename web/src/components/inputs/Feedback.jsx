@@ -1,43 +1,34 @@
 import React, { useState } from 'react';
 import { ThumbsUp, ThumbsDown, Star } from 'lucide-react';
-import { resolveBinding } from '../../core/binding';
-import ErrorDisplay from '../common/ErrorDisplay';
+import FormField from '../common/FormField';
+import { useBoundInput } from '../../hooks/useBoundInput';
 
 export default function Feedback({ node, state, onValueChange, onEvent }) {
-  const { label, value, options, on_change, on_submit } = node;
-  const bound = resolveBinding(value, state);
+  const { value, label, handleChange, handleKeyDown, getProp } = useBoundInput(node, state, {
+    onValueChange,
+    onEvent,
+    defaultValue: '',
+  });
 
-  if (bound.error) {
-    return <ErrorDisplay error={bound.error} title="Binding Error (Feedback)" />;
-  }
-
-  const currentValue = bound.isBound ? bound.value : value;
-  const mode = options === 'thumbs' ? 'thumbs' : 'stars';
   const [hovered, setHovered] = useState(null);
+  const mode = getProp('options') === 'thumbs' ? 'thumbs' : 'stars';
 
   const handleClick = (ratingVal) => {
-    const ratingStr = String(ratingVal);
-    if (bound.isBound) {
-      onValueChange(bound.key, ratingStr);
-    }
-    if (on_change) onEvent(on_change, ratingStr);
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && on_submit) {
-      onEvent(on_submit, String(currentValue ?? ''));
-    }
+    handleChange(String(ratingVal));
   };
 
   return (
-    <div className="st-input-group" tabIndex={0} onKeyDown={handleKeyDown}>
-      {label && <label className="st-label">{label}</label>}
+    <FormField
+      label={label}
+      tabIndex={0}
+      onKeyDown={(e) => handleKeyDown(e, String(value ?? ''))}
+    >
       <div className="st-feedback-container">
         {mode === 'thumbs' ? (
           <div className="st-feedback-thumbs">
             <button
               type="button"
-              className={`st-feedback-btn ${currentValue === 'up' ? 'active' : ''}`}
+              className={`st-feedback-btn ${value === 'up' ? 'active' : ''}`}
               onClick={() => handleClick('up')}
               title="Thumbs Up"
             >
@@ -45,7 +36,7 @@ export default function Feedback({ node, state, onValueChange, onEvent }) {
             </button>
             <button
               type="button"
-              className={`st-feedback-btn ${currentValue === 'down' ? 'active' : ''}`}
+              className={`st-feedback-btn ${value === 'down' ? 'active' : ''}`}
               onClick={() => handleClick('down')}
               title="Thumbs Down"
             >
@@ -55,7 +46,7 @@ export default function Feedback({ node, state, onValueChange, onEvent }) {
         ) : (
           <div className="st-feedback-stars">
             {[1, 2, 3, 4, 5].map((starNum) => {
-              const activeLevel = hovered !== null ? hovered : (Number(currentValue) || 0);
+              const activeLevel = hovered !== null ? hovered : Number(value) || 0;
               const isFilled = starNum <= activeLevel;
               return (
                 <button
@@ -66,13 +57,17 @@ export default function Feedback({ node, state, onValueChange, onEvent }) {
                   onMouseLeave={() => setHovered(null)}
                   onClick={() => handleClick(starNum)}
                 >
-                  <Star size={20} fill={isFilled ? '#ffbb00' : 'none'} color={isFilled ? '#ffbb00' : 'var(--text-muted)'} />
+                  <Star
+                    size={20}
+                    fill={isFilled ? '#ffbb00' : 'none'}
+                    color={isFilled ? '#ffbb00' : 'var(--text-muted)'}
+                  />
                 </button>
               );
             })}
           </div>
         )}
       </div>
-    </div>
+    </FormField>
   );
 }

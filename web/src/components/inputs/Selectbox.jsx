@@ -1,35 +1,24 @@
 import React from 'react';
-import { resolveBinding } from '../../core/binding';
-import ErrorDisplay from '../common/ErrorDisplay';
+import FormField from '../common/FormField';
+import { useBoundInput } from '../../hooks/useBoundInput';
+import { parseOptions } from '../../core/utils';
 
 export default function Selectbox({ node, state, onValueChange, onEvent }) {
-  const { label, value, options, on_change, on_submit } = node;
-  const bound = resolveBinding(value, state);
+  const { value, label, handleChange, handleKeyDown } = useBoundInput(node, state, {
+    onValueChange,
+    onEvent,
+    defaultValue: '',
+  });
 
-  if (bound.error) {
-    return <ErrorDisplay error={bound.error} title="Binding Error (Selectbox)" />;
-  }
-
-  const currentValue = bound.isBound ? (bound.value ?? '') : (value ?? '');
-  const optionList = options ? options.split(',').map((o) => o.trim()) : [];
+  const optionList = parseOptions(node.options, state);
 
   return (
-    <div className="st-input-group">
-      {label && <label className="st-label">{label}</label>}
+    <FormField label={label}>
       <select
         className="st-select"
-        value={currentValue}
-        onChange={(e) => {
-          if (bound.isBound) {
-            onValueChange(bound.key, e.target.value);
-          }
-          if (on_change) onEvent(on_change, e.target.value);
-        }}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' && on_submit) {
-            onEvent(on_submit, e.target.value);
-          }
-        }}
+        value={value}
+        onChange={(e) => handleChange(e.target.value)}
+        onKeyDown={handleKeyDown}
       >
         {optionList.map((opt, i) => (
           <option key={i} value={opt}>
@@ -37,6 +26,6 @@ export default function Selectbox({ node, state, onValueChange, onEvent }) {
           </option>
         ))}
       </select>
-    </div>
+    </FormField>
   );
 }

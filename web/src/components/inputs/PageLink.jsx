@@ -1,18 +1,24 @@
 import React from 'react';
+import { getBoundValue } from '../../core/binding';
+import { navigateToInternalUrl } from '../../core/utils';
 
-export default function PageLink({ node }) {
+export default function PageLink({ node, state }) {
   const { label, page, url } = node;
-  const href = page || url || '#';
+  const boundPage = getBoundValue(page, state);
+  const boundUrl = getBoundValue(url, state);
+  const boundLabel = getBoundValue(label, state);
+  const href = boundPage || boundUrl || '#';
+
   const handleClick = (e) => {
-    if (page && page.startsWith('?')) {
+    if (boundPage && boundPage.startsWith('?')) {
       e.preventDefault();
-      window.history.pushState(null, '', page);
-      window.dispatchEvent(new PopStateEvent('popstate'));
+      navigateToInternalUrl(boundPage);
     }
   };
+
   return (
     <a className="st-page-link" href={href} onClick={handleClick}>
-      {label || href}
+      {boundLabel || href}
     </a>
   );
 }

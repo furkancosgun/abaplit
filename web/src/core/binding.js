@@ -1,5 +1,21 @@
 import { BindingError } from './errors.js';
 
+export function getBoundValue(val, state) {
+  if (val === undefined || val === null || typeof val !== 'string') return val;
+  const res = resolveBinding(val, state);
+  if (res.error) return val;
+  if (res.isBound) return res.value;
+  return val;
+}
+
+export function safeResolveBinding(val, state) {
+  const res = resolveBinding(val, state);
+  if (res.error) {
+    return { isBound: false, key: null, value: val, error: null, rawError: res.error };
+  }
+  return res;
+}
+
 export function isBindingExpression(val) {
   if (typeof val !== 'string') return false;
   const trimmed = val.trim();
@@ -92,9 +108,12 @@ export function setBindingValue(state, path, newValue) {
     const keyToUse = existingKey || seg;
     const nextSource = existingKey ? currentSource[existingKey] : undefined;
 
-    const nextTarget = nextSource && typeof nextSource === 'object'
-      ? (Array.isArray(nextSource) ? [...nextSource] : { ...nextSource })
-      : {};
+    const nextTarget =
+      nextSource && typeof nextSource === 'object'
+        ? Array.isArray(nextSource)
+          ? [...nextSource]
+          : { ...nextSource }
+        : {};
 
     currentTarget[keyToUse] = nextTarget;
     currentTarget = nextTarget;

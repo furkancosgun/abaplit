@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
+import { getBoundValue } from '../../core/binding';
 
-export default function Dialog({ node, renderChildren }) {
+export default function Dialog({ node, state, renderChildren }) {
   const [isOpen, setIsOpen] = useState(true);
   const { title } = node;
+  const boundTitle = getBoundValue(title, state);
 
   if (!isOpen) {
     return (
@@ -13,7 +15,7 @@ export default function Dialog({ node, renderChildren }) {
         style={{ marginBottom: '1rem' }}
         onClick={() => setIsOpen(true)}
       >
-        Open Dialog: {title || 'Details'}
+        Open Dialog: {boundTitle || 'Details'}
       </button>
     );
   }
@@ -22,7 +24,7 @@ export default function Dialog({ node, renderChildren }) {
     <div className="st-dialog-overlay" onClick={() => setIsOpen(false)}>
       <div className="st-dialog-box" onClick={(e) => e.stopPropagation()}>
         <div className="st-dialog-header">
-          <h3>{title || 'Dialog'}</h3>
+          <h3>{boundTitle || 'Dialog'}</h3>
           <button
             type="button"
             className="st-dialog-close"

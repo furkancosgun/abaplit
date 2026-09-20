@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
+import { parseOptions } from '../../core/utils';
 
-export default function Tabs({ node, renderChildren }) {
+export default function Tabs({ node, state, renderChildren }) {
   const [activeTab, setActiveTab] = useState(0);
   const tabNodes = node.children || [];
-
-  const tabTitles = node.titles
-    ? node.titles.split(',').map((t) => t.trim())
-    : tabNodes.map((_, i) => `Tab ${i + 1}`);
+  const parsedTitles = parseOptions(node.titles, state);
+  const tabTitles = parsedTitles.length > 0 ? parsedTitles : tabNodes.map((_, i) => `Tab ${i + 1}`);
 
   return (
     <div className="st-tabs-container">

@@ -1,8 +1,11 @@
 import React from 'react';
+import { getBoundValue } from '../../core/binding';
 
-export default function BadgeWidget({ node }) {
+export default function BadgeWidget({ node, state }) {
   const { text, color } = node;
-  const badgeColor = color || 'var(--primary-color)';
+  const boundText = getBoundValue(text, state);
+  const boundColor = getBoundValue(color, state);
+  const badgeColor = boundColor || 'var(--primary-color)';
 
   return (
     <span
@@ -13,7 +16,7 @@ export default function BadgeWidget({ node }) {
         borderColor: `color-mix(in srgb, ${badgeColor} 30%, transparent)`,
       }}
     >
-      {text}
+      {boundText !== undefined && boundText !== null ? String(boundText) : ''}
     </span>
   );
 }

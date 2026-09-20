@@ -1,10 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, X } from 'lucide-react';
+import { getBoundValue } from '../../core/binding';
 
-export default function Popover({ node, renderChildren }) {
+export default function Popover({ node, state, renderChildren }) {
   const [isOpen, setIsOpen] = useState(false);
   const popoverRef = useRef(null);
-  const label = node.label || 'Options';
+  const rawLabel = node.label || 'Options';
+  const label = getBoundValue(rawLabel, state);
 
   useEffect(() => {
     function handleClickOutside(event) {

@@ -1,24 +1,21 @@
 import React from 'react';
-import { resolveBinding } from '../../core/binding';
 import { DataFormatError } from '../../core/errors';
+import { resolveDataset } from '../../core/utils';
 import ErrorDisplay from '../common/ErrorDisplay';
 
 export default function TableWidget({ node, state }) {
-  const { data } = node;
-  const bound = resolveBinding(data, state);
+  const { data: rawData, bindingPath, isErrorFallback } = resolveDataset(node.data, state);
 
-  if (bound.error) {
-    return <ErrorDisplay error={bound.error} title="Binding Error (Table)" />;
+  if (isErrorFallback) {
+    return <p className="st-text">{String(rawData)}</p>;
   }
-
-  const rawData = bound.isBound ? bound.value : data;
 
   if (!Array.isArray(rawData)) {
     const error = new DataFormatError({
       widget: 'table',
       expected: 'an array of objects (ABAP internal table)',
       received: typeof rawData,
-      bindingPath: bound.key,
+      bindingPath,
     });
     return <ErrorDisplay error={error} title="Data Format Error (Table)" />;
   }
@@ -28,27 +25,26 @@ export default function TableWidget({ node, state }) {
   }
 
   const firstRow = rawData[0];
-  const headers = typeof firstRow === 'object' && firstRow !== null
-    ? Object.keys(firstRow)
-    : ['Value'];
+  const headers =
+    typeof firstRow === 'object' && firstRow !== null ? Object.keys(firstRow) : ['Value'];
 
   return (
     <div className="st-table-wrapper">
       <table className="st-table">
         <thead>
           <tr>
-            {headers.map((h, i) => (
-              <th key={i}>{h}</th>
+            {headers.map((header, i) => (
+              <th key={i}>{header}</th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {rawData.map((row, rIdx) => (
-            <tr key={rIdx}>
-              {headers.map((h, cIdx) => {
-                const cellVal = typeof row === 'object' && row !== null ? row[h] : row;
+          {rawData.map((row, rowIndex) => (
+            <tr key={rowIndex}>
+              {headers.map((header, colIndex) => {
+                const cellVal = typeof row === 'object' && row !== null ? row[header] : row;
                 return (
-                  <td key={cIdx}>
+                  <td key={colIndex}>
                     {cellVal !== undefined && cellVal !== null ? String(cellVal) : ''}
                   </td>
                 );

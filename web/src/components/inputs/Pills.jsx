@@ -1,38 +1,31 @@
 import React from 'react';
-import { resolveBinding } from '../../core/binding';
-import ErrorDisplay from '../common/ErrorDisplay';
+import FormField from '../common/FormField';
+import { useBoundInput } from '../../hooks/useBoundInput';
+import { parseOptions } from '../../core/utils';
 
 export default function Pills({ node, state, onValueChange, onEvent }) {
-  const { label, value, options, on_change, on_submit } = node;
-  const bound = resolveBinding(value, state);
+  const { value, label, handleChange, handleKeyDown } = useBoundInput(node, state, {
+    onValueChange,
+    onEvent,
+    defaultValue: '',
+  });
 
-  if (bound.error) {
-    return <ErrorDisplay error={bound.error} title="Binding Error (Pills)" />;
-  }
-
-  const currentValue = bound.isBound ? bound.value : value;
-  const optionList = options ? options.split(',').map((o) => o.trim()) : [];
+  const optionList = parseOptions(node.options, state);
 
   const handlePillClick = (opt) => {
-    const nextVal = currentValue === opt ? '' : opt;
-    if (bound.isBound) {
-      onValueChange(bound.key, nextVal);
-    }
-    if (on_change) onEvent(on_change, nextVal);
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && on_submit) {
-      onEvent(on_submit, String(currentValue ?? ''));
-    }
+    const nextVal = value === opt ? '' : opt;
+    handleChange(nextVal);
   };
 
   return (
-    <div className="st-input-group">
-      {label && <label className="st-label">{label}</label>}
-      <div className="st-pills-container" tabIndex={0} onKeyDown={handleKeyDown}>
+    <FormField label={label}>
+      <div
+        className="st-pills-container"
+        tabIndex={0}
+        onKeyDown={(e) => handleKeyDown(e, String(value ?? ''))}
+      >
         {optionList.map((opt, idx) => {
-          const isSelected = currentValue === opt;
+          const isSelected = value === opt;
           return (
             <button
               key={idx}
@@ -45,6 +38,6 @@ export default function Pills({ node, state, onValueChange, onEvent }) {
           );
         })}
       </div>
-    </div>
+    </FormField>
   );
 }

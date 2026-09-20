@@ -1,37 +1,26 @@
 import React from 'react';
-import { resolveBinding } from '../../core/binding';
-import ErrorDisplay from '../common/ErrorDisplay';
+import FormField from '../common/FormField';
+import { useBoundInput } from '../../hooks/useBoundInput';
 
 export default function TextArea({ node, state, onValueChange, onEvent }) {
-  const { label, value, placeholder, height, on_change, on_submit } = node;
-  const bound = resolveBinding(value, state);
+  const { value, label, handleChange, handleKeyDown, getProp } = useBoundInput(node, state, {
+    onValueChange,
+    onEvent,
+    defaultValue: '',
+  });
 
-  if (bound.error) {
-    return <ErrorDisplay error={bound.error} title="Binding Error (TextArea)" />;
-  }
-
-  const currentValue = bound.isBound ? (bound.value ?? '') : (value ?? '');
+  const rowCount = parseInt(getProp('height', 4), 10) || 4;
 
   return (
-    <div className="st-input-group">
-      {label && <label className="st-label">{label}</label>}
+    <FormField label={label}>
       <textarea
         className="st-text-area"
-        rows={parseInt(height, 10) || 4}
-        value={currentValue}
-        placeholder={placeholder || ''}
-        onChange={(e) => {
-          if (bound.isBound) {
-            onValueChange(bound.key, e.target.value);
-          }
-          if (on_change) onEvent(on_change, e.target.value);
-        }}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' && on_submit) {
-            onEvent(on_submit, e.target.value);
-          }
-        }}
+        rows={rowCount}
+        value={value}
+        placeholder={getProp('placeholder', '')}
+        onChange={(e) => handleChange(e.target.value)}
+        onKeyDown={handleKeyDown}
       />
-    </div>
+    </FormField>
   );
 }

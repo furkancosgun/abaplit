@@ -1,39 +1,33 @@
 import React, { useState } from 'react';
 import { Loader2, CheckCircle2, AlertCircle, ChevronDown, ChevronRight } from 'lucide-react';
+import { getBoundValue } from '../../core/binding';
 
-export default function StatusContainer({ node, renderChildren }) {
+const STATUS_CONFIG = {
+  running: { icon: Loader2, className: 'st-spinner-icon' },
+  error: { icon: AlertCircle, color: '#ff2b2b' },
+  complete: { icon: CheckCircle2, color: '#09ab3b' },
+};
+
+export default function StatusContainer({ node, state, renderChildren }) {
   const [isOpen, setIsOpen] = useState(false);
-  const statusState = node.state || 'complete';
-  const label = node.label || 'Status';
+  const statusState = getBoundValue(node.state, state) || 'complete';
+  const label = getBoundValue(node.label, state) || 'Status';
 
-  const renderIcon = () => {
-    switch (statusState) {
-      case 'running':
-        return <Loader2 size={18} className="st-spinner-icon" />;
-      case 'error':
-        return <AlertCircle size={18} color="#ff2b2b" />;
-      case 'complete':
-      default:
-        return <CheckCircle2 size={18} color="#09ab3b" />;
-    }
-  };
+  const config = STATUS_CONFIG[statusState] || STATUS_CONFIG.complete;
+  const IconComponent = config.icon;
 
   return (
     <div className={`st-status-container ${statusState}`}>
       <div className="st-status-header" onClick={() => setIsOpen(!isOpen)}>
         <div className="st-status-info">
-          {renderIcon()}
+          <IconComponent size={18} color={config.color} className={config.className} />
           <span className="st-status-title">{label}</span>
         </div>
         <div className="st-status-toggle">
           {isOpen ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
         </div>
       </div>
-      {isOpen && (
-        <div className="st-status-body">
-          {renderChildren(node.children)}
-        </div>
-      )}
+      {isOpen && <div className="st-status-body">{renderChildren(node.children)}</div>}
     </div>
   );
 }

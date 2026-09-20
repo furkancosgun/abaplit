@@ -1,34 +1,24 @@
 import React, { useState } from 'react';
 import { Copy, Check } from 'lucide-react';
+import { getBoundValue } from '../../core/binding';
+import { copyToClipboard } from '../../core/utils';
 
-export default function CodeWidget({ node }) {
+export default function CodeWidget({ node, state }) {
   const [copied, setCopied] = useState(false);
-  const codeContent = node.code || node.text || node.body || '';
+  const rawCode = node.code || node.text || node.body || '';
+  const codeContent = getBoundValue(rawCode, state);
+  const boundLanguage = getBoundValue(node.language, state);
 
   const handleCopy = async () => {
-    try {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        await navigator.clipboard.writeText(codeContent);
-      } else {
-        const ta = document.createElement('textarea');
-        ta.value = codeContent;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-      }
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
+    await copyToClipboard(String(codeContent ?? ''));
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
     <div className="st-code-wrapper">
       <div className="st-code-header">
-        <span className="st-code-lang">{node.language || 'abap'}</span>
+        <span className="st-code-lang">{boundLanguage || 'abap'}</span>
         <button
           type="button"
           className="st-code-copy-btn"
@@ -40,7 +30,7 @@ export default function CodeWidget({ node }) {
         </button>
       </div>
       <pre className="st-code">
-        <code>{codeContent}</code>
+        <code>{String(codeContent ?? '')}</code>
       </pre>
     </div>
   );

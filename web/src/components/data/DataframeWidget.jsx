@@ -1,28 +1,25 @@
 import React, { useState, useMemo } from 'react';
 import { ArrowUpDown, Search } from 'lucide-react';
-import { resolveBinding } from '../../core/binding';
 import { DataFormatError } from '../../core/errors';
+import { resolveDataset } from '../../core/utils';
 import ErrorDisplay from '../common/ErrorDisplay';
 
 export default function DataframeWidget({ node, state }) {
-  const { data } = node;
-  const bound = resolveBinding(data, state);
+  const { data: rawData, bindingPath, isErrorFallback } = resolveDataset(node.data, state);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortColumn, setSortColumn] = useState(null);
   const [sortAsc, setSortAsc] = useState(true);
 
-  if (bound.error) {
-    return <ErrorDisplay error={bound.error} title="Binding Error (Dataframe)" />;
+  if (isErrorFallback) {
+    return <p className="st-text">{String(rawData)}</p>;
   }
-
-  const rawData = bound.isBound ? bound.value : data;
 
   if (!Array.isArray(rawData)) {
     const error = new DataFormatError({
       widget: 'dataframe',
       expected: 'an array of objects (ABAP internal table)',
       received: typeof rawData,
-      bindingPath: bound.key,
+      bindingPath,
     });
     return <ErrorDisplay error={error} title="Data Format Error (Dataframe)" />;
   }
@@ -37,12 +34,12 @@ export default function DataframeWidget({ node, state }) {
     let list = [...rawData];
 
     if (searchTerm.trim()) {
-      const q = searchTerm.toLowerCase();
+      const query = searchTerm.toLowerCase();
       list = list.filter((row) => {
         if (typeof row !== 'object' || row === null) {
-          return String(row).toLowerCase().includes(q);
+          return String(row).toLowerCase().includes(query);
         }
-        return Object.values(row).some((v) => String(v ?? '').toLowerCase().includes(q));
+        return Object.values(row).some((val) => String(val ?? '').toLowerCase().includes(query));
       });
     }
 
@@ -93,23 +90,23 @@ export default function DataframeWidget({ node, state }) {
         <table className="st-table st-dataframe-table">
           <thead>
             <tr>
-              {headers.map((h, i) => (
-                <th key={i} onClick={() => handleSort(h)} className="st-sortable-th">
+              {headers.map((header, i) => (
+                <th key={i} onClick={() => handleSort(header)} className="st-sortable-th">
                   <div className="st-th-content">
-                    <span>{h}</span>
-                    <ArrowUpDown size={12} className={sortColumn === h ? 'active' : ''} />
+                    <span>{header}</span>
+                    <ArrowUpDown size={12} className={sortColumn === header ? 'active' : ''} />
                   </div>
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {filteredData.map((row, rIdx) => (
-              <tr key={rIdx}>
-                {headers.map((h, cIdx) => {
-                  const cellVal = typeof row === 'object' && row !== null ? row[h] : row;
+            {filteredData.map((row, rowIndex) => (
+              <tr key={rowIndex}>
+                {headers.map((header, colIndex) => {
+                  const cellVal = typeof row === 'object' && row !== null ? row[header] : row;
                   return (
-                    <td key={cIdx}>
+                    <td key={colIndex}>
                       {cellVal !== undefined && cellVal !== null ? String(cellVal) : ''}
                     </td>
                   );

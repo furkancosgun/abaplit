@@ -1,11 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { X, ChevronDown } from 'lucide-react';
-import { resolveBinding } from '../../core/binding';
-import ErrorDisplay from '../common/ErrorDisplay';
+import FormField from '../common/FormField';
+import { useBoundInput } from '../../hooks/useBoundInput';
+import { parseOptions } from '../../core/utils';
 
 export default function MultiSelect({ node, state, onValueChange, onEvent }) {
-  const { label, value, options, on_change, on_submit } = node;
-  const bound = resolveBinding(value, state);
+  const { value, label, handleChange, handleKeyDown } = useBoundInput(node, state, {
+    onValueChange,
+    onEvent,
+    defaultValue: [],
+  });
+
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const containerRef = useRef(null);
 
@@ -21,49 +26,31 @@ export default function MultiSelect({ node, state, onValueChange, onEvent }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [dropdownOpen]);
 
-  if (bound.error) {
-    return <ErrorDisplay error={bound.error} title="Binding Error (MultiSelect)" />;
-  }
+  const selectedValues = Array.isArray(value)
+    ? value
+    : typeof value === 'string' && value
+    ? value.split(',').map((v) => v.trim())
+    : [];
 
-  const rawValue = bound.isBound ? bound.value : value;
-  const selectedValues = Array.isArray(rawValue)
-    ? rawValue
-    : (typeof rawValue === 'string' && rawValue ? rawValue.split(',').map((v) => v.trim()) : []);
-
-  const optionList = options ? options.split(',').map((o) => o.trim()) : [];
+  const optionList = parseOptions(node.options, state);
   const availableOptions = optionList.filter((opt) => !selectedValues.includes(opt));
 
   const handleSelect = (opt) => {
-    const updated = [...selectedValues, opt];
-    if (bound.isBound) {
-      onValueChange(bound.key, updated);
-    }
-    if (on_change) onEvent(on_change, updated);
+    handleChange([...selectedValues, opt]);
   };
 
   const handleRemove = (opt, e) => {
     e.stopPropagation();
-    const updated = selectedValues.filter((v) => v !== opt);
-    if (bound.isBound) {
-      onValueChange(bound.key, updated);
-    }
-    if (on_change) onEvent(on_change, updated);
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && on_submit) {
-      onEvent(on_submit, selectedValues);
-    }
+    handleChange(selectedValues.filter((v) => v !== opt));
   };
 
   return (
-    <div className="st-input-group" ref={containerRef}>
-      {label && <label className="st-label">{label}</label>}
+    <FormField label={label} containerRef={containerRef}>
       <div
         className="st-multiselect-container"
         onClick={() => setDropdownOpen(!dropdownOpen)}
         tabIndex={0}
-        onKeyDown={handleKeyDown}
+        onKeyDown={(e) => handleKeyDown(e, selectedValues)}
       >
         <div className="st-multiselect-tags">
           {selectedValues.map((val, idx) => (
@@ -101,6 +88,6 @@ export default function MultiSelect({ node, state, onValueChange, onEvent }) {
           ))}
         </div>
       )}
-    </div>
+    </FormField>
   );
 }

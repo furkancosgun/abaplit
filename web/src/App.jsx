@@ -1,10 +1,21 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import WidgetRenderer from './components/WidgetRenderer';
 import ToastContainer from './components/common/ToastContainer';
 import { setBindingValue } from './core/binding';
 import { dispatchActions } from './core/actions';
+
+function parseJsonOrPass(value) {
+  if (typeof value === 'string') {
+    try {
+      return JSON.parse(value);
+    } catch {
+      return value;
+    }
+  }
+  return value;
+}
 
 export default function App() {
   const [appName, setAppName] = useState(() => {
@@ -13,7 +24,7 @@ export default function App() {
   });
 
   const [state, setState] = useState({});
-  const stateRef = React.useRef(state);
+  const stateRef = useRef(state);
 
   useEffect(() => {
     stateRef.current = state;
@@ -21,24 +32,19 @@ export default function App() {
 
   const [viewTree, setViewTree] = useState(null);
   const [isRunning, setIsRunning] = useState(false);
-  const [isDark, setIsDark] = useState(() => {
-    return localStorage.getItem('abaplit_theme') === 'dark';
-  });
+  const [isDark, setIsDark] = useState(() => localStorage.getItem('abaplit_theme') === 'dark');
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [toasts, setToasts] = useState([]);
 
-  // Sync with URL popstate
   useEffect(() => {
     const handleLocationChange = () => {
       const params = new URLSearchParams(window.location.search);
-      const curApp = params.get('app') || 'zcl_abaplit_demo_000';
-      setAppName(curApp);
+      setAppName(params.get('app') || 'zcl_abaplit_demo_000');
     };
     window.addEventListener('popstate', handleLocationChange);
     return () => window.removeEventListener('popstate', handleLocationChange);
   }, []);
 
-  // Sync theme
   useEffect(() => {
     if (isDark) {
       document.documentElement.setAttribute('data-theme', 'dark');
@@ -49,72 +55,74 @@ export default function App() {
     }
   }, [isDark]);
 
-  // Execute roundtrip
-  const executeRun = useCallback(async (event = '', customState = null, checkInit = false, eventArgs = []) => {
-    setIsRunning(true);
-    try {
-      const curState = customState !== null ? customState : stateRef.current;
-      const normalizedArgs = (() => {
-        if (eventArgs == null) return [];
-        if (Array.isArray(eventArgs)) return eventArgs.map((v) => (v == null ? '' : String(v)));
-        return [String(eventArgs)];
-      })();
+  const addToast = useCallback(({ text, duration = 3000 }) => {
+    const id = Date.now() + Math.random();
+    setToasts((prev) => [...prev, { id, text, duration }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, duration);
+  }, []);
 
-      const payload = {
-        app: appName,
-        event: event || '',
-        event_args: normalizedArgs,
-        check_init: checkInit,
-        state: typeof curState === 'string' ? curState : JSON.stringify(curState || {}),
-      };
+  const dismissToast = useCallback((id) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  }, []);
 
-      const endpoint = window.location.pathname || '/';
+  const executeRun = useCallback(
+    async (event = '', customState = null, checkInit = false, eventArgs = []) => {
+      setIsRunning(true);
+      try {
+        const curState = customState !== null ? customState : stateRef.current;
+        const normalizedArgs = Array.isArray(eventArgs)
+          ? eventArgs.map((v) => (v == null ? '' : String(v)))
+          : eventArgs != null
+          ? [String(eventArgs)]
+          : [];
 
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
+        const payload = {
+          app: appName,
+          event: event || '',
+          event_args: normalizedArgs,
+          check_init: checkInit,
+          state: typeof curState === 'string' ? curState : JSON.stringify(curState || {}),
+        };
 
-      const data = await res.json();
-      if (data.success) {
-        if (data.state) {
-          const parsedState = typeof data.state === 'string' ? JSON.parse(data.state) : data.state;
-          stateRef.current = parsedState;
-          setState(parsedState);
+        const endpoint = window.location.pathname || '/';
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          if (data.state) {
+            const parsedState = parseJsonOrPass(data.state);
+            stateRef.current = parsedState;
+            setState(parsedState);
+          }
+          if (data.view) {
+            setViewTree(parseJsonOrPass(data.view));
+          }
+          const actionList = data.t_actions || data.T_ACTIONS;
+          if (Array.isArray(actionList)) {
+            dispatchActions(actionList, { addToast });
+          }
+        } else {
+          console.error('abaplit execution error:', data.message);
         }
-        if (data.view) {
-          const parsedView = typeof data.view === 'string' ? JSON.parse(data.view) : data.view;
-          setViewTree(parsedView);
-        }
-        const actionList = data.t_actions || data.T_ACTIONS;
-        if (actionList && Array.isArray(actionList)) {
-          dispatchActions(actionList, {
-            addToast: ({ text, duration }) => {
-              const id = Date.now() + Math.random();
-              setToasts((prev) => [...prev, { id, text, duration }]);
-              setTimeout(() => {
-                setToasts((prev) => prev.filter((t) => t.id !== id));
-              }, duration || 3000);
-            },
-          });
-        }
-      } else {
-        console.error('abaplit execution error:', data.message);
+      } catch (err) {
+        console.error('Request failed:', err);
+      } finally {
+        setIsRunning(false);
       }
-    } catch (err) {
-      console.error('Request failed:', err);
-    } finally {
-      setIsRunning(false);
-    }
-  }, [appName]);
+    },
+    [appName, addToast]
+  );
 
-  // Initial load
   useEffect(() => {
     executeRun('', {}, true);
-  }, [appName]);
+  }, [appName, executeRun]);
 
-  // Keyboard shortcut 'R' for rerun
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.key === 'r' || e.key === 'R') && !['INPUT', 'TEXTAREA'].includes(e.target.tagName)) {
@@ -126,25 +134,33 @@ export default function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [executeRun]);
 
-  const handleValueChange = (path, val) => {
+  const handleValueChange = useCallback((path, val) => {
     const nextState = setBindingValue(stateRef.current, path, val);
     stateRef.current = nextState;
     setState(nextState);
-  };
+  }, []);
 
-  // Separate sidebar children from main content
-  let sidebarNodes = [];
-  let mainNodes = [];
+  const handleEvent = useCallback(
+    (evt, args) => {
+      executeRun(evt, null, false, args);
+    },
+    [executeRun]
+  );
 
-  if (viewTree && viewTree.children) {
-    for (const child of viewTree.children) {
-      if (child.type === 'sidebar') {
-        sidebarNodes = child.children || [];
-      } else {
-        mainNodes.push(child);
+  const { sidebarNodes, mainNodes } = useMemo(() => {
+    const side = [];
+    const main = [];
+    if (viewTree?.children) {
+      for (const child of viewTree.children) {
+        if (child.type === 'sidebar') {
+          side.push(...(child.children || []));
+        } else {
+          main.push(child);
+        }
       }
     }
-  }
+    return { sidebarNodes: side, mainNodes: main };
+  }, [viewTree]);
 
   const hasSidebar = sidebarNodes.length > 0;
 
@@ -154,18 +170,18 @@ export default function App() {
         isRunning={isRunning}
         onRerun={() => executeRun()}
         isDark={isDark}
-        onToggleTheme={() => setIsDark(!isDark)}
+        onToggleTheme={() => setIsDark((prev) => !prev)}
         appName={appName}
       />
 
       {hasSidebar && (
         <Sidebar
           isOpen={sidebarOpen}
-          onToggle={() => setSidebarOpen(!sidebarOpen)}
+          onToggle={() => setSidebarOpen((prev) => !prev)}
           nodes={sidebarNodes}
           state={state}
           onValueChange={handleValueChange}
-          onEvent={(evt, args) => executeRun(evt, null, false, args)}
+          onEvent={handleEvent}
           isRunning={isRunning}
         />
       )}
@@ -177,16 +193,13 @@ export default function App() {
             node={child}
             state={state}
             onValueChange={handleValueChange}
-            onEvent={(evt, args) => executeRun(evt, null, false, args)}
+            onEvent={handleEvent}
             isRunning={isRunning}
           />
         ))}
       </main>
 
-      <ToastContainer
-        toasts={toasts}
-        onDismiss={(id) => setToasts((prev) => prev.filter((t) => t.id !== id))}
-      />
+      <ToastContainer toasts={toasts} onDismiss={dismissToast} />
     </div>
   );
 }

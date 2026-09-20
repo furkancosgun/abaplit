@@ -1,25 +1,24 @@
 import React from 'react';
 import { Send } from 'lucide-react';
-import { resolveBinding } from '../../core/binding';
-import ErrorDisplay from '../common/ErrorDisplay';
+import { useBoundInput } from '../../hooks/useBoundInput';
 
 export default function ChatInput({ node, state, onValueChange, onEvent, isRunning }) {
-  const { placeholder, value, on_change, on_submit } = node;
-  const bound = value ? resolveBinding(value, state) : { isBound: false, error: null };
+  const { value, isBound, bindingKey, handleChange, getProp } = useBoundInput(node, state, {
+    onValueChange,
+    onEvent,
+    defaultValue: '',
+  });
 
-  if (bound.error) {
-    return <ErrorDisplay error={bound.error} title="Binding Error (ChatInput)" />;
-  }
-
-  const curVal = bound.isBound ? (bound.value ?? '') : (value ?? '');
+  const messageText = String(value ?? '');
+  const hasText = Boolean(messageText.trim());
 
   const handleSend = () => {
-    if (!String(curVal).trim()) return;
-    if (on_submit) {
-      onEvent(on_submit, String(curVal));
+    if (!hasText) return;
+    if (node.on_submit && onEvent) {
+      onEvent(node.on_submit, messageText);
     }
-    if (bound.isBound) {
-      onValueChange(bound.key, '');
+    if (isBound && onValueChange) {
+      onValueChange(bindingKey, '');
     }
   };
 
@@ -28,14 +27,9 @@ export default function ChatInput({ node, state, onValueChange, onEvent, isRunni
       <input
         type="text"
         className="st-chat-input"
-        value={curVal}
-        placeholder={placeholder || 'Send a message...'}
-        onChange={(e) => {
-          if (bound.isBound) {
-            onValueChange(bound.key, e.target.value);
-          }
-          if (on_change) onEvent(on_change, e.target.value);
-        }}
+        value={value}
+        placeholder={getProp('placeholder', 'Send a message...')}
+        onChange={(e) => handleChange(e.target.value)}
         onKeyDown={(e) => {
           if (e.key === 'Enter') handleSend();
         }}
@@ -43,7 +37,7 @@ export default function ChatInput({ node, state, onValueChange, onEvent, isRunni
       <button
         type="button"
         className="st-chat-send-btn"
-        disabled={!String(curVal).trim() || isRunning}
+        disabled={!hasText || isRunning}
         onClick={handleSend}
         aria-label="Send message"
       >

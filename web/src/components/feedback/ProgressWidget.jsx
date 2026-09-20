@@ -1,12 +1,15 @@
 import React from 'react';
+import { getBoundValue } from '../../core/binding';
 
-export default function ProgressWidget({ node }) {
+export default function ProgressWidget({ node, state }) {
   const { value, text } = node;
-  const pct = Math.max(0, Math.min(100, parseFloat(value) || 0));
+  const boundValue = getBoundValue(value, state);
+  const boundText = getBoundValue(text, state);
+  const pct = Math.max(0, Math.min(100, parseFloat(boundValue) || 0));
 
   return (
     <div className="st-progress-group">
-      {text && <span className="st-progress-text">{text}</span>}
+      {boundText && <span className="st-progress-text">{boundText}</span>}
       <div className="st-progress-track">
         <div className="st-progress-bar" style={{ width: `${pct}%` }} />
       </div>
