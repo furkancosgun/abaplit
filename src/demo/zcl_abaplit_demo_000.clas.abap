@@ -21,6 +21,7 @@ CLASS zcl_abaplit_demo_000 DEFINITION
     DATA mv_runtime       TYPE string VALUE 'ABAP Cloud / On-Premise'.
 
     METHODS constructor.
+    METHODS build_catalog.
 
 ENDCLASS.
 
@@ -28,6 +29,12 @@ ENDCLASS.
 CLASS zcl_abaplit_demo_000 IMPLEMENTATION.
 
   METHOD constructor.
+    build_catalog( ).
+  ENDMETHOD.
+
+  METHOD build_catalog.
+    REFRESH mt_demos.
+
     APPEND VALUE #(
         app_id      = 'zcl_abaplit_demo_001'
         title       = 'Charts & Analytics'
@@ -62,10 +69,32 @@ CLASS zcl_abaplit_demo_000 IMPLEMENTATION.
         category    = 'User Experience'
         description = 'Multi-tab container, modal dialogs, and collapsible diagnostics'
         status      = 'Ready' ) TO mt_demos.
+
+    APPEND VALUE #(
+        app_id      = 'zcl_abaplit_demo_006'
+        title       = 'Modern Widgets & Server Actions'
+        category    = 'Interactive'
+        description = 'Pills, segmented control, multiselect tags, popover, status, live dataframe, and backend actions'
+        status      = 'Ready' ) TO mt_demos.
+
+    APPEND VALUE #(
+        app_id      = 'zcl_abaplit_demo_007'
+        title       = 'Complete Widget Gallery'
+        category    = 'Showcase'
+        description = 'All 67 widgets across 4 tabbed categories: Inputs, Data & Charts, Layout & Feedback, Media & Chat'
+        status      = 'Ready' ) TO mt_demos.
+
+    mv_active_demos = lines( mt_demos ).
   ENDMETHOD.
 
   METHOD zif_abaplit_app~main.
     DATA(st) = client->new_view( ).
+
+    " Bound attributes are hydrated from the client session state even on
+    " initial render, so rebuild the catalog to drop stale entries
+    IF client->get( )-check_init = abap_true.
+      build_catalog( ).
+    ENDIF.
 
     " --- Sidebar Navigation ---
     DATA(sb) = st->sidebar( ).
@@ -86,6 +115,12 @@ CLASS zcl_abaplit_demo_000 IMPLEMENTATION.
 
     sb->link_button( label = '005: Tabs & Layouts'
                      url   = '?app=zcl_abaplit_demo_005' ).
+
+    sb->link_button( label = '006: Modern Widgets'
+                     url   = '?app=zcl_abaplit_demo_006' ).
+
+    sb->link_button( label = '007: Widget Gallery'
+                     url   = '?app=zcl_abaplit_demo_007' ).
 
     sb->divider( ).
     sb->metric( label = 'Version' value = mv_framework_ver ).

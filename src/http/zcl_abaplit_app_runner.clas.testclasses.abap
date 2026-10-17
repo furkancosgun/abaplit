@@ -52,10 +52,10 @@ CLASS ltcl_app_runner IMPLEMENTATION.
     cl_abap_unit_assert=>assert_true( ls_res-success ).
     cl_abap_unit_assert=>assert_equals( exp = 'LCL_TEST_APP'
                                         act = ls_res-app ).
-    cl_abap_unit_assert=>assert_true( contains( val = ls_res-view
-                                                sub = 'Test App 1' ) ).
-    cl_abap_unit_assert=>assert_true( contains( val = ls_res-state
-                                                sub = '"COUNT":1' ) ).
+    cl_abap_unit_assert=>assert_true( xsdbool( contains( val = ls_res-view
+                                                         sub = 'Test App 1' ) ) ).
+    cl_abap_unit_assert=>assert_true( xsdbool( contains( val = ls_res-state
+                                                         sub = '"COUNT":1' ) ) ).
   ENDMETHOD.
 
   METHOD test_event_roundtrip.
@@ -69,8 +69,8 @@ CLASS ltcl_app_runner IMPLEMENTATION.
     DATA(ls_res) = zcl_abaplit_app_runner=>run( ls_req ).
 
     cl_abap_unit_assert=>assert_true( ls_res-success ).
-    cl_abap_unit_assert=>assert_true( contains( val = ls_res-state
-                                                sub = '"COUNT":6' ) ).
+    cl_abap_unit_assert=>assert_true( xsdbool( contains( val = ls_res-state
+                                                         sub = '"COUNT":6' ) ) ).
     cl_abap_unit_assert=>assert_equals( exp = 1
                                         act = lines( ls_res-t_actions ) ).
 

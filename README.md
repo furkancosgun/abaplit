@@ -214,6 +214,26 @@ abaplit enforces strict automated quality gates across both ABAP and browser lay
 
 ---
 
+## 🏢 Installation on SAP NetWeaver / S/4HANA
+
+Run abaplit natively on any on-prem AS ABAP — no Node.js required:
+
+1. **Install with [abapGit](https://abapgit.org)**: pull this repository into a package (e.g. `ZABAPLIT`). All dependencies are included — the ajson JSON library is vendored under `src/vendor/`, and the React frontend is embedded in a single ABAP class (`zcl_abaplit_web_assets`).
+
+2. **The ICF service is created automatically.** During the pull, abapGit creates and activates the service node `/sap/bc/abaplit` (handler `zcl_abaplit_icf` → `zcl_abaplit_http_handler`). No manual SICF setup required.
+
+3. **Open the app** and log on with your SAP user:
+
+   ```
+   https://<host>:<port>/sap/bc/abaplit?app=zcl_abaplit_demo_000
+   ```
+
+   Swap in `zcl_abaplit_demo_001` … `zcl_abaplit_demo_007` for the other demos (`007` is the full 67-widget gallery).
+
+**SAP BTP / ABAP Cloud**: create a class implementing `IF_HTTP_SERVICE_EXTENSION` that delegates to `zcl_abaplit_http_handler=>factory_cloud( )` (adapter: `zcl_abaplit_http_cloud`), and expose it via a Service Binding / Communication Arrangement.
+
+---
+
 ## 🛠️ Development & Deployment
 
 ```bash
